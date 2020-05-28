@@ -1,5 +1,5 @@
-import {createStore} from 'redux';
-import reducers from '../reducers';
+import { createStore } from 'redux';
+import reducers from './reducers';
 
 const developTool = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__;
 

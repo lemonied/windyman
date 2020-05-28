@@ -5,6 +5,10 @@ interface Route {
 }
 
 export const routes: Route[] = [{
+  path: '/user',
+  exact: true,
+  component: () => import('./views/user')
+}, {
   path: '/',
   exact: true,
   component: () => import('./views/home')

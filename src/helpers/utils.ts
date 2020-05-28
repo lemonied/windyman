@@ -21,6 +21,7 @@ export function isEmpty(val: any): boolean {
   return false;
 }
 
+// return a new object.
 export function deepMerge(...args: any[]): any {
   const ret = Object.create(null);
   args.forEach(obj => {

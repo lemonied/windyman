@@ -1,4 +1,4 @@
-import {queryParse, queryString} from './query';
+import { queryParse, queryString } from './query';
 
 interface Url {
   path: string;

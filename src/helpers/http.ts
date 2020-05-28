@@ -1,6 +1,6 @@
 import Axios from 'axios';
-import {deepMerge} from './utils';
-import {Observable} from 'rxjs';
+import { deepMerge } from './utils';
+import { Observable } from 'rxjs';
 
 const baseUrl = '/';
 
