@@ -1,31 +1,37 @@
-import Axios from 'axios';
+import Axios, { AxiosRequestConfig, Canceler } from 'axios';
 import { deepMerge } from './utils';
 import { Observable } from 'rxjs';
+import { queryString } from './query';
 
 const baseUrl = '/';
 
 const defaultAxiosConf = {
   timeout: 15000,
   headers: {
-    'Content-Type': 'application/x-www-form-urlencoded'
+    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
   },
   baseURL: baseUrl
 };
 
-export function http(params: { [prop: string]: any } = {}): Observable<any> {
+export function http(params: AxiosRequestConfig): Observable<any> {
   return new Observable<any>(subscribe => {
-    const source = Axios.CancelToken.source();
-    Axios(deepMerge(defaultAxiosConf, params, {
-      cancelToken: source
-    })).then(res => {
-      subscribe.next(res);
+    let cancel: Canceler;
+    const config = deepMerge(defaultAxiosConf, params);
+    config.cancelToken = new Axios.CancelToken(c => {
+      cancel = c;
+    });
+    Axios(config).then(res => {
+      subscribe.next(res.data);
       subscribe.complete();
     }).catch(error => {
-      if (!Axios.isCancel(error)) {
-        subscribe.error(error);
+      subscribe.error(error);
+      subscribe.complete();
+    });
+    return {
+      unsubscribe() {
+        if (typeof cancel === 'function') { cancel('Cancel'); }
       }
-    })
-    return { unsubscribe() { source.cancel('Cancel'); } };
+    };
   });
 }
 
@@ -34,13 +40,13 @@ export function get(url: string, params: { [prop: string]: any }): Observable<an
 }
 
 export function post(url: string, data: { [prop: string]: any }): Observable<any> {
-  return http({ method: 'post', url, data });
+  return http({ method: 'post', url, data: queryString(data) });
 }
 
 export function upload(url: string, form: FormData, params?: { [prop: string]: string }, cb?: (percent: number) => any): Observable<any> {
   return http({
     method: 'post',
-    header: { 'Content-Type': 'multipart/form-data;' },
+    headers: { 'Content-Type': 'multipart/form-data;' },
     url,
     data: form,
     onUploadProgress(processEvent: any) {

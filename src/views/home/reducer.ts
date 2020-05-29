@@ -11,6 +11,8 @@ const homeState = (state = defaultState, action: any) => {
       return state.merge(action.value);
     case 'SET_RECOMMENDS':
       return state.set('recommends', action.value);
+    case 'UPDATE_RECOMMENDS':
+      return state.update('recommends', prevValue => prevValue.concat(action.value));
     default:
       return state;
   }

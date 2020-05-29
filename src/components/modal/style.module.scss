@@ -1,0 +1,55 @@
+@import "../../common/style/variable";
+@import "../../common/style/mixin";
+
+.modalWrapper{
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, .5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .modal{
+    width: 80%;
+    border-radius: 7px;
+    background: #333333;
+    overflow: hidden;
+    .modalHeader{
+      color: $color-text-d;
+      font-size: 16px;
+      padding: 15px 20px 0 20px;
+    }
+    .modalContent{
+      color: $color-text-l;
+      font-size: 14px;
+      line-height: 18px;
+      padding: 15px 20px 20px 20px;
+    }
+    .modalFooter{
+      @include border-top(#666666);
+      display: flex;
+      .button{
+        flex: 1;
+        text-align: center;
+        text-decoration: none;
+        outline: 0;
+        font-size: 16px;
+        padding: 10px 0;
+        display: block;
+        @include no-wrap;
+        background: transparent;
+        color: $color-text-d;
+        border: 0;
+        &:not(:last-child){
+          @include border-right(#666666);
+        }
+        &:active{
+          background: #555555;
+        }
+      }
+    }
+  }
+}

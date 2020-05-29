@@ -1,11 +1,18 @@
-import React, { PropsWithChildren, FC, useRef, useEffect, useState } from 'react';
+import React, { PropsWithChildren, FC, useRef, useEffect, useState, CSSProperties } from 'react';
 import BScroll, { Position } from 'better-scroll';
 import styles from './style.module.scss';
 import { Loading } from '../loading';
 
-interface Instance {
+interface BScroller extends BScroll{
+  closePullUp: () => void;
+  openPullUp: (option?: any) => void;
+}
+
+export interface Instance {
   finishPullUp: () => void;
   refresh: () => void;
+  closePullUp: () => void;
+  openPullUp: (option?: any) => void;
 }
 /*
 * @Params probeType
@@ -19,6 +26,7 @@ interface Props extends PropsWithChildren<any> {
   onScroll?: (position: Position) => void;
   getInstance?: (context: Instance) => void;
   onPullingUp?: () => void;
+  style?: CSSProperties;
 }
 const defaultProps: Props = {
   probeType: 1
@@ -26,17 +34,22 @@ const defaultProps: Props = {
 
 const ScrollY: FC<Props> = function (props): JSX.Element {
 
+  const { style } = props;
+
   const wrapperRef = useRef<any>(null);
   const instanceRef = useRef<any>(null);
   const [ pullingUp, setPullingUp ] = useState<boolean>(false);
 
+  // Create Scroller
   useEffect(() => {
     const { probeType, onScroll, getInstance, onPullingUp } = props;
-    const wrapper = instanceRef.current = new BScroll(wrapperRef.current, {
+    const pullUpLoadConf = { threshold: 50 };
+    const wrapper: BScroller = instanceRef.current = new BScroll(wrapperRef.current, {
       scrollY: true,
       click: true,
-      probeType
-    });
+      probeType,
+      pullUpLoad: onPullingUp ? pullUpLoadConf : false
+    }) as BScroller;
     wrapper.on('scroll', (e: any) => {
       if (typeof onScroll === 'function') {
         onScroll(e);
@@ -56,18 +69,24 @@ const ScrollY: FC<Props> = function (props): JSX.Element {
       wrapper.finishPullUp();
       setTimeout(refresh, 20);
     };
+    const closePullUp = () => {
+      finishPullUp();
+      wrapper.closePullUp();
+    };
+    const openPullUp = (option = pullUpLoadConf) => {
+      wrapper.openPullUp(option);
+    };
+    const instance = { finishPullUp, refresh, closePullUp, openPullUp };
     if (typeof getInstance === 'function') {
-      getInstance({ finishPullUp, refresh });
+      getInstance(instance);
     }
     return function () {
-      if (instanceRef.current) {
-        instanceRef.current.destroy();
-      }
+      instanceRef.current?.destroy();
     };
   }, [props]);
 
   return (
-    <div className={ styles.scrollYWrapper }>
+    <div className={ styles.scrollYWrapper } style={style}>
       <div className={ styles.scrollY } ref={ wrapperRef }>
         <div>
           { props.children }

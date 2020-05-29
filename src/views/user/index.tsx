@@ -1,16 +1,21 @@
-import React, { FC, PropsWithChildren, useEffect, Fragment } from 'react';
-import { connect } from 'react-redux';
+import React, { FC, PropsWithChildren, useEffect, Fragment, useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Map } from 'immutable';
-import { Dispatch } from 'redux';
-import { getUserInfo } from '../../store/actions/user-info';
+import { pullUserInfo } from '../../store/actions/user-info';
 import { Link } from 'react-router-dom';
+import { modal } from '../../components/modal';
 
 interface Props extends PropsWithChildren<any> {
-  userInfo: Map<string, any>;
-  getUserInfo: () => void;
+
 }
 const User: FC<Props> = function(props) {
-  const { userInfo, getUserInfo } = props;
+
+  const userInfo = useSelector((state: Map<string, any>) => state.get('userInfo'));
+  const dispatch = useDispatch();
+  const getUserInfo = useCallback(() => {
+    pullUserInfo(dispatch);
+  }, [dispatch]);
+
   useEffect(() => {
     setTimeout(getUserInfo, 5000);
   }, [getUserInfo]);
@@ -18,14 +23,9 @@ const User: FC<Props> = function(props) {
     <Fragment>
       <div>{ userInfo.get('nick') }</div>
       <Link to={'/'}>首页</Link>
+      <button onClick={() => modal.open({ content: '这是一个弹窗' }).subscribe()}>弹窗</button>
     </Fragment>
   );
 };
 
-const mapStateToProps = (state: Map<string, any>) => ({
-  userInfo: state.get('userInfo')
-});
-const mapDispatchToProps = (dispatch: Dispatch) => ({
-  getUserInfo: getUserInfo(dispatch)
-});
-export default connect(mapStateToProps, mapDispatchToProps)(User);
+export default User;
