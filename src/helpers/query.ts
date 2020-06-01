@@ -12,7 +12,7 @@ function encode(val: string): string {
 /*
   * format array item
   * for example:
-  * tranforms {arr: [1, {b: 1, c: [2, 3]}]} to arr[]=1&arr[1][b]=1&c[]=2&c[1]=3
+  * transforms {arr: [1, {b: 1, c: [2, 3]}]} to arr[]=1&arr[1][b]=1&c[]=2&c[1]=3
   */
 function arrayParser(arr: any[], prefix: string): string {
   return arr.map((item, key) => {

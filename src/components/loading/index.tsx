@@ -26,4 +26,4 @@ const Loading: FC<Props> = function(props): JSX.Element {
 };
 Loading.defaultProps = defaultProps;
 
-export { Loading }
+export { Loading };

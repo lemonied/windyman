@@ -8,4 +8,4 @@ export const pullUserInfo = (dispatch: Dispatch) => {
       value: fromJS({ status: 1, nick: 'ChenJiYuan' })
     });
   }, 2000);
-}
+};

@@ -33,9 +33,10 @@ const Recommends: FC<Props> = function(props) {
       if (query.current.currentPage === 1) {
         dispatch({ type: 'SET_RECOMMENDS', value: res.result });
       } else {
-        dispatch({ type: 'UPDATE_RECOMMENDS', value: res.result })
+        dispatch({ type: 'UPDATE_RECOMMENDS', value: res.result });
       }
       scroll.current?.finishPullUp();
+      scroll.current?.finishPullDown();
     });
   }, [dispatch]);
 
@@ -44,6 +45,10 @@ const Recommends: FC<Props> = function(props) {
       return scroll.current?.closePullUp();
     }
     query.current.currentPage += 1;
+    getRecommends();
+  }, [getRecommends]);
+  const onPullingDown = useCallback(() => {
+    query.current.currentPage = 1;
     getRecommends();
   }, [getRecommends]);
 
@@ -61,6 +66,7 @@ const Recommends: FC<Props> = function(props) {
     <ScrollY
       onPullingUp={onPullingUp}
       getInstance={e => scroll.current = e}
+      onPullingDown={onPullingDown}
     >
       {
         recommends.map((item, key) => (
@@ -69,6 +75,6 @@ const Recommends: FC<Props> = function(props) {
       }
     </ScrollY>
   );
-}
+};
 
 export { Recommends };

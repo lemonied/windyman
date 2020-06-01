@@ -23,7 +23,7 @@ const User: FC<Props> = function(props) {
     <Fragment>
       <div>{ userInfo.get('nick') }</div>
       <Link to={'/'}>首页</Link>
-      <button onClick={() => modal.open({ content: '这是一个弹窗' }).subscribe()}>弹窗</button>
+      <button onClick={() => modal.confirm({ content: '这是一个弹窗' }).subscribe()}>弹窗</button>
     </Fragment>
   );
 };

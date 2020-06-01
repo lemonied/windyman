@@ -54,3 +54,21 @@ export function debounce(func: (args?: any) => any, delay = 300) {
     }, delay);
   };
 }
+
+export function compileClassNames(...args: (string | null | undefined)[]) {
+  const classNames: string[] = [];
+  args.forEach(item => {
+    if (typeof item !== 'string') { return; }
+    item = item.trim();
+    if (!item) { return; }
+    item.split(' ').forEach(className => {
+      if (classNames.indexOf(className) === -1) {
+        classNames.push(className);
+      }
+    });
+  });
+  return classNames.join(' ');
+}
+export function addClass(dom: HTMLElement, className: string) {
+  dom.className = compileClassNames(dom.className, className);
+}

@@ -17,4 +17,4 @@ export const injectReducer = (key: string, reducer: Reducer) => {
   store.replaceReducer(
     makeAllReducers(originalReducers)
   );
-}
+};

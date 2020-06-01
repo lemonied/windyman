@@ -12,6 +12,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  *{
+    user-select: none;
+  }
   .modal{
     width: 80%;
     border-radius: 7px;
@@ -51,5 +54,48 @@
         }
       }
     }
+  }
+}
+
+.modalEnter {
+  opacity: 0;
+}
+.modalEnterActive {
+  opacity: 1;
+  .modal{
+    animation: modalEject linear .3s;
+  }
+}
+.modalExit {
+  opacity: 1;
+  .modal{
+    transform: scale(1);
+  }
+}
+.modalExitActive {
+  opacity: 0;
+  .modal{
+    transform: scale(0);
+  }
+}
+.modalExitDone{
+  opacity: 0;
+}
+.modalEnterActive, .modalExitActive{
+  transition: opacity .3s ease;
+  .modal{
+    transition: transform .3s ease;
+  }
+}
+
+@keyframes modalEject {
+  0%{
+    transform: scale(0);
+  }
+  60%{
+    transform: scale(1.1);
+  }
+  100%{
+    transform: scale(1);
   }
 }

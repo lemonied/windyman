@@ -10,9 +10,7 @@
     "@types/node": "^12.0.0",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
-    "@types/react-redux": "^7.1.8",
     "@types/react-router-dom": "^5.1.5",
-    "@types/redux-immutable": "^4.0.1",
     "axios": "^0.19.2",
     "better-scroll": "^1.15.2",
     "fastclick": "^1.0.6",
@@ -23,6 +21,7 @@
     "react-redux": "^7.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
+    "react-transition-group": "^4.4.1",
     "redux": "^4.0.5",
     "redux-immutable": "^4.0.0",
     "rxjs": "^6.5.5",
@@ -30,13 +29,12 @@
     "typescript": "~3.7.2"
   },
   "scripts": {
-    "start": "BROWSER=none react-scripts start",
-    "build": "PUBLIC_URL=/ react-scripts build",
+    "start": "BROWSER=none EXTEND_ESLINT=true react-scripts start",
+    "build": "EXTEND_ESLINT=true PUBLIC_URL=/ GENERATE_SOURCEMAP=false react-scripts build",
+    "windows-start": "set BROWSER=none&& set EXTEND_ESLINT=true&& react-scripts start",
+    "windows-build": "set EXTEND_ESLINT=true&& set PUBLIC_URL=/&& set GENERATE_SOURCEMAP=false&& react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
   },
   "browserslist": {
     "production": [
@@ -51,8 +49,11 @@
     ]
   },
   "devDependencies": {
+    "@types/react-redux": "^7.1.8",
+    "@types/redux-immutable": "^4.0.1",
     "@types/better-scroll": "^1.12.2",
     "@types/fastclick": "^1.0.29",
+    "@types/react-transition-group": "^4.4.0",
     "http-proxy-middleware": "^1.0.4"
   }
 }

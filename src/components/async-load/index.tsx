@@ -21,6 +21,6 @@ const AsyncLoad: FC<Props> = function (props): JSX.Element {
   return (
     <Child.default />
   );
-}
+};
 
-export { AsyncLoad }
+export { AsyncLoad };

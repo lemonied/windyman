@@ -1,6 +1,14 @@
 .scrollYWrapper{
   height: 100%;
   position: relative;
+  .loadingWrapper{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+  }
   .scrollY{
     height: 100%;
   }
