@@ -6,9 +6,7 @@ import { Map } from 'immutable';
 import { useSelector } from 'react-redux';
 import { Layout } from '../../components/layout';
 
-interface Props extends PropsWithChildren<any> {
-  userInfo: Map<string, any>;
-}
+interface Props extends PropsWithChildren<any> {}
 
 const Home: FC<Props> = function(props): JSX.Element {
 

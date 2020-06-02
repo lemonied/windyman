@@ -42,6 +42,12 @@ export function deepMerge(...args: any[]): any {
   });
   return ret;
 }
+export function lightCompare(o1: any, o2: any): boolean {
+  if (isPlainObject(o1) && isPlainObject(o2)) {
+    return Object.keys(o2).every(key => o2[key] === o1[key]);
+  }
+  return o1 === o2;
+}
 
 export function debounce(func: (args?: any) => any, delay = 300) {
   let timer: any;
@@ -55,7 +61,7 @@ export function debounce(func: (args?: any) => any, delay = 300) {
   };
 }
 
-export function compileClassNames(...args: (string | null | undefined)[]) {
+export function combineClassNames(...args: (string | null | undefined)[]) {
   const classNames: string[] = [];
   args.forEach(item => {
     if (typeof item !== 'string') { return; }
@@ -70,5 +76,5 @@ export function compileClassNames(...args: (string | null | undefined)[]) {
   return classNames.join(' ');
 }
 export function addClass(dom: HTMLElement, className: string) {
-  dom.className = compileClassNames(dom.className, className);
+  dom.className = combineClassNames(dom.className, className);
 }

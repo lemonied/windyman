@@ -16,6 +16,7 @@
     "fastclick": "^1.0.6",
     "immutable": "^4.0.0-rc.12",
     "node-sass": "^4.14.1",
+    "rc-field-form": "^1.4.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-redux": "^7.2.0",
@@ -49,11 +50,11 @@
     ]
   },
   "devDependencies": {
-    "@types/react-redux": "^7.1.8",
-    "@types/redux-immutable": "^4.0.1",
     "@types/better-scroll": "^1.12.2",
     "@types/fastclick": "^1.0.29",
+    "@types/react-redux": "^7.1.8",
     "@types/react-transition-group": "^4.4.0",
+    "@types/redux-immutable": "^4.0.1",
     "http-proxy-middleware": "^1.0.4"
   }
 }
