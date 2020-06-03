@@ -1,0 +1,80 @@
+@import "../../common/style/mixin";
+
+$lineHeight: 22px;
+
+.wheelWrapper{
+  font-size: 14px;
+  padding: 15% 0;
+  height: $lineHeight;
+  overflow: hidden;
+  position: relative;
+  &:after{
+    content: '';
+    width: 100%;
+    height: $lineHeight;
+    border-top: 1px solid #d9d9d9;
+    border-bottom: 1px solid #d9d9d9;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+  }
+  .wheelScroll{
+    .wheelItem{
+      text-align: center;
+      color: #333;
+      line-height: $lineHeight;
+      width: 100%;
+      @include no-wrap;
+    }
+    .wheelDisabledItem{
+      color: #999;
+    }
+  }
+}
+.pickerModalMask{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  background: rgba(0, 0, 0, .2);
+  .pickerModal{
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #ffffff;
+  }
+}
+.pickerEnter {
+  opacity: 0;
+  transform: translateY(-100%);
+}
+.pickerEnterActive {
+  opacity: 1;
+  .pickerModal{
+    transform: translateY(0);
+  }
+}
+.pickerExit {
+  opacity: 1;
+  .modal{
+    transform: scale(1);
+  }
+}
+.pickerExitActive {
+  opacity: 0;
+  .pickerModal{
+    transform: translateY(-100%);
+  }
+}
+.pickerExitDone {
+  opacity: 0;
+}
+.pickerEnterActive, .pickerExitActive{
+  transition: opacity .3s ease;
+  .pickerModal{
+    transition: transform .3s ease;
+  }
+}

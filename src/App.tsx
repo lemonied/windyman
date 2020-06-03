@@ -1,7 +1,7 @@
 import React from 'react';
-import {BrowserRouter, Switch, Route} from 'react-router-dom';
-import {AsyncLoad} from './components/async-load';
-import {routes} from './routes';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { AsyncLoad } from './components/async-load';
+import { routes } from './routes';
 
 function App() {
   return (
@@ -10,7 +10,7 @@ function App() {
         {
           routes.map(item => (
             <Route exact={item.exact} path={item.path} key={item.path}>
-              <AsyncLoad load={item.component} />
+              <AsyncLoad load={item.component}/>
             </Route>
           ))
         }

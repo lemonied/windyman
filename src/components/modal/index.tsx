@@ -49,7 +49,7 @@ export class Modal extends Component<Props, any> {
           exitActive: styles.modalExitActive,
           exitDone: styles.modalExitDone
         }}
-        timeout={200}
+        timeout={300}
       >
         <div className={styles.modalWrapper} onClick={maskClick}>
           <div className={styles.modal} onClick={this.preventClick.bind(this)}>
