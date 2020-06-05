@@ -20,7 +20,7 @@ const defaultProps: Props = {
 };
 
 export class Modal extends Component<Props, any> {
-  static defaultProps = defaultProps;
+  static defaultProps: Props = defaultProps;
   readonly state = {
     show: false
   };

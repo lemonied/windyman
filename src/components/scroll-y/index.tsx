@@ -38,6 +38,7 @@ interface Props extends PropsWithChildren<any> {
   onPullingDown?: () => void;
   style?: CSSProperties;
   scroll?: { [prop: string]: any };
+  getInstance?: (instance: ScrollYInstance) => void;
 }
 const defaultProps: Props = {
   probeType: 1
@@ -61,7 +62,7 @@ const ScrollY: FC<Props> = function (props): JSX.Element {
   // Create Scroller
   useEffect(() => {
     const bubbleConf = bubbleRef.current?.conf;
-    const { probeType, onScroll, scroll, onPullingUp, onPullingDown } = props;
+    const { probeType, onScroll, scroll, onPullingUp, onPullingDown, getInstance } = props;
     const pullUpLoadConf = { threshold: 50 };
     const pullDownConf = { threshold: 60, stop: 30 };
     const wrapper: BScroller = instanceRef.current = new BScroll(wrapperRef.current, {
@@ -123,6 +124,9 @@ const ScrollY: FC<Props> = function (props): JSX.Element {
       wrapper.openPullDown(options);
     };
     const instance = { finishPullUp, refresh, closePullUp, openPullUp, finishPullDown, openPullDown };
+    if (typeof getInstance === 'function') {
+      getInstance(instance);
+    }
     if (scroll && typeof scroll === 'object') {
       Object.assign(scroll, instance);
     }

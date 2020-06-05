@@ -22,6 +22,7 @@ interface Instance {
   play(): void;
   stop(): void;
 }
+export type SliderInstance = Instance;
 interface Props extends PropsWithChildren<any>{
   children: ReactElement[];
   dot?: boolean;
@@ -33,6 +34,7 @@ interface Props extends PropsWithChildren<any>{
   speed?: number;
   getInstance?: (instance: Instance) => void;
   data?: any;
+  slider?: { [prop: string]: any };
 }
 const defaultProps: Props = {
   children: [],
@@ -43,14 +45,19 @@ const defaultProps: Props = {
   threshold: 0.3,
   speed: 400
 };
+// Slider Hook
+export const useSlider = ():SliderInstance  => {
+  const instance = useRef<SliderInstance>({} as SliderInstance);
+  return instance.current;
+};
 const Slider: FC<Props> = function(props): JSX.Element {
-  const [ currentIndex, setCurrentIndex ] = useState<number>(0);
+  const { children, dot, loop, click, interval, autoplay, threshold, speed, getInstance, data, slider } = props;
 
+  const [ currentIndex, setCurrentIndex ] = useState<number>(0);
   const scrollRef = useRef<BScroll>();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const slideGroupRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<any>();
-  const { children, dot, loop, click, interval, autoplay, threshold, speed, getInstance, data } = props;
   const childrenLength = useMemo(() => {
     return Children.toArray(children).length;
   }, [children]);
@@ -125,6 +132,9 @@ const Slider: FC<Props> = function(props): JSX.Element {
     if (typeof getInstance === 'function') {
       getInstance(instance);
     }
+    if (slider && typeof slider === 'object') {
+      Object.assign(slider, instance);
+    }
     const onResize = debounce(() => {
       initSlideWidth();
       instance.refresh();
@@ -134,7 +144,7 @@ const Slider: FC<Props> = function(props): JSX.Element {
       window.removeEventListener('resize', onResize);
       instance.destroy();
     };
-  }, [initSlideWidth, loop, threshold, speed, click, instance, getInstance, data]);
+  }, [initSlideWidth, loop, threshold, speed, click, instance, getInstance, data, slider]);
 
   return (
     <div ref={wrapperRef} className={styles.slider}>

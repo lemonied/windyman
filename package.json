@@ -31,11 +31,10 @@
   },
   "scripts": {
     "start": "BROWSER=none EXTEND_ESLINT=true react-scripts start",
-    "build": "EXTEND_ESLINT=true PUBLIC_URL=/ GENERATE_SOURCEMAP=false react-scripts build",
-    "windows-start": "set BROWSER=none&& set EXTEND_ESLINT=true&& react-scripts start",
-    "windows-build": "set EXTEND_ESLINT=true&& set PUBLIC_URL=/&& set GENERATE_SOURCEMAP=false&& react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "build": "CI=true PUBLIC_URL=/ GENERATE_SOURCEMAP=false react-scripts build",
+    "windows-start": "set BROWSER=none && set EXTEND_ESLINT=true && react-scripts start",
+    "windows-build": "set CI=true && set PUBLIC_URL=/ && set GENERATE_SOURCEMAP=false && react-scripts build",
+    "test": "react-scripts test"
   },
   "browserslist": {
     "production": [
