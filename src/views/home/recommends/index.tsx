@@ -2,7 +2,7 @@ import React, { FC, PropsWithChildren, useCallback, useEffect, useRef } from 're
 import { useDispatch, useSelector } from 'react-redux';
 import { Map } from 'immutable';
 import { post } from '../../../helpers/http';
-import { ScrollY, Instance } from '../../../components/scroll-y';
+import { ScrollY, useScrollY } from '../../../components/scroll-y';
 import { Subscription } from 'rxjs';
 
 interface Props extends PropsWithChildren<any> {
@@ -18,7 +18,7 @@ const Recommends: FC<Props> = function(props) {
 
   const pageBean = useRef<any>();
 
-  const scroll = useRef<Instance>();
+  const scroll = useScrollY();
 
   const subscribe = useRef<Subscription>();
 
@@ -35,18 +35,18 @@ const Recommends: FC<Props> = function(props) {
       } else {
         dispatch({ type: 'UPDATE_RECOMMENDS', value: res.result });
       }
-      scroll.current?.finishPullUp();
-      scroll.current?.finishPullDown();
+      scroll.finishPullUp();
+      scroll.finishPullDown();
     });
-  }, [dispatch]);
+  }, [dispatch, scroll]);
 
   const onPullingUp = useCallback(() => {
     if (pageBean.current.totalPage <= pageBean.current.currentPage) {
-      return scroll.current?.closePullUp();
+      return scroll.closePullUp();
     }
     query.current.currentPage += 1;
     getRecommends();
-  }, [getRecommends]);
+  }, [getRecommends, scroll]);
   const onPullingDown = useCallback(() => {
     query.current.currentPage = 1;
     getRecommends();
@@ -65,7 +65,7 @@ const Recommends: FC<Props> = function(props) {
   return (
     <ScrollY
       onPullingUp={onPullingUp}
-      getInstance={e => scroll.current = e}
+      scroll={scroll}
       onPullingDown={onPullingDown}
     >
       {

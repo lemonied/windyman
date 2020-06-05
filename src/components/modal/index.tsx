@@ -72,7 +72,10 @@ export class Modal extends Component<Props, any> {
 export class ModalService {
   ele: Element[] = [];
 
-  create(options: { title: string; content: string | ReactNode; footer: Footer[]; }, callback: (result?: any) => void) {
+  create(
+    options: { title: string; content: string | ReactNode; footer: Footer[]; },
+    callback?: (result?: any) => void
+  ): { close(): void; } {
     const { title, content, footer } = options;
     const container = document.createElement('div');
     container.className = 'modal-container';
@@ -120,10 +123,6 @@ export class ModalService {
             }
           }]
         )
-      }, () => {
-        works.close();
-        subscribe.next();
-        subscribe.complete();
       });
     });
   }
@@ -140,15 +139,12 @@ export class ModalService {
             subscriber.complete();
           }
         }]
-      }, () => {
-        works.close();
-        subscriber.next();
-        subscriber.complete();
       });
     });
   }
 
   destroy(ele: Element) {
+    ReactDOM.unmountComponentAtNode(ele);
     ele.remove();
     const index = this.ele.indexOf(ele);
     if (index > -1) {
@@ -156,7 +152,10 @@ export class ModalService {
     }
   }
   destroyAll() {
-    this.ele.forEach(el => el.remove());
+    this.ele.forEach(el => {
+      ReactDOM.unmountComponentAtNode(el);
+      el.remove();
+    });
   }
 }
 

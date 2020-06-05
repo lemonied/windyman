@@ -1,10 +1,10 @@
 @import "../../common/style/mixin";
 
-$lineHeight: 22px;
+$lineHeight: 25px;
 
 .wheelWrapper{
   font-size: 14px;
-  padding: 15% 0;
+  padding: 20% 0;
   height: $lineHeight;
   overflow: hidden;
   position: relative;
@@ -45,11 +45,37 @@ $lineHeight: 22px;
     right: 0;
     bottom: 0;
     background: #ffffff;
+    .pickerActions{
+      background: inherit;
+      padding: 5px 8px;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 1;
+      border-bottom: 1px solid #ddd;
+      .cancel{
+        color: #999999;
+      }
+      .submit{
+        color: #1890ff;
+      }
+      .cancel, .submit{
+        &:active{
+          opacity: .8;
+        }
+      }
+    }
   }
 }
 .pickerEnter {
   opacity: 0;
-  transform: translateY(-100%);
+  .pickerModal{
+    transform: translateY(100%);
+  }
 }
 .pickerEnterActive {
   opacity: 1;
@@ -59,18 +85,19 @@ $lineHeight: 22px;
 }
 .pickerExit {
   opacity: 1;
-  .modal{
+  .pickerModal{
     transform: scale(1);
   }
 }
 .pickerExitActive {
   opacity: 0;
   .pickerModal{
-    transform: translateY(-100%);
+    transform: translateY(100%);
   }
 }
 .pickerExitDone {
   opacity: 0;
+  display: none;
 }
 .pickerEnterActive, .pickerExitActive{
   transition: opacity .3s ease;

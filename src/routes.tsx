@@ -9,6 +9,10 @@ export const routes: Route[] = [{
   exact: true,
   component: () => import('./views/user')
 }, {
+  path: '/example',
+  exact: true,
+  component: () => import('./views/examples')
+}, {
   path: '/',
   exact: true,
   component: () => import('./views/home')

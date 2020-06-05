@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, FC, useRef, useEffect, useState, CSSProperties, useCallback } from 'react';
+import React, { PropsWithChildren, FC, useEffect, useState, CSSProperties, useCallback, useRef } from 'react';
 import BScroll, { Position } from 'better-scroll';
 import styles from './style.module.scss';
 import { Loading } from '../loading';
@@ -9,7 +9,7 @@ interface BScroller extends BScroll{
   openPullDown: (options?: any) => void;
 }
 
-export interface Instance {
+interface Instance {
   finishPullUp: () => void;
   refresh: () => void;
   closePullUp: () => void;
@@ -17,6 +17,13 @@ export interface Instance {
   finishPullDown: () => void;
   openPullDown: (options?: any) => void;
 }
+export type ScrollYInstance = Instance;
+
+// ScrollY Hook
+export const useScrollY = (): ScrollYInstance => {
+  const scroll = useRef<ScrollYInstance>({} as ScrollYInstance);
+  return scroll.current;
+};
 /*
 * @Params probeType
 * When set to 1, The scroll event is non-real time fired (after the screen scrolled for some time)
@@ -27,15 +34,15 @@ export interface Instance {
 interface Props extends PropsWithChildren<any> {
   probeType?: 1 | 2 | 3;
   onScroll?: (position: Position) => void;
-  getInstance?: (context: Instance) => void;
   onPullingUp?: () => void;
   onPullingDown?: () => void;
   style?: CSSProperties;
+  scroll?: { [prop: string]: any };
 }
 const defaultProps: Props = {
   probeType: 1
 };
-
+// ScrollY Component
 const ScrollY: FC<Props> = function (props): JSX.Element {
 
   const { style } = props;
@@ -54,7 +61,7 @@ const ScrollY: FC<Props> = function (props): JSX.Element {
   // Create Scroller
   useEffect(() => {
     const bubbleConf = bubbleRef.current?.conf;
-    const { probeType, onScroll, getInstance, onPullingUp, onPullingDown } = props;
+    const { probeType, onScroll, scroll, onPullingUp, onPullingDown } = props;
     const pullUpLoadConf = { threshold: 50 };
     const pullDownConf = { threshold: 60, stop: 30 };
     const wrapper: BScroller = instanceRef.current = new BScroll(wrapperRef.current, {
@@ -116,8 +123,8 @@ const ScrollY: FC<Props> = function (props): JSX.Element {
       wrapper.openPullDown(options);
     };
     const instance = { finishPullUp, refresh, closePullUp, openPullUp, finishPullDown, openPullDown };
-    if (typeof getInstance === 'function') {
-      getInstance(instance);
+    if (scroll && typeof scroll === 'object') {
+      Object.assign(scroll, instance);
     }
     return function () {
       instanceRef.current?.destroy();
