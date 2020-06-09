@@ -9,7 +9,7 @@ interface BScroller extends BScroll{
   openPullDown: (options?: any) => void;
 }
 
-interface Instance {
+interface ScrollYInstance {
   finishPullUp: () => void;
   refresh: () => void;
   closePullUp: () => void;
@@ -17,7 +17,6 @@ interface Instance {
   finishPullDown: () => void;
   openPullDown: (options?: any) => void;
 }
-export type ScrollYInstance = Instance;
 
 // ScrollY Hook
 export const useScrollY = (): ScrollYInstance => {

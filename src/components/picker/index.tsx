@@ -12,24 +12,34 @@ interface Item {
   disabled?: boolean;
   [prop: string]: any;
 }
-interface Instance {
+interface PickerInstance {
   wheelTo(index: number): void;
   getSelectedIndex(): number;
+  refresh(): void;
 }
 interface Props extends PropsWithChildren<any> {
   data: Item[];
   defaultSelectedIndex?: number;
-  getInstance?(instance: Instance): void;
+  getInstance?(instance: PickerInstance): void;
+  picker?: { [prop: string]: any };
+  className?: string;
+  onChange?: (index: number) => void;
 }
 const defaultProps: Props = {
   data: [],
   defaultSelectedIndex: 0
 };
+// Picker Hook
+export const usePicker = (): PickerInstance => {
+  const instance = useRef<PickerInstance>({} as PickerInstance);
+  return instance.current;
+};
 const Picker: FC<Props> = function(props): JSX.Element {
-  const { data, getInstance, defaultSelectedIndex } = props;
+  const { data, getInstance, defaultSelectedIndex = 0, picker, className, onChange } = props;
   const wheelWrapperRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<BScroll>();
-  const instanceRef = useRef<Instance>();
+  const instanceRef = useRef<PickerInstance>();
+  const defaultSelectedIndexRef = useRef<number>(defaultSelectedIndex);
 
   useEffect(() => {
     const instance = instanceRef.current = {
@@ -38,16 +48,22 @@ const Picker: FC<Props> = function(props): JSX.Element {
       },
       getSelectedIndex() {
         return scrollRef.current?.getSelectedIndex() || 0;
+      },
+      refresh() {
+        scrollRef.current?.refresh();
       }
     };
     if (typeof getInstance === 'function') {
       getInstance(instance);
     }
-  }, [getInstance, data]);
+    if (picker && typeof picker === 'object') {
+      Object.assign(picker, instance);
+    }
+  }, [getInstance, picker]);
   useEffect(() => {
     const scroll = scrollRef.current = new BScroll(wheelWrapperRef.current as Element, {
       wheel:{
-        selectedIndex: defaultSelectedIndex,
+        selectedIndex: defaultSelectedIndexRef.current,
         rotate: 25,
         adjustTime: 400,
         wheelWrapperClass: styles.wheelScroll,
@@ -59,10 +75,25 @@ const Picker: FC<Props> = function(props): JSX.Element {
     return () => {
       scroll.destroy();
     };
+  }, []);
+  useEffect(() => {
+    instanceRef.current?.refresh();
+    instanceRef.current?.wheelTo(defaultSelectedIndex);
   }, [data, defaultSelectedIndex]);
+  useEffect(() => {
+    const listen = () => {
+      if (typeof onChange === 'function') {
+        onChange(scrollRef.current?.getSelectedIndex() || 0);
+      }
+    };
+    scrollRef.current?.on('scrollEnd', listen);
+    return () => {
+      scrollRef.current?.off('scrollEnd', listen);
+    };
+  }, [onChange]);
 
   return (
-    <div ref={wheelWrapperRef} className={styles.wheelWrapper}>
+    <div ref={wheelWrapperRef} className={combineClassNames(styles.wheelWrapper, className)}>
       <ul className={styles.wheelScroll}>
         {
           data.map(item => (
@@ -80,28 +111,37 @@ Picker.defaultProps = defaultProps;
 
 export { Picker };
 
-export type PickerDataItem = Item;
 export interface MultiPickerDataItem extends Item {
   children?: this[];
 }
+export type PickerValues = string | number | (string | number)[];
 interface PickerModalProps extends PropsWithChildren<any> {
   data: MultiPickerDataItem[];
-  defaultValue?: string | number;
-  onSubmit?(value?: string | number): void;
+  defaultValue?: PickerValues;
+  multi?: number;
+  onSubmit?(value?: PickerValues): void;
 }
 interface PickerModalState {
   show: boolean;
-  data: MultiPickerDataItem[];
+  data: MultiPickerDataItem[][];
+  selectedIndex: number[];
 }
+
 export class PickerModal extends Component<PickerModalProps, PickerModalState> {
   readonly state: PickerModalState = {
     show: false,
-    data: []
+    data: [],
+    selectedIndex: []
   }
   static defaultProps = {
-    data: []
+    data: [],
+    multi: 1
   }
-  picker: Instance | null = null;
+  dataSet: MultiPickerDataItem[][] = [];
+  values: (string | number)[] = [];
+  dataManager: MultiDataManager = new MultiDataManager(this.props.multi);
+  sourceValues: MultiPickerDataItem[] = [];
+  picker: PickerInstance[] = [];
   preventClick(e: any) {
     e.preventDefault();
     e.stopPropagation();
@@ -112,33 +152,47 @@ export class PickerModal extends Component<PickerModalProps, PickerModalState> {
   show() {
     this.setState({ show: true });
   }
-  getPickerInstance(instance: Instance) {
-    this.picker = instance;
+  getPickerInstance(instance: PickerInstance, index: number) {
+    if (this.picker[index]) {
+      this.picker[index] = instance;
+    } else {
+      this.picker.push(instance);
+    }
   }
-  setValue(value?: string | number) {
-    if (typeof value === 'undefined') {
-      return this.picker?.wheelTo(0);
+  onChange(index: number, key: number) {
+    if (this.dataSet[key] && this.dataSet[key][index]) {
+      this.values[key] = this.dataSet[key][index].value;
     }
-    const { data } = this.state;
-    const index = data.findIndex(item => item.value === value);
-    if (index > -1) {
-      this.picker?.wheelTo(index);
-    }
+    this.setValue(
+      this.values
+    );
+  }
+  setValue(values?: PickerValues) {
+    this.dataManager.setValues(values);
+    this.setState({
+      data: this.dataManager.dataSet,
+      selectedIndex: this.dataManager.selectedIndex
+    });
+    this.dataSet = this.dataManager.dataSet;
+    this.values = this.dataManager.values;
+    this.sourceValues = this.dataManager.sourceValues;
   }
   setData(data: MultiPickerDataItem[]) {
-    this.setState({ data });
+    this.dataManager.setData(data);
+    this.setState({ data: this.dataManager.dataSet });
+    this.dataSet = this.dataManager.dataSet;
   }
   onSave(save: boolean) {
     const { onSubmit } = this.props;
     const { data } = this.state;
     if (onSubmit) {
       if (save) {
-        const index = this.picker?.getSelectedIndex();
-        if (typeof index !== 'undefined' && index > -1) {
-          onSubmit(data[index].value);
-        } else {
-          onSubmit();
-        }
+        this.dataManager.setIndex(
+          data.map((item, key) => Math.max(this.picker[key]?.getSelectedIndex(), 0))
+        );
+        this.values = this.dataManager.values;
+        this.sourceValues = this.dataManager.sourceValues;
+        onSubmit(this.values);
       } else {
         onSubmit();
       }
@@ -146,14 +200,13 @@ export class PickerModal extends Component<PickerModalProps, PickerModalState> {
     this.hide();
   }
   componentDidMount() {
-    const { data } = this.props;
+    const { data, defaultValue } = this.props;
     this.setData(data);
+    this.setValue(defaultValue);
   }
 
   render() {
-    const { defaultValue } = this.props;
-    const { show, data } = this.state;
-    const index = data.findIndex(item => item.value === defaultValue);
+    const { show, data, selectedIndex } = this.state;
     return (
       <CSSTransition
         in={show}
@@ -172,10 +225,111 @@ export class PickerModal extends Component<PickerModalProps, PickerModalState> {
               <span className={styles.cancel} onClick={e => this.onSave(false)}>取消</span>
               <span className={styles.submit} onClick={e => this.onSave(true)}>确定</span>
             </div>
-            <Picker data={data} getInstance={this.getPickerInstance.bind(this)} defaultSelectedIndex={index > -1 ? index : 0} />
+            {
+              data.map((item, key) => (
+                <Picker
+                  className={styles.pickerItem}
+                  key={key}
+                  data={item}
+                  getInstance={e => this.getPickerInstance(e, key)}
+                  defaultSelectedIndex={selectedIndex[key]}
+                  onChange={e => this.onChange(e, key)}
+                />
+              ))
+            }
           </div>
         </div>
       </CSSTransition>
+    );
+  }
+}
+
+export class MultiDataManager {
+  dataSet: MultiPickerDataItem[][] = [];
+  sources: MultiPickerDataItem[] = [];
+  values: (string | number)[] = [];
+  sourceValues: MultiPickerDataItem[] = [];
+  selectedIndex: number[] = [];
+  multi = 1;
+  constructor(multi = 1) {
+    this.multi = multi;
+  }
+  static isArrayEqual(array1: Array<any>, array2: Array<any>): boolean {
+    if (array1 === array2) {
+      return true;
+    }
+    const length = Math.max(array1.length, array2.length);
+    for (let i = 0; i < length; i++) {
+      if (array1[i] !== array2[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+  static notEmpty(value: PickerValues | undefined): value is PickerValues {
+    return typeof value !== 'undefined' && value !== '' && value !== null;
+  }
+  setData(data?: MultiPickerDataItem[]) {
+    if (data) {
+      this.sources = data;
+    }
+    const multi = this.multi;
+    const list: MultiPickerDataItem[][] = [];
+    const deep = (children: MultiPickerDataItem[], index: number) => {
+      list.push(children);
+      let value = this.values[index];
+      if (typeof value === 'undefined' && children.length) {
+        value = children[0].value;
+      }
+      for (let i = 0; i < children.length; i++) {
+        if (
+          children[i].value === value &&
+          children[i].children?.length &&
+          index + 1 < multi
+        ) {
+          deep(children[i].children as any, index + 1);
+          return;
+        }
+      }
+      if (index + 1 < multi && children.length) {
+        deep(children[0].children as any, index + 1);
+      }
+    };
+    deep(this.sources, 0);
+    this.dataSet = list;
+  }
+  setValues(values?: PickerValues) {
+    let results: (string | number)[] = [];
+    if (MultiDataManager.notEmpty(values) && Array.isArray(values)) {
+      results = values;
+    } else if (MultiDataManager.notEmpty(values) && !Array.isArray(values)) {
+      results = [values];
+    }
+    if (!MultiDataManager.isArrayEqual(this.values, results)) {
+      this.values = results;
+    }
+    this.setData();
+    const data = this.dataSet;
+    this.sourceValues = [];
+    this.selectedIndex = [];
+    data.forEach((item, key) => {
+      const value = this.values[key];
+      const index = item.findIndex(val => val.value === value);
+      this.selectedIndex.push(Math.max(0, index));
+      if (index > -1) {
+        this.sourceValues.push(item[index]);
+      }
+    });
+  }
+  setIndex(index: number[]) {
+    this.setValues(
+      this.dataSet.map((item, key) => {
+        const i = index[key];
+        if (i && item[i]) {
+          return item[i].value;
+        }
+        return item[0].value;
+      })
     );
   }
 }
@@ -184,16 +338,17 @@ export class PickerService {
   ele: Element[] = [];
   create(
     data: MultiPickerDataItem[],
-    defaultValue?: string | number,
+    defaultValue?: PickerValues,
+    multi?: number,
     afterRender?: (container: Element, modal: PickerModal) => void,
-    onSubmit?: (value: string | number) => void
+    onSubmit?: (value: (string | number)[]) => void
   ): void {
     const pickerModal: RefObject<PickerModal> = createRef<PickerModal>();
     const container = document.createElement('div');
     this.ele.push(container);
     container.className = 'picker-container';
     document.body.appendChild(container);
-    ReactDOM.render(<PickerModal data={data} defaultValue={defaultValue} ref={pickerModal} onSubmit={onSubmit} />, container, () => {
+    ReactDOM.render(<PickerModal multi={multi} data={data} defaultValue={defaultValue} ref={pickerModal} onSubmit={onSubmit} />, container, () => {
         if (afterRender && pickerModal.current) {
           afterRender(container, pickerModal.current);
         }
@@ -202,18 +357,19 @@ export class PickerService {
   }
   open(
     data: MultiPickerDataItem[],
-    defaultValue?: string | number,
+    defaultValue?: PickerValues,
+    multi?: number,
     callback?: (modal: PickerModal) => void
   ): Observable<any> {
     let container: Element;
     return new Observable(subscriber => {
-      this.create(data, defaultValue, (ele, pickerModal) => {
+      this.create(data, defaultValue, multi, (ele, pickerModal) => {
         if (callback) {
           callback(pickerModal);
         }
         container = ele;
         pickerModal.show();
-      }, (value?: string | number) => {
+      }, (value?: (string | number)[]) => {
         subscriber.next(value);
         subscriber.complete();
         setTimeout(() => this.destroy(container), 300);

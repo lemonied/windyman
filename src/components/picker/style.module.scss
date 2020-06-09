@@ -45,9 +45,12 @@ $lineHeight: 25px;
     right: 0;
     bottom: 0;
     background: #ffffff;
+    display: flex;
+    .pickerItem{
+      flex: 1;
+    }
     .pickerActions{
       background: inherit;
-      padding: 5px 8px;
       position: absolute;
       left: 0;
       right: 0;
@@ -64,6 +67,8 @@ $lineHeight: 25px;
         color: #1890ff;
       }
       .cancel, .submit{
+        display: inline-block;
+        padding: 5px 8px;
         &:active{
           opacity: .8;
         }

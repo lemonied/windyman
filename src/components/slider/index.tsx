@@ -14,7 +14,7 @@ import styles from './style.module.scss';
 import BScroll from 'better-scroll';
 import { debounce } from '../../helpers/utils';
 
-interface Instance {
+interface SliderInstance {
   next(time?: number, easing?: object): void;
   prev(time?: number, easing?: object): void;
   destroy(): void;
@@ -22,7 +22,6 @@ interface Instance {
   play(): void;
   stop(): void;
 }
-export type SliderInstance = Instance;
 interface Props extends PropsWithChildren<any>{
   children: ReactElement[];
   dot?: boolean;
@@ -32,7 +31,7 @@ interface Props extends PropsWithChildren<any>{
   autoplay?: boolean;
   threshold?: number;
   speed?: number;
-  getInstance?: (instance: Instance) => void;
+  getInstance?: (instance: SliderInstance) => void;
   data?: any;
   slider?: { [prop: string]: any };
 }
@@ -73,7 +72,7 @@ const Slider: FC<Props> = function(props): JSX.Element {
       });
     }
   }, [loop, childrenLength]);
-  const instance = useMemo<Instance>(() => {
+  const instance = useMemo<SliderInstance>(() => {
     return {
       prev: (...args) => {
         scrollRef.current?.prev(...args);
