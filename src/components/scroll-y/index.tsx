@@ -1,9 +1,9 @@
-import React, { PropsWithChildren, FC, useEffect, useState, CSSProperties, useCallback, useRef } from 'react';
+import React, { PropsWithChildren, FC, useEffect, useState, CSSProperties, useCallback, useRef, useMemo } from 'react';
 import BScroll, { Position } from 'better-scroll';
 import styles from './style.module.scss';
 import { Loading } from '../loading';
 
-interface BScroller extends BScroll{
+interface BScroller extends BScroll {
   closePullUp: () => void;
   openPullUp: (option?: any) => void;
   openPullDown: (options?: any) => void;
@@ -46,10 +46,11 @@ const defaultProps: Props = {
 const ScrollY: FC<Props> = function (props): JSX.Element {
 
   const { style } = props;
+  const { onScroll, onPullingDown, onPullingUp, getInstance, scroll } = props;
 
-  const wrapperRef = useRef<any>(null);
-  const instanceRef = useRef<any>(null);
-  const bubbleRef = useRef<BubbleInstance>();
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const instanceRef = useRef<BScroller>();
+  const bubble = useBubble();
   // Initial top value
   const bubbleInit = useRef({ initTop: -100 });
   const [ pullingUp, setPullingUp ] = useState<boolean>(false);
@@ -57,21 +58,33 @@ const ScrollY: FC<Props> = function (props): JSX.Element {
   const [ loadingTop, setLoadingTop ] = useState<number>(bubbleInit.current.initTop);
   const [ pullingDown, setPullingDown ] = useState<boolean>(false);
   const [ pullingDownSnapshot, setPullingDownSnapshot ] = useState<boolean>(false);
+  const propsRef = useRef<Props>(Object.assign({}, props));
+  const pullUpLoadConf = useMemo(() => {
+    return { threshold: 50 };
+  }, []);
+  const pullDownConf = useMemo(() => {
+    return { threshold: 60, stop: 30 };
+  }, []);
 
   // Create Scroller
   useEffect(() => {
-    const bubbleConf = bubbleRef.current?.conf;
-    const { probeType, onScroll, scroll, onPullingUp, onPullingDown, getInstance } = props;
-    const pullUpLoadConf = { threshold: 50 };
-    const pullDownConf = { threshold: 60, stop: 30 };
-    const wrapper: BScroller = instanceRef.current = new BScroll(wrapperRef.current, {
+    const { probeType, onPullingUp, onPullingDown } = propsRef.current;
+    instanceRef.current = new BScroll(wrapperRef.current as Element, {
       scrollY: true,
       click: true,
       probeType,
       pullUpLoad: onPullingUp ? pullUpLoadConf : false,
       pullDownRefresh: onPullingDown ? pullDownConf : false
     }) as BScroller;
-    wrapper.on('scroll', (e: any) => {
+    return function () {
+      instanceRef.current?.destroy();
+    };
+  }, [pullDownConf, pullUpLoadConf]);
+  // onScroll
+  useEffect(() => {
+    const wrapper = instanceRef.current;
+    const bubbleConf = bubble.conf;
+    const listener = (e: any) => {
       if (typeof onScroll === 'function') {
         onScroll(e);
       }
@@ -82,36 +95,53 @@ const ScrollY: FC<Props> = function (props): JSX.Element {
         const loadingPosTop = Math.min(-2, e.y - pullDownConf.threshold);
         setLoadingTop(loadingPosTop);
       }
-    });
-    wrapper.on('pullingUp', () => {
+    };
+    wrapper?.on('scroll', listener);
+    return () => {
+      instanceRef.current?.off('scroll', listener);
+    };
+  }, [onScroll, onPullingDown, pullDownConf, bubble]);
+  // on pulling up and pulling down
+  useEffect(() => {
+    const wrapper = instanceRef.current;
+    const pullingUp = () => {
       if (typeof onPullingUp === 'function') {
         setPullingUp(true);
         onPullingUp();
       }
-    });
-    wrapper.on('pullingDown', () => {
+    };
+    const pullingDown = () => {
       if (typeof onPullingDown === 'function') {
         setPullingDown(true);
         onPullingDown();
       }
-    });
+    };
+    wrapper?.on('pullingUp', pullingUp);
+    wrapper?.on('pullingDown', pullingDown);
+    return () => {
+      instanceRef.current?.off('pullingUp', pullingUp);
+      instanceRef.current?.off('pullingDown', pullingDown);
+    };
+  }, [onPullingUp, onPullingDown]);
+  // use instance
+  useEffect(() => {
     const refresh = () => {
-      wrapper.refresh();
+      instanceRef.current?.refresh();
     };
     const finishPullUp = () => {
       setPullingUp(false);
-      wrapper.finishPullUp();
+      instanceRef.current?.finishPullUp();
       setTimeout(refresh, 20);
     };
     const closePullUp = () => {
       finishPullUp();
-      wrapper.closePullUp();
+      instanceRef.current?.closePullUp();
     };
     const openPullUp = (option = pullUpLoadConf) => {
-      wrapper.openPullUp(option);
+      instanceRef.current?.openPullUp(option);
     };
     const finishPullDown = () => {
-      wrapper.finishPullDown();
+      instanceRef.current?.finishPullDown();
       setPullingDown(false);
       setPullingDownSnapshot(true);
       setTimeout(() => {
@@ -120,7 +150,7 @@ const ScrollY: FC<Props> = function (props): JSX.Element {
       }, 500);
     };
     const openPullDown = (options = pullDownConf) => {
-      wrapper.openPullDown(options);
+      instanceRef.current?.openPullDown(options);
     };
     const instance = { finishPullUp, refresh, closePullUp, openPullUp, finishPullDown, openPullDown };
     if (typeof getInstance === 'function') {
@@ -129,10 +159,7 @@ const ScrollY: FC<Props> = function (props): JSX.Element {
     if (scroll && typeof scroll === 'object') {
       Object.assign(scroll, instance);
     }
-    return function () {
-      instanceRef.current?.destroy();
-    };
-  }, [props]);
+  }, [getInstance, scroll, pullUpLoadConf, pullDownConf]);
 
   return (
     <div className={ styles.scrollYWrapper } style={style}>
@@ -145,7 +172,7 @@ const ScrollY: FC<Props> = function (props): JSX.Element {
                 <Loading title={'加载中...'} /> :
                 <Bubble
                   y={bubbleY}
-                  getInstance={e => bubbleRef.current = e}
+                  bubble={bubble}
                 />
             }
           </div>
@@ -186,9 +213,14 @@ interface BubbleInstance {
 interface BubbleProps extends PropsWithChildren<any> {
   y: number;
   getInstance?: (instance: BubbleInstance) => void;
+  bubble?: { [prop: string]: any };
 }
 const defaultBubbleProps: BubbleProps = {
   y: 0
+};
+const useBubble = (): BubbleInstance => {
+  const instance = useRef<BubbleInstance>({} as BubbleInstance);
+  return instance.current;
 };
 const Bubble: FC<BubbleProps> = function(props): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -207,7 +239,7 @@ const Bubble: FC<BubbleProps> = function(props): JSX.Element {
     headRadius: 0,
     distance: 0
   });
-  const { y } = props;
+  const { y, getInstance, bubble } = props;
   const [width, setWidth] = useState<number>(50);
   const [height, setHeight] = useState<number>(80);
 
@@ -286,7 +318,6 @@ const Bubble: FC<BubbleProps> = function(props): JSX.Element {
 
   // Initial data
   useEffect(() => {
-    const { getInstance } = props;
     const conf = dataRef.current;
     const ratio = conf.ratio;
     conf.initRadius = 16 * ratio;
@@ -302,10 +333,17 @@ const Bubble: FC<BubbleProps> = function(props): JSX.Element {
       x: conf.initCenterX,
       y: conf.initCenterY
     };
+  }, []);
+  // use instance
+  useEffect(() => {
+    const instance = { conf: dataRef.current };
     if (typeof getInstance === 'function') {
-      getInstance({ conf });
+      getInstance(instance);
     }
-  }, [props]);
+    if (bubble && typeof bubble === 'object') {
+      Object.assign(bubble, instance);
+    }
+  }, [getInstance, bubble]);
   // Initial width and height when the component is created
   useEffect(() => {
     const conf = dataRef.current;

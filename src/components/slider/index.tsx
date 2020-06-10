@@ -22,7 +22,7 @@ interface SliderInstance {
   play(): void;
   stop(): void;
 }
-interface Props extends PropsWithChildren<any>{
+interface Props extends PropsWithChildren<any> {
   children: ReactElement[];
   dot?: boolean;
   loop?: boolean;
@@ -128,12 +128,6 @@ const Slider: FC<Props> = function(props): JSX.Element {
     scroll.on('beforeScrollStart', () => {
       instance.stop();
     });
-    if (typeof getInstance === 'function') {
-      getInstance(instance);
-    }
-    if (slider && typeof slider === 'object') {
-      Object.assign(slider, instance);
-    }
     const onResize = debounce(() => {
       initSlideWidth();
       instance.refresh();
@@ -143,7 +137,16 @@ const Slider: FC<Props> = function(props): JSX.Element {
       window.removeEventListener('resize', onResize);
       instance.destroy();
     };
-  }, [initSlideWidth, loop, threshold, speed, click, instance, getInstance, data, slider]);
+  }, [initSlideWidth, loop, threshold, speed, click, instance, data]);
+  // use instance
+  useEffect(() => {
+    if (typeof getInstance === 'function') {
+      getInstance(instance);
+    }
+    if (slider && typeof slider === 'object') {
+      Object.assign(slider, instance);
+    }
+  }, [instance, getInstance, slider]);
 
   return (
     <div ref={wrapperRef} className={styles.slider}>
