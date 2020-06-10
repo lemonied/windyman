@@ -1,11 +1,16 @@
 import React, { FC, PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MultiDataManager, MultiPickerDataItem, PickerModal, PickerService, PickerValues } from '../picker';
 import styles from './style.module.scss';
+import { FormInstance } from 'rc-field-form';
 
 interface InputSharedProps extends PropsWithChildren<any> {
   value?: any;
   onChange?: (value: any) => void;
   placeholder?: string;
+  form?: FormInstance;
+  required?: boolean;
+  name?: string;
+  errors?: string[];
 }
 interface Props extends InputSharedProps {
   type?: 'text';
@@ -20,21 +25,26 @@ const defaultProps: InputProps = {
   type: 'text'
 };
 const Input: FC<InputProps> = function(props): JSX.Element {
-  const { type, data, onChange, value, placeholder, multi } = props;
+  const { type, data, onChange, value, placeholder, multi, errors } = props;
+  const [optErrors, setOptErrors] = useState<string[] | undefined>();
 
   const input = useMemo(() => {
     switch (type) {
       case 'text':
-        return (<input type="text" placeholder={placeholder} />);
+        return (<input type="text" placeholder={placeholder} onChange={onChange} value={value || ''} />);
       case 'picker':
         return (<PickerInput data={data} onChange={onChange} value={value} placeholder={placeholder} multi={multi} />);
       default:
-        return (<input type={type} placeholder={placeholder} />);
+        return (<input type={type} placeholder={placeholder} value={value || ''} onChange={onChange} />);
     }
   }, [type, data, onChange, value, placeholder, multi]);
 
+  useEffect(() => {
+    setOptErrors(errors);
+  }, [errors]);
+
   return (
-    <div className={styles.wrapper}>{input}</div>
+    <div className={styles.wrapper}>{input}{optErrors}</div>
   );
 
 };
@@ -75,7 +85,6 @@ const PickerInput: FC<PickerInputProps> = function(props): JSX.Element {
   }, [emitChange, dataManager]);
   // echo picker
   const echoPicker = useCallback((data: MultiPickerDataItem[], value?: PickerValues) => {
-    const oldValues = dataManager.values;
     pickerModalRef.current?.setData(data);
     pickerModalRef.current?.setValue(value);
 
@@ -84,10 +93,7 @@ const PickerInput: FC<PickerInputProps> = function(props): JSX.Element {
     setCurrentValue(
       dataManager.sourceValues.map(item => item.name).join(' ')
     );
-    if (oldValues !== dataManager.values) {
-      emitChange();
-    }
-  }, [dataManager, emitChange]);
+  }, [dataManager]);
   const showPicker = useCallback(() => {
     pickerServiceRef.current.open(dataManager.sources, dataManager.values, multi, (modal) => {
       pickerModalRef.current = modal;
