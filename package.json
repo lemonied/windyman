@@ -1,59 +1,78 @@
 {
-  "name": "ret",
-  "version": "0.1.0",
-  "private": true,
+  "name": "windyman",
+  "version": "0.1.7",
+  "scripts": {
+    "start": "BROWSER=none EXTEND_ESLINT=true react-scripts start",
+    "build": "tsc --project ./src && node ./build-cmt.js && NODE_ENV=production node ./config/prod.js",
+    "build-web": "CI=true PUBLIC_URL=/ GENERATE_SOURCEMAP=false react-scripts build",
+    "windows-start": "set BROWSER=none && set EXTEND_ESLINT=true && react-scripts start",
+    "windows-build-web": "set CI=true && set PUBLIC_URL=/ && set GENERATE_SOURCEMAP=false && react-scripts build",
+    "test": "react-scripts test"
+  },
+  "repository": "https://github.com/timoodada/hook.git",
+  "author": "ChenJiYuan <chenjiyuan.123@qq.com>",
+  "license": "MIT",
+  "module": "dist/es/components/index.js",
+  "main": "dist/lib/components/index.js",
+  "types": "dist/es/components/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "react",
+    "typescript",
+    "component",
+    "mobile"
+  ],
   "dependencies": {
+    "rc-field-form": "^1.4.4",
+    "react-transition-group": "^4.4.1",
+    "rxjs": "^6.5.5",
+    "rxjs-compat": "^6.5.5"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.10.1",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "@types/fastclick": "^1.0.29",
     "@types/jest": "^24.0.0",
     "@types/node": "^12.0.0",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
+    "@types/react-redux": "^7.1.8",
     "@types/react-router-dom": "^5.1.5",
-    "axios": "^0.19.2",
-    "better-scroll": "^1.15.2",
+    "@types/react-transition-group": "^4.4.0",
+    "@types/redux-immutable": "^4.0.1",
+    "autoprefixer": "^9.8.0",
+    "babel-loader": "^8.1.0",
+    "babel-polyfill": "^6.26.0",
+    "bxios": "^1.0.2",
     "fastclick": "^1.0.6",
+    "fs-extra": "^9.0.1",
+    "glob": "^7.1.6",
+    "http-proxy-middleware": "^1.0.4",
     "immutable": "^4.0.0-rc.12",
     "node-sass": "^4.14.1",
-    "rc-field-form": "^1.4.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-redux": "^7.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
-    "react-transition-group": "^4.4.1",
     "redux": "^4.0.5",
     "redux-immutable": "^4.0.0",
-    "rxjs": "^6.5.5",
-    "rxjs-compat": "^6.5.5",
-    "typescript": "~3.7.2"
-  },
-  "scripts": {
-    "start": "BROWSER=none EXTEND_ESLINT=true react-scripts start",
-    "build": "CI=true PUBLIC_URL=/ GENERATE_SOURCEMAP=false react-scripts build",
-    "windows-start": "set BROWSER=none && set EXTEND_ESLINT=true && react-scripts start",
-    "windows-build": "set CI=true && set PUBLIC_URL=/ && set GENERATE_SOURCEMAP=false && react-scripts build",
-    "test": "react-scripts test"
+    "sass-loader": "^8.0.2",
+    "typescript": "~3.7.2",
+    "webpack-merge": "^4.2.2"
   },
   "browserslist": {
     "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
+      "> 1%",
+      "last 2 versions"
     ],
     "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
+      "> 1%",
+      "last 2 versions"
     ]
-  },
-  "devDependencies": {
-    "@types/better-scroll": "^1.12.2",
-    "@types/fastclick": "^1.0.29",
-    "@types/react-redux": "^7.1.8",
-    "@types/react-transition-group": "^4.4.0",
-    "@types/redux-immutable": "^4.0.1",
-    "http-proxy-middleware": "^1.0.4"
   }
 }

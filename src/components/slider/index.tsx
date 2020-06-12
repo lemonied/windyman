@@ -11,8 +11,8 @@ import React, {
   ReactElement
 } from 'react';
 import styles from './style.module.scss';
-import BScroll from 'better-scroll';
-import { debounce } from '../../helpers/utils';
+import { BScroll } from '../better-scroll';
+import { debounce } from '../../common/utils';
 
 interface SliderInstance {
   next(time?: number, easing?: object): void;

@@ -1,5 +1,6 @@
-import Axios, { AxiosRequestConfig, Canceler } from 'axios';
-import { deepMerge } from './utils';
+import Bxios, { CancelToken } from 'bxios';
+import { RequestConfig, Canceler } from 'bxios/dist/types/types';
+import { deepMerge } from '../common/utils';
 import { Observable } from 'rxjs';
 import { queryString } from './query';
 
@@ -13,14 +14,14 @@ const defaultAxiosConf = {
   baseURL: baseUrl
 };
 
-export function http(params: AxiosRequestConfig): Observable<any> {
+export function http(params: RequestConfig): Observable<any> {
   return new Observable<any>(subscribe => {
     let cancel: Canceler;
     const config = deepMerge(defaultAxiosConf, params);
-    config.cancelToken = new Axios.CancelToken(c => {
+    config.cancelToken = new CancelToken(c => {
       cancel = c;
     });
-    Axios(config).then(res => {
+    Bxios(config).then(res => {
       subscribe.next(res.data);
       subscribe.complete();
     }).catch(error => {

@@ -1,5 +1,6 @@
 import React, { PropsWithChildren, FC, useEffect, useState, CSSProperties, useCallback, useRef, useMemo } from 'react';
-import BScroll, { Position } from 'better-scroll';
+import { BScroll } from '../better-scroll';
+import { Position } from '../better-scroll/bscroll.esm';
 import styles from './style.module.scss';
 import { Loading } from '../loading';
 

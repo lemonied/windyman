@@ -1,6 +1,6 @@
 import React, { CSSProperties, FC, PropsWithChildren } from 'react';
 import styles from './style.module.scss';
-import gif from './loading.gif';
+import { LoadingIcon } from './loading';
 
 interface Props extends PropsWithChildren<any> {
   title?: string;
@@ -15,7 +15,7 @@ const Loading: FC<Props> = function(props): JSX.Element {
   const { title, style } = props;
   return (
     <div className={ styles.loading } style={ style }>
-      <img width="20" src={gif} alt="loading" />
+      <LoadingIcon width={20} height={20} />
       {
         title ?
           <span className={ styles.title }>{ title }</span> :

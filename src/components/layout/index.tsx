@@ -1,6 +1,6 @@
 import React, { CSSProperties, FC, PropsWithChildren, ReactNode } from 'react';
 import styles from './style.module.scss';
-import { combineClassNames } from '../../helpers/utils';
+import { combineClassNames } from '../../common/utils';
 
 interface Props extends PropsWithChildren<any>{
   header?: string | ReactNode;

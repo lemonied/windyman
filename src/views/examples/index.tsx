@@ -4,6 +4,7 @@ import { Field, useForm } from 'rc-field-form';
 import { Input } from '../../components/input';
 import { post } from '../../helpers/http';
 import { YField, YForm } from '../../components/y-form';
+import { Loading } from '../../components/loading';
 
 const formatCity = (cities: any) => {
   return cities.map((item: any) => {
@@ -47,6 +48,7 @@ const Examples: FC<any> = function(): JSX.Element {
 
   return (
     <Layout>
+      <Loading />
       <YForm form={form}>
         <YField
           name={'education'}

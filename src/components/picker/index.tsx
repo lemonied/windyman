@@ -1,8 +1,8 @@
 import React, { Component, FC, PropsWithChildren, useEffect, useRef, createRef, RefObject } from 'react';
 import ReactDOM from 'react-dom';
 import styles from './style.module.scss';
-import BScroll from 'better-scroll';
-import { combineClassNames } from '../../helpers/utils';
+import { BScroll } from '../better-scroll';
+import { combineClassNames } from '../../common/utils';
 import { CSSTransition } from 'react-transition-group';
 import { Observable } from 'rxjs';
 
