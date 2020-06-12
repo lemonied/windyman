@@ -2,7 +2,7 @@
 
 $lineHeight: 25px;
 
-.wheelWrapper{
+.windy-wheel-wrapper{
   font-size: 14px;
   padding: 20% 0;
   height: $lineHeight;
@@ -19,37 +19,37 @@ $lineHeight: 25px;
     left: 0;
     transform: translateY(-50%);
   }
-  .wheelScroll{
-    .wheelItem{
+  .wheel-scroll{
+    .wheel-item{
       text-align: center;
       color: #333;
       line-height: $lineHeight;
       width: 100%;
       @include no-wrap;
     }
-    .wheelDisabledItem{
+    .wheel-disabled-item{
       color: #999;
     }
   }
 }
-.pickerModalMask{
+.windy-picker-modal-mask{
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
   top: 0;
   background: rgba(0, 0, 0, .2);
-  .pickerModal{
+  .picker-modal{
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
     background: #ffffff;
     display: flex;
-    .pickerItem{
+    .picker-item{
       flex: 1;
     }
-    .pickerActions{
+    .picker-actions{
       background: inherit;
       position: absolute;
       left: 0;
@@ -76,37 +76,37 @@ $lineHeight: 25px;
     }
   }
 }
-.pickerEnter {
+.picker-enter {
   opacity: 0;
-  .pickerModal{
+  .picker-modal{
     transform: translateY(100%);
   }
 }
-.pickerEnterActive {
+.picker-enter-active {
   opacity: 1;
-  .pickerModal{
+  .picker-modal{
     transform: translateY(0);
   }
 }
-.pickerExit {
+.picker-exit {
   opacity: 1;
-  .pickerModal{
+  .picker-modal{
     transform: scale(1);
   }
 }
-.pickerExitActive {
+.picker-exit-active {
   opacity: 0;
-  .pickerModal{
+  .picker-modal{
     transform: translateY(100%);
   }
 }
-.pickerExitDone {
+.picker-exit-done {
   opacity: 0;
   display: none;
 }
-.pickerEnterActive, .pickerExitActive{
+.picker-enter-active, .picker-exit-active{
   transition: opacity .3s ease;
-  .pickerModal{
+  .picker-modal{
     transition: transform .3s ease;
   }
 }

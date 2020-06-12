@@ -1,9 +1,9 @@
 import React, { FC, useEffect, useState } from 'react';
-import { Layout } from '../../components/layout';
+import { Layout } from '../../../components/layout';
 import { Field, useForm } from 'rc-field-form';
-import { Input } from '../../components/input';
-import { post } from '../../helpers/http';
-import { YField, YForm } from '../../components/y-form';
+import { Input } from '../../../components/input';
+import { post } from '../../../helpers/http';
+import { YField, YForm } from '../../../components/y-form';
 
 const formatCity = (cities: any) => {
   return cities.map((item: any) => {
@@ -15,7 +15,7 @@ const formatCity = (cities: any) => {
   });
 };
 
-const Examples: FC<any> = function(): JSX.Element {
+const FormDemo: FC<any> = function(): JSX.Element {
   const [options, setOptions] = useState([]);
   const [city, setCity] = useState([]);
   const [form] = useForm();
@@ -102,4 +102,4 @@ const Examples: FC<any> = function(): JSX.Element {
   );
 };
 
-export default Examples;
+export { FormDemo };

@@ -1,7 +1,7 @@
 @import "../../common/style/variable";
 @import "../../common/style/mixin";
 
-.modalWrapper{
+.windy-modal-wrapper{
   position: absolute;
   top: 0;
   bottom: 0;
@@ -20,18 +20,18 @@
     border-radius: 7px;
     background: #333333;
     overflow: hidden;
-    .modalHeader{
+    .modal-header{
       color: $color-text-d;
       font-size: 16px;
       padding: 15px 20px 0 20px;
     }
-    .modalContent{
+    .modal-content{
       color: $color-text-l;
       font-size: 14px;
       line-height: 18px;
       padding: 15px 20px 20px 20px;
     }
-    .modalFooter{
+    .modal-footer{
       @include border-top(#666666);
       display: flex;
       .button{
@@ -57,38 +57,38 @@
   }
 }
 
-.modalEnter {
+.modal-enter {
   opacity: 0;
 }
-.modalEnterActive {
+.modal-enter-active {
   opacity: 1;
   .modal{
-    animation: modalEject linear .3s;
+    animation: windy-modal-eject linear .3s;
   }
 }
-.modalExit {
+.modal-exit {
   opacity: 1;
   .modal{
     transform: scale(1);
   }
 }
-.modalExitActive {
+.modal-exit-active {
   opacity: 0;
   .modal{
     transform: scale(0);
   }
 }
-.modalExitDone{
+.modal-exit-done{
   opacity: 0;
 }
-.modalEnterActive, .modalExitActive{
+.modal-enter-active, .modal-exit-active{
   transition: opacity .3s ease;
   .modal{
     transition: transform .3s ease;
   }
 }
 
-@keyframes modalEject {
+@keyframes windy-modal-eject {
   0%{
     transform: scale(0);
   }

@@ -1,6 +1,6 @@
 import React, { Component, PropsWithChildren, ReactNode, createRef } from 'react';
 import ReactDOM from 'react-dom';
-import styles from './style.module.scss';
+import './style.scss';
 import { Observable } from 'rxjs';
 import { CSSTransition } from 'react-transition-group';
 
@@ -43,22 +43,22 @@ export class Modal extends Component<Props, any> {
       <CSSTransition
         in={show}
         classNames={{
-          enter: styles.modalEnter,
-          enterActive: styles.modalEnterActive,
-          exit: styles.modalExit,
-          exitActive: styles.modalExitActive,
-          exitDone: styles.modalExitDone
+          enter: 'modal-enter',
+          enterActive: 'modal-enter-active',
+          exit: 'modal-exit',
+          exitActive: 'modal-exit-active',
+          exitDone: 'modal-exit-done'
         }}
         timeout={300}
       >
-        <div className={styles.modalWrapper} onClick={maskClick}>
-          <div className={styles.modal} onClick={this.preventClick.bind(this)}>
-            <div className={styles.modalHeader}>{ header }</div>
-            <div className={styles.modalContent}>{ content }</div>
-            <div className={styles.modalFooter}>
+        <div className={'windy-modal-wrapper'} onClick={maskClick}>
+          <div className={'modal'} onClick={this.preventClick.bind(this)}>
+            <div className={'modal-header'}>{ header }</div>
+            <div className={'modal-content'}>{ content }</div>
+            <div className={'modal-footer'}>
               {
                 footer?.map((item, key) =>(
-                  <button key={key} className={styles.button} onClick={item.callback}>{item.text}</button>
+                  <button key={key} className={'button'} onClick={item.callback}>{item.text}</button>
                 ))
               }
             </div>

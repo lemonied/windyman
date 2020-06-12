@@ -1,19 +1,19 @@
 @import "../../common/style/mixin";
 
-.slider{
+.windy-slider{
   overflow: hidden;
   width: 100%;
   position: relative;
-  .sliderGroup{
+  .slider-group{
     @include clearFix;
-    .slideItem{
+    .slide-item{
       float: left;
       & > *{
         width: 100%;
       }
     }
   }
-  .dotGroup{
+  .dot-group{
     position: absolute;
     bottom: 5%;
     left: 50%;

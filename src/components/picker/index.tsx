@@ -1,6 +1,6 @@
 import React, { Component, FC, PropsWithChildren, useEffect, useRef, createRef, RefObject } from 'react';
 import ReactDOM from 'react-dom';
-import styles from './style.module.scss';
+import './style.scss';
 import { BScroll } from '../better-scroll';
 import { combineClassNames } from '../../common/utils';
 import { CSSTransition } from 'react-transition-group';
@@ -66,9 +66,9 @@ const Picker: FC<Props> = function(props): JSX.Element {
         selectedIndex: defaultSelectedIndexRef.current,
         rotate: 25,
         adjustTime: 400,
-        wheelWrapperClass: styles.wheelScroll,
-        wheelItemClass: styles.wheelItem,
-        wheelDisabledItemClass: styles.wheelDisabledItem
+        wheelWrapperClass: 'wheel-scroll',
+        wheelItemClass: 'wheel-item',
+        wheelDisabledItemClass: 'wheel-disabled-item'
       } as any,
       probeType: 3
     });
@@ -93,13 +93,13 @@ const Picker: FC<Props> = function(props): JSX.Element {
   }, [onChange]);
 
   return (
-    <div ref={wheelWrapperRef} className={combineClassNames(styles.wheelWrapper, className)}>
-      <ul className={styles.wheelScroll}>
+    <div ref={wheelWrapperRef} className={combineClassNames('windy-wheel-wrapper', className)}>
+      <ul className={'wheel-scroll'}>
         {
           data.map(item => (
             <li
               key={item.value}
-              className={combineClassNames(styles.wheelItem, item.disabled ? styles.wheelDisabledItem : null)}
+              className={combineClassNames('wheel-item', item.disabled ? 'wheel-disabled-item' : null)}
             >{ item.name }</li>
           ))
         }
@@ -211,24 +211,24 @@ export class PickerModal extends Component<PickerModalProps, PickerModalState> {
       <CSSTransition
         in={show}
         classNames={{
-          enter: styles.pickerEnter,
-          enterActive: styles.pickerEnterActive,
-          exit: styles.pickerExit,
-          exitActive: styles.pickerExitActive,
-          exitDone: styles.pickerExitDone
+          enter: 'picker-enter',
+          enterActive: 'picker-enter-active',
+          exit: 'picker-exit',
+          exitActive: 'picker-exit-active',
+          exitDone: 'picker-exit-done'
         }}
         timeout={300}
       >
-        <div className={styles.pickerModalMask} onClick={e => this.onSave(false)}>
-          <div className={styles.pickerModal} onClick={this.preventClick}>
-            <div className={styles.pickerActions}>
-              <span className={styles.cancel} onClick={e => this.onSave(false)}>取消</span>
-              <span className={styles.submit} onClick={e => this.onSave(true)}>确定</span>
+        <div className={'windy-picker-modal-mask'} onClick={e => this.onSave(false)}>
+          <div className={'picker-modal'} onClick={this.preventClick}>
+            <div className={'picker-actions'}>
+              <span className={'cancel'} onClick={e => this.onSave(false)}>取消</span>
+              <span className={'submit'} onClick={e => this.onSave(true)}>确定</span>
             </div>
             {
               data.map((item, key) => (
                 <Picker
-                  className={styles.pickerItem}
+                  className={'picker-item'}
                   key={key}
                   data={item}
                   getInstance={e => this.getPickerInstance(e, key)}

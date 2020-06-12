@@ -10,7 +10,7 @@ import React, {
   useMemo,
   ReactElement
 } from 'react';
-import styles from './style.module.scss';
+import './style.scss';
 import { BScroll } from '../better-scroll';
 import { debounce } from '../../common/utils';
 
@@ -149,12 +149,12 @@ const Slider: FC<Props> = function(props): JSX.Element {
   }, [instance, getInstance, slider]);
 
   return (
-    <div ref={wrapperRef} className={styles.slider}>
-      <div className={styles.sliderGroup} ref={slideGroupRef}>
+    <div ref={wrapperRef} className={'windy-slider'}>
+      <div className={'slider-group'} ref={slideGroupRef}>
         {
           Children.map(children, ((item, key) => (
             <div
-              className={styles.slideItem}
+              className={'slide-item'}
               key={key}
             >{ item }</div>
           )))
@@ -162,7 +162,7 @@ const Slider: FC<Props> = function(props): JSX.Element {
       </div>
       {
         dot ?
-          <div className={styles.dotGroup}>
+          <div className={'dot-group'}>
             { Children.map(children, (item, key) => (<span key={key} className={currentIndex === key ? 'active' : ''} />)) }
           </div> :
           null

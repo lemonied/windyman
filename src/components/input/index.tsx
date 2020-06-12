@@ -1,6 +1,6 @@
 import React, { FC, PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MultiDataManager, MultiPickerDataItem, PickerModal, PickerService, PickerValues } from '../picker';
-import styles from './style.module.scss';
+import './style.scss';
 import { FormInstance } from 'rc-field-form';
 
 interface InputSharedProps extends PropsWithChildren<any> {
@@ -44,7 +44,7 @@ const Input: FC<InputProps> = function(props): JSX.Element {
   }, [errors]);
 
   return (
-    <div className={styles.wrapper}>{input}{optErrors}</div>
+    <div className={'windy-input-wrapper'}>{input}{optErrors}</div>
   );
 
 };

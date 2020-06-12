@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, FC, useEffect, useState, CSSProperties, useCallback, useRef, useMemo } from 'react';
 import { BScroll } from '../better-scroll';
 import { Position } from '../better-scroll/bscroll.esm';
-import styles from './style.module.scss';
+import './style.scss';
 import { Loading } from '../loading';
 
 interface BScroller extends BScroll {
@@ -163,11 +163,11 @@ const ScrollY: FC<Props> = function (props): JSX.Element {
   }, [getInstance, scroll, pullUpLoadConf, pullDownConf]);
 
   return (
-    <div className={ styles.scrollYWrapper } style={style}>
+    <div className={ 'windy-scroll-y-wrapper' } style={style}>
       {
         pullingDownSnapshot ?
           null :
-          <div className={styles.loadingWrapper} style={{ top: pullingDown ? -2 : loadingTop }}>
+          <div className={'loading-wrapper'} style={{ top: pullingDown ? -2 : loadingTop }}>
             {
               pullingDown ?
                 <Loading title={'加载中...'} /> :
@@ -178,7 +178,7 @@ const ScrollY: FC<Props> = function (props): JSX.Element {
             }
           </div>
       }
-      <div className={ styles.scrollY } ref={ wrapperRef }>
+      <div className={ 'scroll-y' } ref={ wrapperRef }>
         <div>
           { props.children }
           {
