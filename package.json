@@ -9,7 +9,7 @@
     "windows-build-web": "set CI=true && set PUBLIC_URL=/ && set GENERATE_SOURCEMAP=false && react-scripts build",
     "test": "react-scripts test"
   },
-  "repository": "https://github.com/timoodada/hook.git",
+  "repository": "https://github.com/timoodada/windyman.git",
   "author": "ChenJiYuan <chenjiyuan.123@qq.com>",
   "license": "MIT",
   "module": "dist/es/components/index.js",
