@@ -348,7 +348,8 @@ export class PickerService {
     this.ele.push(container);
     container.className = 'picker-container';
     document.body.appendChild(container);
-    ReactDOM.render(<PickerModal multi={multi} data={data} defaultValue={defaultValue} ref={pickerModal} onSubmit={onSubmit} />, container, () => {
+    ReactDOM.render(<PickerModal multi={multi} data={data} defaultValue={defaultValue} ref={pickerModal} onSubmit={onSubmit} />, container,
+      () => {
         if (afterRender && pickerModal.current) {
           afterRender(container, pickerModal.current);
         }

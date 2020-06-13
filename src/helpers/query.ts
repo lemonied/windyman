@@ -44,8 +44,8 @@ export function queryString(val: any, prefix?: string): string {
         value = JSON.stringify(value);
       }
       const ret = prefix ?
-      `${prefix}[${key}]=${encode(value)}` :
-      `${key}=${encode(value)}`;
+        `${prefix}[${key}]=${encode(value)}` :
+        `${key}=${encode(value)}`;
       serializedParams.push(ret);
     });
     return serializedParams.join('&');

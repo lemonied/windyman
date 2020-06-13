@@ -2,7 +2,7 @@ const {resolve} = require('path');
 const postcssNormalize = require('postcss-normalize');
 const glob = require('glob');
 
-const source = resolve(__dirname, '../src');
+const source = resolve(__dirname, '../src').replace(/\\/g, '/');
 const entry = {};
 
 const files = glob.sync(
@@ -11,6 +11,41 @@ const files = glob.sync(
 files.forEach(item => {
   entry[item.replace(/(\/)[^/]+$/, '$1index').replace(source, '')] = item;
 });
+
+const cssLoaders = (modules = false) => {
+  return [{
+    loader: 'style-loader'
+  }, {
+    loader: 'css-loader',
+    options: {
+      importLoaders: 1,
+      modules: modules
+    }
+  }, {
+    loader: 'postcss-loader',
+    options: {
+      // Necessary for external CSS imports to work
+      // https://github.com/facebook/create-react-app/issues/2677
+      ident: 'postcss',
+      plugins: () => [
+        require('postcss-flexbugs-fixes'),
+        require('postcss-preset-env')({
+          autoprefixer: {
+            flexbox: 'no-2009',
+          },
+          stage: 3
+        }),
+        // Adds PostCSS Normalize as the reset css with default options,
+        // so that it honors browserslist config in package.json
+        // which in turn let's users customize the target behavior as per their needs.
+        postcssNormalize()
+      ],
+      sourceMap: false
+    }
+  }, {
+    loader: 'sass-loader'
+  }];
+};
 
 module.exports = {
   entry: entry,
@@ -28,52 +63,23 @@ module.exports = {
     rules: [{
       test: /\.(js|mjs|jsx|ts|tsx)$/,
       include: resolve(__dirname, '../src'),
-      use: [
-        {
-          loader: 'babel-loader',
-          options: {
-            presets: ['react-app'],
-            plugins: [
-              ['@babel/plugin-proposal-class-properties']
-            ]
-          }
-        }
-      ]
-    }, {
-      test: /\.scss$/,
-      exclude: /node_modules/,
       use: [{
-        loader: 'style-loader'
-      }, {
-        loader: 'css-loader',
+        loader: 'babel-loader',
         options: {
-          importLoaders: 1,
-          import: true
+          presets: ['react-app'],
+          plugins: [
+            ['@babel/plugin-proposal-class-properties']
+          ]
         }
-      }, {
-        loader: 'postcss-loader',
-        options: {
-          // Necessary for external CSS imports to work
-          // https://github.com/facebook/create-react-app/issues/2677
-          ident: 'postcss',
-          plugins: () => [
-            require('postcss-flexbugs-fixes'),
-            require('postcss-preset-env')({
-              autoprefixer: {
-                flexbox: 'no-2009',
-              },
-              stage: 3
-            }),
-            // Adds PostCSS Normalize as the reset css with default options,
-            // so that it honors browserslist config in package.json
-            // which in turn let's users customize the target behavior as per their needs.
-            postcssNormalize()
-          ],
-          sourceMap: false
-        }
-      }, {
-        loader: 'sass-loader'
       }]
+    }, {
+      test: /^((?!module).)+\.scss$/,
+      exclude: /node_modules/,
+      use: cssLoaders(false)
+    }, {
+      test: /\.module\.scss$/,
+      exclude: /node_modules/,
+      use: cssLoaders(true)
     }]
   }
 };

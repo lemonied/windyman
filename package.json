@@ -4,9 +4,10 @@
   "scripts": {
     "start": "BROWSER=none EXTEND_ESLINT=true react-scripts start",
     "build": "tsc --project ./src && node ./build-cmt.js && NODE_ENV=production node ./config/prod.js",
-    "build-web": "CI=true PUBLIC_URL=/ GENERATE_SOURCEMAP=false react-scripts build",
-    "windows-start": "set BROWSER=none && set EXTEND_ESLINT=true && react-scripts start",
-    "windows-build-web": "set CI=true && set PUBLIC_URL=/ && set GENERATE_SOURCEMAP=false && react-scripts build",
+    "build-all": "CI=true EXTEND_ESLINT=true PUBLIC_URL=/ GENERATE_SOURCEMAP=false react-scripts build",
+    "windows-start": "set BROWSER=none&& set EXTEND_ESLINT=true&& react-scripts start",
+    "windows-build": "tsc --project ./src && node ./build-cmt.js && set NODE_ENV=production&& node ./config/prod.js",
+    "windows-build-all": "set CI=true&& set EXTEND_ESLINT=true&& set PUBLIC_URL=/&& set GENERATE_SOURCEMAP=false&& react-scripts build",
     "test": "react-scripts test"
   },
   "repository": "https://github.com/timoodada/windyman.git",
@@ -46,8 +47,8 @@
     "@types/redux-immutable": "^4.0.1",
     "autoprefixer": "^9.8.0",
     "babel-loader": "^8.1.0",
-    "babel-polyfill": "^6.26.0",
     "bxios": "^1.0.2",
+    "core-js": "^3.6.5",
     "fastclick": "^1.0.6",
     "fs-extra": "^9.0.1",
     "glob": "^7.1.6",
@@ -61,6 +62,7 @@
     "react-scripts": "3.4.1",
     "redux": "^4.0.5",
     "redux-immutable": "^4.0.0",
+    "regenerator-runtime": "^0.13.5",
     "sass-loader": "^8.0.2",
     "typescript": "~3.7.2",
     "webpack-merge": "^4.2.2"

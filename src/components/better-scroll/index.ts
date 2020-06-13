@@ -1,3 +1,3 @@
-import BScroll from './bscroll.esm';
+import BScroll from './bscroll';
 
 export { BScroll };
