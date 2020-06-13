@@ -3,10 +3,10 @@
   "version": "0.1.7",
   "scripts": {
     "start": "BROWSER=none EXTEND_ESLINT=true react-scripts start",
-    "build": "tsc --project ./src && node ./build-cmt.js && NODE_ENV=production node ./config/prod.js",
+    "build": "tsc --project ./src && node ./build-cmt.js && NODE_ENV=production node config/build.js",
     "build-all": "CI=true EXTEND_ESLINT=true PUBLIC_URL=/ GENERATE_SOURCEMAP=false react-scripts build",
     "windows-start": "set BROWSER=none&& set EXTEND_ESLINT=true&& react-scripts start",
-    "windows-build": "tsc --project ./src && node ./build-cmt.js && set NODE_ENV=production&& node ./config/prod.js",
+    "windows-build": "tsc --project ./src && node ./build-cmt.js && set NODE_ENV=production&& node config/build.js",
     "windows-build-all": "set CI=true&& set EXTEND_ESLINT=true&& set PUBLIC_URL=/&& set GENERATE_SOURCEMAP=false&& react-scripts build",
     "test": "react-scripts test"
   },

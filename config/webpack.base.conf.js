@@ -57,7 +57,8 @@ module.exports = {
     path: resolve(__dirname, '../dist/lib'),
     filename: '[name].js',
     libraryTarget: 'umd',
-    library: 'windy'
+    library: 'windy',
+    libraryExport: 'default'
   },
   module: {
     rules: [{

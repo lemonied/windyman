@@ -19,7 +19,7 @@ npm i windyman
 ```bash
 yarn add windyman
 ```
-项目样式文件使用scss
+因项目样式使用scss，使用前请先安装node-sass
 ```bash
 npm i node-sass --save-dev
 ```
