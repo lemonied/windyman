@@ -1,6 +1,6 @@
 {
   "name": "windyman",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "scripts": {
     "start": "BROWSER=none EXTEND_ESLINT=true react-scripts start",
     "build": "tsc --project ./src && node ./build-cmt.js && NODE_ENV=production node config/build.js",
@@ -30,6 +30,11 @@
     "react-transition-group": "^4.4.1",
     "rxjs": "^6.5.5",
     "rxjs-compat": "^6.5.5"
+  },
+  "peerDependencies": {
+    "node-sass": "^4.14.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.10.1",
