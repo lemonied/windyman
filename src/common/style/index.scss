@@ -1,4 +1,5 @@
-@import "src/common/style/reset";
+@import "reset";
+@import "variable";
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -15,4 +16,17 @@ code {
 
 html, body, #root {
   height: 100%;
+  background: $color-background-body;
+}
+a{
+  color: $color-theme;
+  -webkit-backface-visibility: hidden;
+  text-decoration: none;
+  outline: none;
+  &:hover{
+    color: lighten($color-theme, 0.2);
+  }
+  &:active, &:focus{
+    color: darken($color-theme, 0.2);
+  }
 }

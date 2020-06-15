@@ -6,6 +6,9 @@ module.exports = function (app) {
     pathRewrite: {
       '^/service': '/service'
     },
+    headers: {
+      referer: 'https://www.zghnrc.gov.cn'
+    },
     changeOrigin: true,
     secure: false,
     timeout: 10000,

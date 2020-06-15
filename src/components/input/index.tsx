@@ -1,5 +1,5 @@
 import React, { FC, PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { MultiDataManager, MultiPickerDataItem, PickerModal, PickerService, PickerValues } from '../picker';
+import { MultiDataManager, MultiDataSet, PickerModal, PickerService, PickerValues } from '../picker';
 import './style.scss';
 import { FormInstance } from 'rc-field-form';
 
@@ -17,7 +17,7 @@ interface Props extends InputSharedProps {
 }
 interface InputPickerOption extends InputSharedProps {
   type: 'picker'
-  data: MultiPickerDataItem[];
+  data: MultiDataSet;
   multi?: number;
 }
 type InputProps = Props | InputPickerOption;
@@ -52,7 +52,7 @@ Input.defaultProps = defaultProps;
 export { Input };
 
 interface PickerInputProps extends InputSharedProps {
-  data: MultiPickerDataItem[];
+  data: MultiDataSet;
   value?: PickerValues;
   multi?: number;
   onChange?(value: PickerValues): void;
@@ -84,7 +84,7 @@ const PickerInput: FC<PickerInputProps> = function(props): JSX.Element {
     emitChange();
   }, [emitChange, dataManager]);
   // echo picker
-  const echoPicker = useCallback((data: MultiPickerDataItem[], value?: PickerValues) => {
+  const echoPicker = useCallback((data: MultiDataSet, value?: PickerValues) => {
     pickerModalRef.current?.setData(data);
     pickerModalRef.current?.setValue(value);
 
@@ -97,7 +97,7 @@ const PickerInput: FC<PickerInputProps> = function(props): JSX.Element {
   const showPicker = useCallback(() => {
     pickerServiceRef.current.open(dataManager.sources, dataManager.values, multi, (modal) => {
       pickerModalRef.current = modal;
-    }).subscribe(res => {
+    }).then(res => {
       pickerModalRef.current = undefined;
       if (typeof res !== 'undefined') {
         echoDisplay(res);

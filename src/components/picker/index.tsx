@@ -4,7 +4,6 @@ import './style.scss';
 import { BScroll } from '../better-scroll';
 import { combineClassNames } from '../../common/utils';
 import { CSSTransition } from 'react-transition-group';
-import { Observable } from 'rxjs';
 
 interface Item {
   name: string | number;
@@ -114,16 +113,18 @@ export { Picker };
 export interface MultiPickerDataItem extends Item {
   children?: this[];
 }
+export type MultiDataChildren = MultiPickerDataItem[];
+export type MultiDataSet = MultiPickerDataItem[][];
 export type PickerValues = string | number | (string | number)[];
 interface PickerModalProps extends PropsWithChildren<any> {
-  data: MultiPickerDataItem[];
+  data: MultiDataChildren | MultiDataSet;
   defaultValue?: PickerValues;
   multi?: number;
   onSubmit?(value?: PickerValues): void;
 }
 interface PickerModalState {
   show: boolean;
-  data: MultiPickerDataItem[][];
+  data: MultiDataSet;
   selectedIndex: number[];
 }
 
@@ -137,10 +138,10 @@ export class PickerModal extends Component<PickerModalProps, PickerModalState> {
     data: [],
     multi: 1
   }
-  dataSet: MultiPickerDataItem[][] = [];
+  dataSet: MultiDataSet = [];
   values: (string | number)[] = [];
   dataManager: MultiDataManager = new MultiDataManager(this.props.multi);
-  sourceValues: MultiPickerDataItem[] = [];
+  sourceValues: MultiDataChildren = [];
   picker: PickerInstance[] = [];
   preventClick(e: any) {
     e.preventDefault();
@@ -177,7 +178,7 @@ export class PickerModal extends Component<PickerModalProps, PickerModalState> {
     this.values = this.dataManager.values;
     this.sourceValues = this.dataManager.sourceValues;
   }
-  setData(data: MultiPickerDataItem[]) {
+  setData(data: MultiDataChildren | MultiDataSet) {
     this.dataManager.setData(data);
     this.setState({ data: this.dataManager.dataSet });
     this.dataSet = this.dataManager.dataSet;
@@ -245,10 +246,10 @@ export class PickerModal extends Component<PickerModalProps, PickerModalState> {
 }
 
 export class MultiDataManager {
-  dataSet: MultiPickerDataItem[][] = [];
-  sources: MultiPickerDataItem[] = [];
+  dataSet: MultiDataSet = [];
+  sources: MultiDataChildren | MultiDataSet = [];
   values: (string | number)[] = [];
-  sourceValues: MultiPickerDataItem[] = [];
+  sourceValues: MultiDataChildren = [];
   selectedIndex: number[] = [];
   multi = 1;
   constructor(multi = 1) {
@@ -269,13 +270,20 @@ export class MultiDataManager {
   static notEmpty(value: PickerValues | undefined): value is PickerValues {
     return typeof value !== 'undefined' && value !== '' && value !== null;
   }
-  setData(data?: MultiPickerDataItem[]) {
+  static isMultiDataSet(data: MultiDataChildren | MultiDataSet): data is MultiDataSet {
+    return data.every((item: any) => Array.isArray(item));
+  }
+  setData(data?: MultiDataChildren | MultiDataSet) {
     if (data) {
       this.sources = data;
     }
+    if (MultiDataManager.isMultiDataSet(this.sources)) {
+      this.dataSet = this.sources;
+      return;
+    }
     const multi = this.multi;
-    const list: MultiPickerDataItem[][] = [];
-    const deep = (children: MultiPickerDataItem[], index: number) => {
+    const list: MultiDataSet = [];
+    const deep = (children: MultiDataChildren, index: number) => {
       list.push(children);
       let value = this.values[index];
       if (typeof value === 'undefined' && children.length) {
@@ -337,7 +345,7 @@ export class MultiDataManager {
 export class PickerService {
   ele: Element[] = [];
   create(
-    data: MultiPickerDataItem[],
+    data: MultiDataChildren | MultiDataSet,
     defaultValue?: PickerValues,
     multi?: number,
     afterRender?: (container: Element, modal: PickerModal) => void,
@@ -357,13 +365,13 @@ export class PickerService {
     );
   }
   open(
-    data: MultiPickerDataItem[],
+    data: MultiDataChildren | MultiDataSet,
     defaultValue?: PickerValues,
     multi?: number,
     callback?: (modal: PickerModal) => void
-  ): Observable<any> {
+  ): Promise<any> {
     let container: Element;
-    return new Observable(subscriber => {
+    return new Promise((resolve, reject) => {
       this.create(data, defaultValue, multi, (ele, pickerModal) => {
         if (callback) {
           callback(pickerModal);
@@ -371,8 +379,7 @@ export class PickerService {
         container = ele;
         pickerModal.show();
       }, (value?: (string | number)[]) => {
-        subscriber.next(value);
-        subscriber.complete();
+        resolve(value);
         setTimeout(() => this.destroy(container), 300);
       });
     });

@@ -1,9 +1,14 @@
 import React, { FC, useEffect, useState } from 'react';
-import { Layout } from '../../../components/layout';
+import { Header, Layout } from '../../../components/layout';
 import { Field, useForm } from 'rc-field-form';
 import { Input } from '../../../components/input';
 import { post } from '../../../helpers/http';
 import { YField, YForm } from '../../../components/y-form';
+
+const demoDataSet = [
+  [{name: '一月', value: 1}, {name: '二月', value: 2}, {name: '三月', value: 3}],
+  [{name: '一日', value: 4}, {name: '二日', value: 5}, {name: '三日', value: 6}]
+];
 
 const formatCity = (cities: any) => {
   return cities.map((item: any) => {
@@ -15,7 +20,7 @@ const formatCity = (cities: any) => {
   });
 };
 
-const FormDemo: FC<any> = function(): JSX.Element {
+const YFormDemo: FC<any> = function(): JSX.Element {
   const [options, setOptions] = useState([]);
   const [city, setCity] = useState([]);
   const [form] = useForm();
@@ -46,8 +51,13 @@ const FormDemo: FC<any> = function(): JSX.Element {
   }, [options, form]);
 
   return (
-    <Layout>
+    <Layout
+      header={
+        <Header title={'YForm'} />
+      }
+    >
       <YForm form={form}>
+        {/*单选示例*/}
         <YField
           name={'education'}
           rules={[{
@@ -62,8 +72,15 @@ const FormDemo: FC<any> = function(): JSX.Element {
             }
           }]}
         >
-          <Input type={'picker'} data={options} />
+          <Input type={'picker'} data={options} placeholder={'单选下拉'} />
         </YField>
+        {/*多选示例（数据结构一）*/}
+        <YField
+          name={'multi'}
+        >
+          <Input type={'picker'} multi={2} data={demoDataSet} placeholder={'级联选择-1'} />
+        </YField>
+        {/*多选示例（数据结构二）*/}
         <Field
           name={'city'}
         >
@@ -71,8 +88,10 @@ const FormDemo: FC<any> = function(): JSX.Element {
             data={city}
             multi={3}
             type={'picker'}
+            placeholder={'级联选择-2'}
           />
         </Field>
+        {/*Input type="text"*/}
         <YField
           initialValue={'123'}
           rules={[{
@@ -102,4 +121,4 @@ const FormDemo: FC<any> = function(): JSX.Element {
   );
 };
 
-export { FormDemo };
+export { YFormDemo };

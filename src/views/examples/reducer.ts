@@ -5,7 +5,7 @@ const defaultState: Map<string, any> = Map({
   recommends: []
 });
 
-const homeState = (state = defaultState, action: any) => {
+const demoState = (state = defaultState, action: any) => {
   switch (action.type) {
     case 'SET_HOME_STATE':
       return state.merge(action.value);
@@ -18,4 +18,4 @@ const homeState = (state = defaultState, action: any) => {
   }
 };
 
-injectReducer('homeState', homeState);
+injectReducer('demoState', demoState);

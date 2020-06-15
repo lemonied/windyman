@@ -1,17 +1,14 @@
-import React, { FC, PropsWithChildren, useCallback, useEffect, useRef } from 'react';
+import React, { FC, useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Map } from 'immutable';
 import { post } from '../../../helpers/http';
 import { ScrollY, useScrollY } from '../../../components/scroll-y';
 import { Subscription } from 'rxjs';
+import { Header, Layout } from '../../../components/layout';
 
-interface Props extends PropsWithChildren<any> {
+const ScrollYDemo: FC = function(props) {
 
-}
-
-const Recommends: FC<Props> = function(props) {
-
-  const recommends: any[] = useSelector((state: Map<string, any>) => state.getIn(['homeState', 'recommends']));
+  const recommends: any[] = useSelector((state: Map<string, any>) => state.getIn(['demoState', 'recommends']));
   const dispatch = useDispatch();
 
   const query = useRef({ currentPage: 1, countsNum: 50 });
@@ -63,18 +60,28 @@ const Recommends: FC<Props> = function(props) {
   }, []);
 
   return (
-    <ScrollY
-      onPullingUp={onPullingUp}
-      scroll={scroll}
-      onPullingDown={onPullingDown}
-    >
-      {
-        recommends.map((item, key) => (
-          <div key={key}>{ item.cand03 }</div>
-        ))
+    <Layout
+      header={
+        <Header title={'ScrollY'} />
       }
-    </ScrollY>
+    >
+      <div style={{padding: '10px 0', height: '100%'}}>
+        <ScrollY
+          onPullingUp={onPullingUp}
+          scroll={scroll}
+          onPullingDown={onPullingDown}
+        >
+          <div style={{padding: '0 10px'}}>
+            {
+              recommends.map((item, key) => (
+                <div key={key}>{ item.cand03 }</div>
+              ))
+            }
+          </div>
+        </ScrollY>
+      </div>
+    </Layout>
   );
 };
 
-export { Recommends };
+export { ScrollYDemo };

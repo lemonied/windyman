@@ -1,0 +1,29 @@
+@import "../../common/style/variable";
+
+.windy-fixed-router{
+  background: $color-background;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.windy-fixed-router-exited{
+  display: none;
+}
+.windy-slide-enter{
+  transform: translateX(100%);
+}
+.windy-slide-enter-active{
+  transform: translateX(0);
+}
+.windy-slide-exit{
+  transform: translateX(0);
+}
+.windy-slide-exit-active{
+  transform: translateX(100%);
+}
+.windy-slide-enter-active, .windy-slide-exit-active{
+  transition: transform .3s ease;
+}

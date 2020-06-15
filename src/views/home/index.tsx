@@ -1,24 +1,23 @@
 import React, { FC, PropsWithChildren } from 'react';
-import { Recommends } from './recommends';
 import { Link } from 'react-router-dom';
-import './reducer';
-import { Map } from 'immutable';
-import { useSelector } from 'react-redux';
-import { Layout } from '../../components/layout';
+import { Header, Layout } from '../../components/layout';
 
 interface Props extends PropsWithChildren<any> {}
 
 const Home: FC<Props> = function(props): JSX.Element {
-
-  const userInfo = useSelector((state: Map<string, any>) => state.get('userInfo'));
-
   return (
     <Layout
-      footer={
-        <Link to={'/user'}>昵称：{ userInfo.get('nick') }</Link>
+      header={
+        <Header title={'快乐风男'} left={null} />
       }
     >
-      <Recommends />
+      <div
+        style={{
+          padding: '10px 10px'
+        }}
+      >
+        <Link to={'/example'}>组件示例</Link>
+      </div>
     </Layout>
   );
 };

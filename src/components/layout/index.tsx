@@ -2,7 +2,7 @@ import React, { CSSProperties, FC, PropsWithChildren, ReactNode } from 'react';
 import './style.scss';
 import { combineClassNames } from '../../common/utils';
 
-interface Props extends PropsWithChildren<any>{
+interface Props extends PropsWithChildren<any> {
   header?: string | ReactNode;
   footer?: string | ReactNode;
   extra?: ReactNode;
@@ -23,3 +23,5 @@ const Layout: FC<Props> = function(props): JSX.Element {
 };
 
 export { Layout };
+
+export { Header } from './header';

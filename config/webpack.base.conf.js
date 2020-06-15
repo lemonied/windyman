@@ -52,7 +52,7 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.ts', '.tsx', '.json'],
   },
-  externals: ['react', 'react-dom', 'rc-field-form', 'react-transition-group', 'rxjs', 'rxjs-compat'],
+  externals: ['react', 'react-dom', 'react-router-dom', 'rc-field-form', 'react-transition-group'],
   output: {
     path: resolve(__dirname, '../dist/lib'),
     filename: '[name].js',

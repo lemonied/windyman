@@ -42,6 +42,7 @@ export function deepMerge(...args: any[]): any {
   });
   return ret;
 }
+
 export function lightCompare(o1: any, o2: any): boolean {
   if (isPlainObject(o1) && isPlainObject(o2)) {
     return Object.keys(o2).every(key => o2[key] === o1[key]);
@@ -64,9 +65,13 @@ export function debounce(func: (args?: any) => any, delay = 300) {
 export function combineClassNames(...args: (string | null | undefined)[]) {
   const classNames: string[] = [];
   args.forEach(item => {
-    if (typeof item !== 'string') { return; }
+    if (typeof item !== 'string') {
+      return;
+    }
     item = item.trim();
-    if (!item) { return; }
+    if (!item) {
+      return;
+    }
     item.split(' ').forEach(className => {
       if (classNames.indexOf(className) === -1) {
         classNames.push(className);
@@ -75,6 +80,38 @@ export function combineClassNames(...args: (string | null | undefined)[]) {
   });
   return classNames.join(' ');
 }
+
 export function addClass(dom: HTMLElement, className: string) {
   dom.className = combineClassNames(dom.className, className);
+}
+
+const elementStyle = document.createElement('div').style;
+
+const vendor = (style: string) => {
+  const upStyle = style.charAt(0).toUpperCase() + style.substr(1);
+  const transformNames: any = {
+    standard: style,
+    webkit: `webkit${upStyle}`,
+    Moz: `Moz${upStyle}`,
+    O: `O${upStyle}`,
+    ms: `ms${upStyle}`
+  };
+
+  for (const key in transformNames) {
+    if (transformNames.hasOwnProperty(key) && typeof elementStyle[transformNames[key]] !== 'undefined') {
+      return key;
+    }
+  }
+
+  return false;
+};
+
+export function prefixStyle(style: string): string {
+  const prefix = vendor(style);
+
+  if (prefix === 'standard' || prefix === false) {
+    return style;
+  }
+
+  return prefix + style.charAt(0).toUpperCase() + style.substr(1);
 }

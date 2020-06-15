@@ -1,12 +1,13 @@
 # windyman
 
-react 移动端 ui 框架
+React 移动端 UI 框架
 
 项目开发使用react版本
 ```json
 {
   "react": "^16.13.1",
-  "react-dom": "^16.13.1"
+  "react-dom": "^16.13.1",
+  "react-router-dom": "^5.2.0"
 }
 ```
 
@@ -19,7 +20,7 @@ npm i windyman
 ```bash
 yarn add windyman
 ```
-因项目样式使用scss，使用前请先安装node-sass
+组件样式使用scss，使用前请先安装node-sass
 ```bash
 npm i node-sass --save-dev
 ```

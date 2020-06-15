@@ -1,0 +1,33 @@
+@import "../../../common/style/variable";
+@import "../../../common/style/mixin";
+
+.windy-header{
+  box-shadow: 0 1px 6px #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  position: relative;
+  min-height: 30px;
+  .back-icon{
+    path{
+      fill: $color-theme;
+    }
+  }
+  .left{
+    padding: 0 0 0 5px;
+    display: flex;
+    align-items: center;
+  }
+  .content{
+    width: 60%;
+    font-size: 18px;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: $color-text;
+    @include no-wrap;
+  }
+}

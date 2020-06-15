@@ -1,7 +1,6 @@
 import React, { Component, PropsWithChildren, ReactNode, createRef } from 'react';
 import ReactDOM from 'react-dom';
 import './style.scss';
-import { Observable } from 'rxjs';
 import { CSSTransition } from 'react-transition-group';
 
 interface Footer {
@@ -100,43 +99,42 @@ export class ModalService {
       }
     };
   }
-  confirm(options: { title?: string; content: string | ReactNode; }): Observable<boolean> {
-    const { title = '提示', content } = options;
-    return new Observable(subscribe => {
+  confirm(
+    options: { title?: string; content: string | ReactNode; cancelText?: string; confirmText?: string; }
+  ): Promise<boolean> {
+    const { title = '提示', content, cancelText = '取消', confirmText = '确定' } = options;
+    return new Promise((resolve, reject) => {
       const works = this.create({
         title,
         content,
         footer: (
           [{
-            text: '取消',
+            text: cancelText,
             callback: () => {
               works.close();
-              subscribe.next();
-              subscribe.complete();
+              resolve();
             }
           }, {
-            text: '确定',
+            text: confirmText,
             callback: () => {
               works.close();
-              subscribe.next(true);
-              subscribe.complete();
+              resolve(true);
             }
           }]
         )
       });
     });
   }
-  alert(content?: string | ReactNode): Observable<boolean> {
-    return new Observable(subscriber => {
+  alert(content: string | ReactNode, confirmText = '好的'): Promise<boolean> {
+    return new Promise((resolve, reject) => {
       const works = this.create({
         title: '提示',
         content,
         footer: [{
-          text: '好的',
+          text: confirmText,
           callback: () => {
             works.close();
-            subscriber.next(true);
-            subscriber.complete();
+            resolve(true);
           }
         }]
       });
