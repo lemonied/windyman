@@ -1,13 +1,11 @@
 .windy-input-wrapper{
   display: flex;
   align-items: center;
-  &:not(:last-child){
-    border-bottom: 1px solid #d9d9d9;
-  }
   input{
     border: none;
     outline: none;
     flex: 1;
     padding: 8px 10px;
+    font-size: 16px;
   }
 }

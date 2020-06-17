@@ -15,6 +15,7 @@
     }
   }
   .left{
+    @include extend-click;
     padding: 0 0 0 5px;
     display: flex;
     align-items: center;

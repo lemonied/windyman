@@ -1,6 +1,7 @@
+@import "../../common/style/variable";
 @import "../../common/style/mixin";
 
-$lineHeight: 25px;
+$lineHeight: 30px;
 
 .windy-wheel-wrapper{
   font-size: 14px;
@@ -12,8 +13,8 @@ $lineHeight: 25px;
     content: '';
     width: 100%;
     height: $lineHeight;
-    border-top: 1px solid #d9d9d9;
-    border-bottom: 1px solid #d9d9d9;
+    border-top: 1px solid $color-border;
+    border-bottom: 1px solid $color-border;
     position: absolute;
     top: 50%;
     left: 0;
@@ -25,6 +26,7 @@ $lineHeight: 25px;
       color: #333;
       line-height: $lineHeight;
       width: 100%;
+      font-size: 18px;
       @include no-wrap;
     }
     .wheel-disabled-item{
@@ -39,6 +41,13 @@ $lineHeight: 25px;
   bottom: 0;
   top: 0;
   background: rgba(0, 0, 0, .2);
+  &.date-time-picker{
+    .wheel-scroll{
+      .wheel-item{
+        font-size: 14px;
+      }
+    }
+  }
   .picker-modal{
     position: absolute;
     left: 0;
@@ -59,7 +68,16 @@ $lineHeight: 25px;
       align-items: center;
       justify-content: space-between;
       z-index: 1;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid $color-border;
+      .picker-modal-title{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 50%;
+        text-align: center;
+        @include no-wrap;
+      }
       .cancel{
         color: #999999;
       }
@@ -68,7 +86,7 @@ $lineHeight: 25px;
       }
       .cancel, .submit{
         display: inline-block;
-        padding: 5px 8px;
+        padding: 9px 15px;
         &:active{
           opacity: .8;
         }

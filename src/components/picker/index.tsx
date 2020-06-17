@@ -1,4 +1,4 @@
-import React, { Component, FC, PropsWithChildren, useEffect, useRef, createRef, RefObject } from 'react';
+import React, { Component, FC, PropsWithChildren, useEffect, useRef, createRef, RefObject, ReactNode } from 'react';
 import ReactDOM from 'react-dom';
 import './style.scss';
 import { BScroll } from '../better-scroll';
@@ -6,7 +6,7 @@ import { combineClassNames } from '../../common/utils';
 import { CSSTransition } from 'react-transition-group';
 
 interface Item {
-  name: string | number;
+  name: string | number | ReactNode;
   value: string | number;
   disabled?: boolean;
   [prop: string]: any;
@@ -77,8 +77,10 @@ const Picker: FC<Props> = function(props): JSX.Element {
   }, []);
   useEffect(() => {
     instanceRef.current?.refresh();
+  }, [data]);
+  useEffect(() => {
     instanceRef.current?.wheelTo(defaultSelectedIndex);
-  }, [data, defaultSelectedIndex]);
+  }, [defaultSelectedIndex]);
   useEffect(() => {
     const listen = () => {
       if (typeof onChange === 'function') {
@@ -95,9 +97,9 @@ const Picker: FC<Props> = function(props): JSX.Element {
     <div ref={wheelWrapperRef} className={combineClassNames('windy-wheel-wrapper', className)}>
       <ul className={'wheel-scroll'}>
         {
-          data.map(item => (
+          data.map((item, key) => (
             <li
-              key={item.value}
+              key={key}
               className={combineClassNames('wheel-item', item.disabled ? 'wheel-disabled-item' : null)}
             >{ item.name }</li>
           ))
@@ -116,11 +118,13 @@ export interface MultiPickerDataItem extends Item {
 export type MultiDataChildren = MultiPickerDataItem[];
 export type MultiDataSet = MultiPickerDataItem[][];
 export type PickerValues = string | number | (string | number)[];
-interface PickerModalProps extends PropsWithChildren<any> {
+interface PickerModalProps {
   data: MultiDataChildren | MultiDataSet;
+  title?: string | ReactNode;
   defaultValue?: PickerValues;
   multi?: number;
   onSubmit?(value?: PickerValues): void;
+  wrapperClassName?: string;
 }
 interface PickerModalState {
   show: boolean;
@@ -208,6 +212,7 @@ export class PickerModal extends Component<PickerModalProps, PickerModalState> {
 
   render() {
     const { show, data, selectedIndex } = this.state;
+    const { title, wrapperClassName } = this.props;
     return (
       <CSSTransition
         in={show}
@@ -220,10 +225,11 @@ export class PickerModal extends Component<PickerModalProps, PickerModalState> {
         }}
         timeout={300}
       >
-        <div className={'windy-picker-modal-mask'} onClick={e => this.onSave(false)}>
+        <div className={combineClassNames('windy-picker-modal-mask', wrapperClassName)} onClick={e => this.onSave(false)}>
           <div className={'picker-modal'} onClick={this.preventClick}>
             <div className={'picker-actions'}>
               <span className={'cancel'} onClick={e => this.onSave(false)}>取消</span>
+              <span className={'picker-modal-title'}>{ title }</span>
               <span className={'submit'} onClick={e => this.onSave(true)}>确定</span>
             </div>
             {
@@ -244,7 +250,9 @@ export class PickerModal extends Component<PickerModalProps, PickerModalState> {
     );
   }
 }
-
+/*
+* Data Manager
+*/
 export class MultiDataManager {
   dataSet: MultiDataSet = [];
   sources: MultiDataChildren | MultiDataSet = [];
@@ -292,14 +300,15 @@ export class MultiDataManager {
       for (let i = 0; i < children.length; i++) {
         if (
           children[i].value === value &&
-          children[i].children?.length &&
           index + 1 < multi
         ) {
-          deep(children[i].children as any, index + 1);
+          if (children[i].children?.length) {
+            deep(children[i].children as any, index + 1);
+          }
           return;
         }
       }
-      if (index + 1 < multi && children.length) {
+      if (index + 1 < multi && children.length && children[0].children && children[0].children.length) {
         deep(children[0].children as any, index + 1);
       }
     };
@@ -336,27 +345,37 @@ export class MultiDataManager {
         if (i && item[i]) {
           return item[i].value;
         }
-        return item[0].value;
+        return item[0]?.value;
       })
     );
   }
 }
 
+/*
+* class PickerService
+*/
+export interface PickerServiceOptions {
+  data: MultiDataChildren | MultiDataSet;
+  defaultValue?: PickerValues;
+  multi?: number;
+  title?: string | ReactNode;
+  wrapperClassName?: string;
+}
 export class PickerService {
   ele: Element[] = [];
-  create(
-    data: MultiDataChildren | MultiDataSet,
-    defaultValue?: PickerValues,
-    multi?: number,
-    afterRender?: (container: Element, modal: PickerModal) => void,
-    onSubmit?: (value: (string | number)[]) => void
-  ): void {
+  create(options: {
+    afterRender?: (container: Element, modal: PickerModal) => void;
+    onSubmit?: (value: (string | number)[]) => void;
+  } & PickerServiceOptions): void {
+    const {data, defaultValue, multi, title, afterRender, onSubmit, wrapperClassName} = options;
     const pickerModal: RefObject<PickerModal> = createRef<PickerModal>();
     const container = document.createElement('div');
     this.ele.push(container);
     container.className = 'picker-container';
     document.body.appendChild(container);
-    ReactDOM.render(<PickerModal multi={multi} data={data} defaultValue={defaultValue} ref={pickerModal} onSubmit={onSubmit} />, container,
+    ReactDOM.render(
+      <PickerModal multi={multi} data={data} defaultValue={defaultValue} ref={pickerModal} onSubmit={onSubmit} title={title} wrapperClassName={wrapperClassName} />,
+      container,
       () => {
         if (afterRender && pickerModal.current) {
           afterRender(container, pickerModal.current);
@@ -364,23 +383,29 @@ export class PickerService {
       }
     );
   }
-  open(
-    data: MultiDataChildren | MultiDataSet,
-    defaultValue?: PickerValues,
-    multi?: number,
-    callback?: (modal: PickerModal) => void
-  ): Promise<any> {
+  open(options: {
+    callback?: (modal: PickerModal) => void;
+  } & PickerServiceOptions): Promise<any> {
+    const {data, defaultValue, multi, callback, title, wrapperClassName} = options;
     let container: Element;
     return new Promise((resolve, reject) => {
-      this.create(data, defaultValue, multi, (ele, pickerModal) => {
-        if (callback) {
-          callback(pickerModal);
+      this.create({
+        data,
+        defaultValue,
+        multi,
+        title,
+        wrapperClassName,
+        afterRender: (ele, pickerModal) => {
+          if (callback) {
+            callback(pickerModal);
+          }
+          container = ele;
+          pickerModal.show();
+        },
+        onSubmit: (value?: (string | number)[]) => {
+          resolve(value);
+          setTimeout(() => this.destroy(container), 300);
         }
-        container = ele;
-        pickerModal.show();
-      }, (value?: (string | number)[]) => {
-        resolve(value);
-        setTimeout(() => this.destroy(container), 300);
       });
     });
   }

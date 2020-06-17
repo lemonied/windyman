@@ -6,8 +6,8 @@ import { post } from '../../../helpers/http';
 import { YField, YForm } from '../../../components/y-form';
 
 const demoDataSet = [
-  [{name: '一月', value: 1}, {name: '二月', value: 2}, {name: '三月', value: 3}],
-  [{name: '一日', value: 4}, {name: '二日', value: 5}, {name: '三日', value: 6}]
+  [{name: '红色', value: 1}, {name: '白色', value: 2}, {name: '绿色', value: 3}],
+  [{name: '小号', value: 4}, {name: '中号', value: 5}, {name: '大号', value: 6}]
 ];
 
 const formatCity = (cities: any) => {
@@ -74,13 +74,13 @@ const YFormDemo: FC<any> = function(): JSX.Element {
         >
           <Input type={'picker'} data={options} placeholder={'单选下拉'} />
         </YField>
-        {/*多选示例（数据结构一）*/}
+        {/*多列选择*/}
         <YField
           name={'multi'}
         >
-          <Input type={'picker'} multi={2} data={demoDataSet} placeholder={'级联选择-1'} />
+          <Input type={'picker'} multi={2} data={demoDataSet} placeholder={'多列选择'} />
         </YField>
-        {/*多选示例（数据结构二）*/}
+        {/*级联选择*/}
         <Field
           name={'city'}
         >
@@ -88,10 +88,11 @@ const YFormDemo: FC<any> = function(): JSX.Element {
             data={city}
             multi={3}
             type={'picker'}
-            placeholder={'级联选择-2'}
+            placeholder={'级联选择'}
+            title={'选择城市'}
           />
         </Field>
-        {/*Input type="text"*/}
+        {/*普通text输入框*/}
         <YField
           initialValue={'123'}
           rules={[{
@@ -115,6 +116,12 @@ const YFormDemo: FC<any> = function(): JSX.Element {
           name={'username'}
         >
           <Input type={'text'} placeholder={'username'} />
+        </YField>
+        {/* 日期时间选择器 */}
+        <YField
+          name={'datatime'}
+        >
+          <Input placeholder={'日期时间选择器'} type={'dateTime'} title={'日期时间'} column={6} />
         </YField>
       </YForm>
     </Layout>
