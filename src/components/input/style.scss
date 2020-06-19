@@ -1,11 +1,14 @@
-.windy-input-wrapper{
-  display: flex;
-  align-items: center;
-  input{
-    border: none;
-    outline: none;
-    flex: 1;
-    padding: 8px 10px;
-    font-size: 16px;
+input.y-input{
+  border: none;
+  outline: none;
+  font-size: 16px;
+  width: 100%;
+  padding: 8px 10px;
+}
+.windy-picker-modal-mask.date-time-picker{
+  .wheel-scroll{
+    .wheel-item{
+      font-size: 14px;
+    }
   }
 }

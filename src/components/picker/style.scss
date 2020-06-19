@@ -41,13 +41,6 @@ $lineHeight: 30px;
   bottom: 0;
   top: 0;
   background: rgba(0, 0, 0, .2);
-  &.date-time-picker{
-    .wheel-scroll{
-      .wheel-item{
-        font-size: 14px;
-      }
-    }
-  }
   .picker-modal{
     position: absolute;
     left: 0;

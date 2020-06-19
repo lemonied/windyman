@@ -5,7 +5,7 @@ import React, {
   forwardRef,
   ForwardRefExoticComponent,
   ForwardRefRenderFunction,
-  ReactElement,
+  ReactElement, ReactNode,
   RefAttributes,
   useCallback,
   useImperativeHandle,
@@ -15,6 +15,8 @@ import Form, { Field, FormInstance, useForm } from 'rc-field-form';
 import { FormProps } from 'rc-field-form/es/Form';
 import { FieldData, FieldError, NamePath } from 'rc-field-form/es/interface';
 import { FieldProps } from 'rc-field-form/es/Field';
+import './style.scss';
+import { combineClassNames } from '../../common/utils';
 
 interface YFormProps extends FormProps {
   children?: ReactElement<any, any>[];
@@ -67,22 +69,23 @@ interface YFieldProps extends FieldProps {
   form?: FormInstance;
   children?: ReactElement;
   errors?: FieldError[];
+  label?: string | ReactNode;
 }
 const YField: FC<YFieldProps> = function(props): JSX.Element {
-  const { children: propChildren, form, rules = [], name, errors } = props;
-  const children = useMemo<ReactElement | undefined>(() => {
-    if (propChildren) {
-      return cloneElement(propChildren, {
-        form,
-        required: rules.some((item: any) => item && item.required),
-        name,
-        errors: findErrors(errors, name)
-      });
-    }
-    return propChildren;
-  }, [propChildren, form, rules, name, errors]);
+  const {rules = [], name, errors, label } = props;
+
+  const formatErrors = useMemo(() => {
+    return findErrors(errors, name);
+  }, [errors, name]);
+  const required = useMemo(() => {
+    return rules.some((val: any) => val && val.required);
+  }, [rules]);
   return (
-    <Field {...props} children={children} />
+    <div className={combineClassNames('y-form-item', required ? 'required' : '')}>
+      <span className={'y-label'}>{ label }</span>
+      <Field {...props} />
+      <span>{formatErrors}</span>
+    </div>
   );
 };
 

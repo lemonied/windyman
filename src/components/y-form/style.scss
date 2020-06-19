@@ -1,0 +1,16 @@
+@import "../../common/style/variable";
+
+.y-form-item{
+  display: flex;
+  align-items: center;
+  .y-label{
+    display: inline-block;
+    padding: 0 10px 0 8px;
+  }
+  .y-input{
+    flex: 1;
+  }
+  &:not(:last-child){
+    border-bottom: 1px solid $color-border;
+  }
+}

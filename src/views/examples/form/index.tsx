@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 import { Header, Layout } from '../../../components/layout';
-import { Field, useForm } from 'rc-field-form';
+import { useForm } from 'rc-field-form';
 import { Input } from '../../../components/input';
 import { post } from '../../../helpers/http';
 import { YField, YForm } from '../../../components/y-form';
@@ -60,6 +60,7 @@ const YFormDemo: FC<any> = function(): JSX.Element {
         {/*单选示例*/}
         <YField
           name={'education'}
+          label={'教育程度'}
           rules={[{
             required: true
           }, {
@@ -77,12 +78,14 @@ const YFormDemo: FC<any> = function(): JSX.Element {
         {/*多列选择*/}
         <YField
           name={'multi'}
+          label={'多列'}
         >
           <Input type={'picker'} multi={2} data={demoDataSet} placeholder={'多列选择'} />
         </YField>
         {/*级联选择*/}
-        <Field
+        <YField
           name={'city'}
+          label={'多列'}
         >
           <Input
             data={city}
@@ -91,7 +94,7 @@ const YFormDemo: FC<any> = function(): JSX.Element {
             placeholder={'级联选择'}
             title={'选择城市'}
           />
-        </Field>
+        </YField>
         {/*普通text输入框*/}
         <YField
           initialValue={'123'}
@@ -114,14 +117,23 @@ const YFormDemo: FC<any> = function(): JSX.Element {
             }
           }]}
           name={'username'}
+          label={'用户名'}
         >
           <Input type={'text'} placeholder={'username'} />
         </YField>
         {/* 日期时间选择器 */}
         <YField
           name={'datatime'}
+          label={'日期时间'}
         >
           <Input placeholder={'日期时间选择器'} type={'dateTime'} title={'日期时间'} column={6} />
+        </YField>
+        {/* 时间选择器 */}
+        <YField
+          name={'time'}
+          label={'时间'}
+        >
+          <Input placeholder={'时间选择器'} type={'time'} title={'时间'} column={3} />
         </YField>
       </YForm>
     </Layout>

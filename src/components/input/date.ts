@@ -13,6 +13,7 @@ export class TimeManager {
   seconds: DateDataSet[] = [];
   dataSet: DateDataSet[] = [];
   column = 6;
+  timeColumn = 3;
   constructor() {
     for (let i = 0; i <= 23; i++) {
       this.hours.push({
@@ -39,6 +40,12 @@ export class TimeManager {
       return val;
     }
     return '0' + val;
+  }
+  setRange(start: Date, end: Date, column = 3) {
+    this.start = start;
+    this.end = end;
+    this.timeColumn = column;
+    this.dataSet = this.getHours(start.getFullYear(), start.getMonth() + 1, start.getDate(), this.hours);
   }
   compareWithStartAndEnd(year?: number, month?: number, day?: number, hour?: number, minute?: number): boolean {
     return (typeof year !== 'undefined' && this.start.getFullYear() !== year && this.end.getFullYear() !== year) ||
@@ -70,7 +77,7 @@ export class TimeManager {
       return {
         name: hour.name,
         value: hour.value,
-        children: this.getMinutes(year, month, day, hour.value, hour.children)
+        children: this.timeColumn > 1 ? this.getMinutes(year, month, day, hour.value, hour.children) : []
       };
     });
     return ret;
@@ -98,7 +105,7 @@ export class TimeManager {
       return {
         name: minute.name,
         value: minute.value,
-        children: this.getSeconds(year, month, day, hour, minute.value, minute.children)
+        children: this.timeColumn > 2 ? this.getSeconds(year, month, day, hour, minute.value, minute.children) : []
       };
     });
     return ret;
@@ -252,7 +259,7 @@ export class DateTimeManager extends TimeManager {
     } else if (year > startYear) {
       ret = this.months.slice(0, this.end.getMonth() + 1);
     } else if (year < endYear) {
-      ret = this.months.slice(this.end.getMonth());
+      ret = this.months.slice(this.start.getMonth());
     } else {
       ret = this.months.slice(this.start.getMonth(), this.end.getMonth() + 1);
     }
@@ -289,4 +296,31 @@ export class DateTimeManager extends TimeManager {
     });
     return ret;
   }
+}
+
+// time format
+export function dateFormat(date: string | number | Date, fmt: string) {
+  if (typeof date === 'string') {
+    date = new Date(date.replace(/-/g, '/'));
+  } else if (typeof date === 'number') {
+    date = new Date(date);
+  }
+  const o: any = {
+    'M+': date.getMonth() + 1, // 月份
+    'd+': date.getDate(), // 日
+    'h+': date.getHours(), // 小时
+    'm+': date.getMinutes(), // 分
+    's+': date.getSeconds(), // 秒
+    'q+': Math.floor((date.getMonth() + 3) / 3), // 季度
+    'S': date.getMilliseconds() // 毫秒
+  };
+  if (/(y+)/.test(fmt)) {
+    fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
+  }
+  for (const k in o) {
+    if (o.hasOwnProperty(k) && new RegExp('(' + k + ')').test(fmt)) {
+      fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? (o[k]) : (('00' + o[k]).substr(('' + o[k]).length)));
+    }
+  }
+  return fmt;
 }

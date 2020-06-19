@@ -1,6 +1,6 @@
 export { AsyncLoad } from './async-load';
 
-export { Input, PickerInput } from './input';
+export { Input } from './input';
 
 export { Layout } from './layout';
 
