@@ -16,7 +16,16 @@ const Home: FC<Props> = function(props): JSX.Element {
           padding: '10px 10px'
         }}
       >
-        <Link to={'/example'}>组件示例</Link>
+        <div style={{textAlign: 'center'}}>
+          <img
+            src={process.env.PUBLIC_URL + '/yasuo.jpg'}
+            alt="yasuo"
+            style={{width: '50%', margin: '10px 0'}}
+          />
+          <div>
+            <Link to={'/example'}>组件示例</Link>
+          </div>
+        </div>
       </div>
     </Layout>
   );

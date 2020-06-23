@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { Switch, useLocation } from 'react-router-dom';
 import './style.scss';
-import { combineClassNames } from '../../common/utils';
+import { combineClassNames } from '../../../common/utils';
 
 interface FixedRouterProps {
   defaultPath: string;

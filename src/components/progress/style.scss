@@ -1,0 +1,49 @@
+@import "../../common/style/variable";
+
+.windy-progress-outer{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  .windy-progress-inner{
+    height: 5px;
+    flex: 1;
+    background-color: #f5f5f5;
+    border-radius: 100px;
+    overflow: hidden;
+    .windy-progress-bg{
+      height: 100%;
+      background: $color-theme;
+      transition: all ease .3s;
+    }
+  }
+  .windy-progress-after{
+    padding: 0 0 0 10px;
+    font-size: 14px;
+  }
+}
+.windy-circle-progress{
+  position: relative;
+  .circle-progress{
+    display: block;
+    .circle-trail{
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 0.3s ease 0s, stroke-dasharray 0.3s ease 0s, stroke 0.3s ease 0s, stroke-width 0.06s ease 0.3s;
+      stroke: #f5f5f5;
+    }
+    .circle-path{
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 0.3s ease 0s, stroke-dasharray 0.3s ease 0s, stroke 0.3s ease 0s, stroke-width 0.06s ease 0.3s;
+      stroke: $color-theme;
+    }
+  }
+  .windy-circle-progress-middle{
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    transform: translateY(-50%);
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+  }
+}

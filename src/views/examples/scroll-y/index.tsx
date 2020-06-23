@@ -1,17 +1,20 @@
-import React, { FC, useCallback, useEffect, useRef } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Map } from 'immutable';
 import { post } from '../../../helpers/http';
 import { ScrollY, useScrollY } from '../../../components/scroll-y';
 import { Subscription } from 'rxjs';
 import { Header, Layout } from '../../../components/layout';
+import { Loading } from '../../../components/loading';
 
 const ScrollYDemo: FC = function(props) {
+
+  const [loading, setLoading] = useState(false);
 
   const recommends: any[] = useSelector((state: Map<string, any>) => state.getIn(['demoState', 'recommends']));
   const dispatch = useDispatch();
 
-  const query = useRef({ currentPage: 1, countsNum: 50 });
+  const query = useRef({ currentPage: 1, rowsNum: 30 });
 
   const pageBean = useRef<any>();
 
@@ -21,13 +24,17 @@ const ScrollYDemo: FC = function(props) {
 
   const getRecommends = useCallback(() => {
     subscribe.current?.unsubscribe();
+    if (query.current.currentPage === 1) {
+      setLoading(true);
+    }
     subscribe.current = post('/service/business/sms/sms/getContentList', Object.assign({
       plateform: 1,
-      rowsNum: 20,
+      countsNum: 50,
       channel_code: 'ZXDT'
-    }, query)).subscribe(res => {
+    }, query.current)).subscribe(res => {
       pageBean.current = res.pageBean;
       if (query.current.currentPage === 1) {
+        setLoading(false);
         dispatch({ type: 'SET_RECOMMENDS', value: res.result });
       } else {
         dispatch({ type: 'UPDATE_RECOMMENDS', value: res.result });
@@ -65,6 +72,11 @@ const ScrollYDemo: FC = function(props) {
         <Header title={'ScrollY'} />
       }
     >
+      {
+        loading && !recommends.length ?
+          <Loading title={'加载中...'} /> :
+          null
+      }
       <div style={{padding: '10px 0', height: '100%'}}>
         <ScrollY
           onPullingUp={onPullingUp}

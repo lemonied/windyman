@@ -45,8 +45,10 @@ const YFormDemo: FC<any> = function(): JSX.Element {
   useEffect(() => {
     if (!options.length) { return; }
     form.setFieldsValue({
-      education: '21',
-      username: '456'
+      education: '21'
+    });
+    form.validateFields().then(values => {
+      // validate all fields
     });
   }, [options, form]);
 
@@ -63,14 +65,6 @@ const YFormDemo: FC<any> = function(): JSX.Element {
           label={'教育程度'}
           rules={[{
             required: true
-          }, {
-            validator: (rule, value) => {
-              if (value < 20) {
-                return Promise.resolve();
-              } else {
-                return Promise.reject('has error');
-              }
-            }
           }]}
         >
           <Input type={'picker'} data={options} placeholder={'单选下拉'} />
@@ -102,18 +96,11 @@ const YFormDemo: FC<any> = function(): JSX.Element {
             required: true
           }, {
             validator(rule, value) {
-              return new Promise((resolve, reject) => {
-                setTimeout(() => {
-                  if (!value) {
-                    return resolve();
-                  }
-                  if (/^\d+$/.test(value)) {
-                    resolve();
-                  } else {
-                    reject('格式错误');
-                  }
-                }, 1000);
-              });
+              if (/^\d+$/.test(value)) {
+                return Promise.resolve();
+              } else {
+                return Promise.reject('只能输入数字');
+              }
             }
           }]}
           name={'username'}

@@ -4,7 +4,7 @@
 import { MultiDataChildren, MultiDataManager, MultiDataSet, PickerModal, PickerService, PickerValues } from '../../picker';
 import React, { FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-interface PickerInputProps {
+export interface PickerInputProps {
   data: MultiDataSet | MultiDataChildren;
   value?: PickerValues;
   defaultSelectedValues?: PickerValues;
