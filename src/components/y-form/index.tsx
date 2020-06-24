@@ -19,6 +19,8 @@ import './style.scss';
 import { combineClassNames } from '../../common/utils';
 import { Icon } from '../icon';
 import { modal } from '../modal';
+import { Item, List } from '../List';
+import { usePicker } from '../input/picker-input';
 
 interface YFormProps extends FormProps {
   children?: ReactElement<any, any>[];
@@ -48,7 +50,7 @@ const FormFc: ForwardRefRenderFunction<FormInstance, YFormProps> = function(prop
     return form;
   });
   return (
-    <Form {...props} form={form} onFieldsChange={onFieldsChange} children={children} />
+    <Form {...props} form={form} onFieldsChange={onFieldsChange} children={<List className={'y-form'}>{children}</List>} />
   );
 };
 
@@ -75,8 +77,9 @@ interface YFieldProps extends FieldProps {
   requiredTip?: string | ReactNode;
 }
 const YField: FC<YFieldProps> = function(props): JSX.Element {
-  const {rules = [], name, errors, label, form, initialValue, requiredTip = '该项为必填项' } = props;
+  const {rules = [], name, errors, label, form, initialValue, requiredTip = '该项为必填项', children } = props;
   const [value, setValue] = useState(initialValue);
+  const [hasArrow, setHasArrow] = useState(false);
   useEffect(() => {
     if (form && name) {
       setValue(form.getFieldValue(name));
@@ -100,24 +103,46 @@ const YField: FC<YFieldProps> = function(props): JSX.Element {
   const showRequiredTip = useCallback(() => {
     modal.alert(requiredTip);
   }, [requiredTip]);
+  const picker = usePicker();
+  const clonedChildren = useMemo(() => {
+    if (children) {
+      return cloneElement(children, {
+        hasArrow: setHasArrow,
+        picker
+      });
+    }
+    return children;
+  }, [children, picker]);
+  const onItemClick = useCallback((e) => {
+    if (picker.open) {
+      picker.open();
+    }
+  }, [picker]);
   return (
-    <div className={'y-form-item'}>
-      <span className={className}>{ label }</span>
-      <Field {...props} />
-      <span className={'input-after'}>
-        {
-          !value && required ?
-            <span className={'required-icon'} onClick={showRequiredTip}>
-              <Icon type={'info-circle'} />
-            </span> :
-            formatErrors.length ?
-              <span className={'error-icon'} onClick={showErrorTip}>
-                <Icon type={'warning-circle'} />
+    <Item
+      onClick={onItemClick}
+      arrow={hasArrow ? 'horizontal' : null}
+      prefix={
+        <span className={className}>{ label }</span>
+      }
+      extra={
+        <span className={'input-after'}>
+          {
+            !value && required ?
+              <span className={'required-icon'} onClick={showRequiredTip}>
+                <Icon type={'info-circle'} />
               </span> :
-              null
-        }
-      </span>
-    </div>
+              formatErrors.length ?
+                <span className={'error-icon'} onClick={showErrorTip}>
+                  <Icon type={'warning-circle'} />
+                </span> :
+                null
+          }
+        </span>
+      }
+    >
+      <Field {...props} children={clonedChildren} />
+    </Item>
   );
 };
 

@@ -1,0 +1,31 @@
+@import "../../common/style/variable";
+
+.windy-list{
+  .windy-list-item{
+    display: flex;
+    align-items: center;
+    .windy-item-prefix{
+      padding: 0 5px;
+    }
+    .windy-item-content{
+      flex: 1;
+    }
+    .windy-item-extra{
+      padding: 0 10px;
+    }
+    &:not(:last-child){
+      border-bottom: 1px solid $color-border;
+    }
+    .windy-item-after{
+      padding: 0 10px 0 0;
+      .item-after-right{
+        color: #666;
+      }
+    }
+    &.has-arrow{
+      &:active{
+        background: #f5f5f5;
+      }
+    }
+  }
+}

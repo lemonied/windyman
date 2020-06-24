@@ -1,11 +1,7 @@
 @import "../../common/style/variable";
 
-.y-form-item{
-  display: flex;
-  align-items: center;
+.y-form{
   .y-label{
-    display: inline-block;
-    padding: 0 10px 0 8px;
     &.required{
       position: relative;
       &:before{
@@ -17,15 +13,8 @@
       }
     }
   }
-  .y-input{
-    flex: 1;
-  }
-  &:not(:last-child){
-    border-bottom: 1px solid $color-border;
-  }
   .input-after{
     display: inline-block;
-    padding: 0 10px;
     .required-icon{
       color: $color-theme;
     }

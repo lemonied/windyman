@@ -4,6 +4,8 @@ input.y-input{
   font-size: 16px;
   width: 100%;
   padding: 8px 10px;
+  box-sizing: border-box;
+  background: none;
 }
 .windy-picker-modal-mask.date-time-picker{
   .wheel-scroll{

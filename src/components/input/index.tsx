@@ -1,13 +1,15 @@
-import React, { FC, PropsWithChildren, ReactNode } from 'react';
+import React, { FC, PropsWithChildren, ReactNode, useEffect } from 'react';
 import { MultiDataChildren, MultiDataSet } from '../picker';
 import './style.scss';
-import { PickerInput } from './picker-input';
+import { PickerInput, PickerInputInstance } from './picker-input';
 import { DateTimePicker, DateTimePickerProps, TimePicker, TimePickerProps } from './date-time-input';
 
 interface InputSharedProps extends PropsWithChildren<any> {
   value?: any;
   onChange?: (value: any) => void;
   placeholder?: string;
+  hasArrow?: (arrow: boolean) => void;
+  picker?: PickerInputInstance;
 }
 interface InputNormalProps extends InputSharedProps {
   type?: 'text';
@@ -28,26 +30,27 @@ interface InputTimePickerOption extends InputTimePicker {
 }
 
 type InputProps = InputNormalProps | InputPickerOption | InputDateTimePickerOption | InputTimePickerOption;
-const defaultProps: InputProps = {
-  type: 'text'
-};
 const Input: FC<InputProps> = function(props): JSX.Element {
-  const { type, data, onChange, value, placeholder, multi, title, column, start, end } = props;
+  const { type = 'text', data, onChange, value, placeholder, multi, title, column, start, end, hasArrow, picker } = props;
 
+  useEffect(() => {
+    if (typeof hasArrow === 'function') {
+      hasArrow(['picker', 'dateTime', 'time'].includes(type));
+    }
+  }, [hasArrow, type]);
 
   switch (type) {
     case 'text':
       return (<input type="text" className={'y-input'} placeholder={placeholder} onChange={onChange} value={value || ''} />);
     case 'picker':
-      return (<PickerInput data={data} onChange={onChange} value={value} placeholder={placeholder} multi={multi} title={title} />);
+      return (<PickerInput data={data} onChange={onChange} value={value} placeholder={placeholder} multi={multi} title={title} picker={picker} />);
     case 'dateTime':
-      return (<DateTimePicker column={column} title={title} placeholder={placeholder} onChange={onChange} start={start} end={end} />);
+      return (<DateTimePicker column={column} title={title} placeholder={placeholder} onChange={onChange} start={start} end={end} picker={picker} />);
     case 'time':
-      return (<TimePicker start={start} end={end} onChange={onChange} value={value} column={column} title={title} placeholder={placeholder} />);
+      return (<TimePicker start={start} end={end} onChange={onChange} value={value} column={column} title={title} placeholder={placeholder} picker={picker} />);
     default:
       return (<input className={'y-input'} type={type} placeholder={placeholder} value={value || ''} onChange={onChange} />);
   }
 
 };
-Input.defaultProps = defaultProps;
 export { Input };

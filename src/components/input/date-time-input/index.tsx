@@ -4,7 +4,7 @@
 import React, { FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { dateFormat, DateTimeManager, TimeManager } from '../date';
 import { MultiDataChildren, PickerValues } from '../../picker';
-import { PickerInput } from '../picker-input';
+import { PickerInput, PickerInputInstance } from '../picker-input';
 
 export interface DateTimePickerProps {
   start?: Date;
@@ -14,6 +14,7 @@ export interface DateTimePickerProps {
   value?: Date | string;
   onChange?: (value: Date) => void;
   placeholder?: string;
+  picker?: PickerInputInstance;
 }
 const DateTimePicker: FC<DateTimePickerProps> = function(props): JSX.Element {
   const defaultStart = useMemo<Date>(() => {
@@ -24,7 +25,7 @@ const DateTimePicker: FC<DateTimePickerProps> = function(props): JSX.Element {
   }, []);
   const dateManager = useRef<DateTimeManager>(new DateTimeManager());
 
-  const { start = defaultStart, end = defaultEnd, column = 5, placeholder, onChange, value, title } = props;
+  const { start = defaultStart, end = defaultEnd, column = 5, placeholder, onChange, value, title, picker } = props;
   const [data, setData] = useState<MultiDataChildren>([]);
   /* init data */
   useEffect(() => {
@@ -110,6 +111,7 @@ const DateTimePicker: FC<DateTimePickerProps> = function(props): JSX.Element {
       formatNames={formatNames}
       title={title}
       defaultSelectedValues={defaultSelectedValue}
+      picker={picker}
     />
   );
 };
@@ -128,9 +130,10 @@ export interface TimePickerProps {
   title?: string | ReactNode;
   column?: 1 | 2 | 3;
   placeholder?: string;
+  picker?: PickerInputInstance;
 }
 const TimePicker: FC<TimePickerProps> = (props): JSX.Element => {
-  const { start, end, onChange, value, title, column = 3, placeholder } = props;
+  const { start, end, onChange, value, title, column = 3, placeholder, picker } = props;
   const [data, setData] = useState<MultiDataChildren>([]);
   const [realValue, setRealValue] = useState<PickerValues>([]);
   const defaultStart = useMemo(() => {
@@ -176,6 +179,7 @@ const TimePicker: FC<TimePickerProps> = (props): JSX.Element => {
       multi={column}
       placeholder={placeholder}
       defaultSelectedValues={defaultSelectedValue}
+      picker={picker}
     />
   );
 };

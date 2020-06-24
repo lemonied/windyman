@@ -13,10 +13,18 @@ export interface PickerInputProps {
   onChange?(value: PickerValues): void;
   wrapperClassName?: string;
   formatNames?: (values: MultiDataChildren) => string;
-  placeholder?: string
+  placeholder?: string;
+  picker?: PickerInputInstance;
 }
+export interface PickerInputInstance {
+  open?: (e?: any) => void;
+}
+export const usePicker = (): PickerInputInstance => {
+  const picker = useRef<PickerInputInstance>({} as PickerInputInstance);
+  return picker.current;
+};
 const PickerInput: FC<PickerInputProps> = function(props): JSX.Element {
-  const { data, value = '', onChange, placeholder, multi = 1, title, wrapperClassName, formatNames, defaultSelectedValues } = props;
+  const { data, value = '', onChange, placeholder, multi = 1, title, wrapperClassName, formatNames, defaultSelectedValues, picker } = props;
   const pickerServiceRef = useRef<PickerService>(new PickerService());
   const pickerModalRef = useRef<PickerModal>();
   const [currentValue, setCurrentValue] = useState<string>('');
@@ -62,7 +70,9 @@ const PickerInput: FC<PickerInputProps> = function(props): JSX.Element {
     }
     setCurrentValue(valueNames);
   }, [dataManager, formatNames]);
-  const showPicker = useCallback(() => {
+  const showPicker = useCallback((e?: any) => {
+    e?.stopPropagation();
+    e?.preventDefault();
     const defaultValue = !dataManager.values.length && defaultSelectedValues ?
       defaultSelectedValues :
       dataManager.values;
@@ -86,6 +96,13 @@ const PickerInput: FC<PickerInputProps> = function(props): JSX.Element {
     echoPicker(data, value);
   }, [data, value, echoPicker]);
 
+  useEffect(() => {
+    if (picker) {
+      Object.assign(picker, {
+        open: showPicker
+      });
+    }
+  }, [picker, showPicker]);
   return (
     <input className={'y-input'} type="text" onClick={showPicker} placeholder={placeholder} value={currentValue} readOnly={true} />
   );
