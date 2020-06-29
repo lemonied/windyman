@@ -3,10 +3,8 @@ import React, {
   cloneElement,
   FC,
   forwardRef,
-  ForwardRefExoticComponent,
   ForwardRefRenderFunction,
   ReactElement, ReactNode,
-  RefAttributes,
   useCallback, useEffect,
   useImperativeHandle,
   useMemo, useState
@@ -54,7 +52,7 @@ const FormFc: ForwardRefRenderFunction<FormInstance, YFormProps> = function(prop
   );
 };
 
-export const YForm: ForwardRefExoticComponent<YFormProps & RefAttributes<FormInstance>> = forwardRef<FormInstance, YFormProps>(FormFc);
+export const YForm = forwardRef<FormInstance, YFormProps>(FormFc);
 
 const findErrors = (errors?: FieldError[], name?: NamePath): string[] | undefined => {
   if (!errors || !name) {
@@ -77,7 +75,7 @@ interface YFieldProps extends FieldProps {
   requiredTip?: string | ReactNode;
 }
 const YField: FC<YFieldProps> = function(props): JSX.Element {
-  const {rules = [], name, errors, label, form, initialValue, requiredTip = '该项为必填项', children } = props;
+  const { rules = [], name, errors, label, form, initialValue, requiredTip = '该项为必填项', children } = props;
   const [value, setValue] = useState(initialValue);
   const [hasArrow, setHasArrow] = useState(false);
   useEffect(() => {
@@ -95,13 +93,21 @@ const YField: FC<YFieldProps> = function(props): JSX.Element {
   const className = useMemo(() => {
     return combineClassNames('y-label', required ? 'required' : '');
   }, [required]);
-  const showErrorTip = useCallback(() => {
+  const showErrorTip = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
     modal.alert(
       <div>{formatErrors.map((item, key) => (<div key={key}>{item}</div>))}</div>
-    );
+    ).then(() => {
+      // close
+    });
   }, [formatErrors]);
-  const showRequiredTip = useCallback(() => {
-    modal.alert(requiredTip);
+  const showRequiredTip = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    modal.alert(requiredTip).then(() => {
+      // close
+    });
   }, [requiredTip]);
   const picker = usePicker();
   const clonedChildren = useMemo(() => {

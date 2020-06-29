@@ -5,7 +5,6 @@
   display: flex;
   align-items: center;
   .windy-progress-inner{
-    height: 5px;
     flex: 1;
     background-color: #f5f5f5;
     border-radius: 100px;
@@ -14,6 +13,26 @@
       height: 100%;
       background: $color-theme;
       transition: all ease .3s;
+      position: relative;
+      @keyframes progress {
+        0%{
+          width: 0;
+          opacity: 1;
+        }
+        100%{
+          width: 100%;
+          opacity: 0;
+        }
+      }
+      &:after{
+        content: '';
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: rgba(255, 255, 255, .4);
+        animation: progress 2.4s cubic-bezier(.23,1,.32,1) infinite;
+      }
     }
   }
   .windy-progress-after{
@@ -46,4 +65,10 @@
     font-size: 20px;
     font-weight: bold;
   }
+}
+.progress-container{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
 }

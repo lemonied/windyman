@@ -4,8 +4,9 @@
   .windy-list-item{
     display: flex;
     align-items: center;
+    padding: 5px 0;
     .windy-item-prefix{
-      padding: 0 5px;
+      padding: 0 10px;
     }
     .windy-item-content{
       flex: 1;

@@ -1,5 +1,15 @@
-import React, { FC, ReactNode, Fragment } from 'react';
+import React, {
+  FC,
+  ReactNode,
+  Fragment,
+  useState,
+  useEffect,
+  useRef,
+  forwardRef,
+  ForwardRefRenderFunction, useImperativeHandle, useMemo, createRef
+} from 'react';
 import './style.scss';
+import ReactDOM from 'react-dom';
 
 const DefaultAppend:FC<{percent: number;}> = function(props) {
   const { percent = 0 } = props;
@@ -10,11 +20,14 @@ const DefaultAppend:FC<{percent: number;}> = function(props) {
 
 interface NormalProgressProps {
   percent: number;
+  progress?: ProgressInstance;
+  after?: string | ReactNode | null;
+  middle?: string | ReactNode | null;
+  height?: number;
 }
 
 interface CircleProgressProps extends NormalProgressProps {
   type?: 'circle';
-  middle?: string | ReactNode | null;
 }
 const CircleProgress: FC<CircleProgressProps> = function(props) {
   const { percent, middle } = props;
@@ -40,52 +53,115 @@ const CircleProgress: FC<CircleProgressProps> = function(props) {
           fillOpacity="0"
         />
       </svg>
-      <div className={'windy-circle-progress-middle'}>
-        {
-          middle === null ?
-            middle :
+      {
+        typeof middle === 'undefined' ?
+          <div className={'windy-circle-progress-middle'}>
             <DefaultAppend percent={percent} />
-        }
-      </div>
+          </div> :
+          middle
+      }
     </div>
   );
 };
 
 interface LineProgressProps extends NormalProgressProps {
   type?: 'line';
-  after?: string | ReactNode | null;
 }
 const LineProgress: FC<LineProgressProps> = function (props) {
-  const { percent = 0, after } = props;
+  const { percent = 0, after, height = 5 } = props;
 
   return (
     <div className={'windy-progress-outer'}>
-      <div className={'windy-progress-inner'}>
+      <div className={'windy-progress-inner'} style={{height}}>
         <div className={'windy-progress-bg'} style={{width: `${percent}%`}} />
       </div>
-      <div className={'windy-progress-after'}>
-        {
-          after === null ?
-            after :
+      {
+        typeof after === 'undefined' ?
+          <div className={'windy-progress-after'}>
             <DefaultAppend percent={percent} />
-        }
-      </div>
+          </div> :
+          after
+      }
+
     </div>
   );
 };
 
+interface ProgressInstance {
+  setPercent?: (percent: number) => void;
+}
+export const useProgress = (): ProgressInstance => {
+  const instance = useRef<ProgressInstance>({});
+  return instance.current;
+};
 type ProgressProps = LineProgressProps | CircleProgressProps;
-const Progress: FC<ProgressProps> = function(props) {
-  const { type = 'line', percent = 0 } = props;
+const ProgressFc: ForwardRefRenderFunction<ProgressInstance, ProgressProps> = function(props, ref) {
+  const { type = 'line', percent = 0, progress, after, middle, height } = props;
+  const [count, setCount] = useState(percent);
+  useEffect(() => {
+    setCount(percent);
+  }, [percent]);
+  const instance = useMemo<ProgressInstance>(() => {
+    return {
+      setPercent: setCount
+    };
+  }, []);
+  useEffect(() => {
+    if (typeof progress !== 'undefined') {
+      Object.assign(progress, instance);
+    }
+  }, [progress, instance]);
+  useImperativeHandle(ref, () => {
+    return instance;
+  });
 
   switch (type) {
     case 'line':
-      return <LineProgress percent={percent} />;
+      return <LineProgress percent={count} after={after} height={height} />;
     case 'circle':
-      return <CircleProgress percent={percent} />;
+      return <CircleProgress percent={count} middle={middle} />;
     default:
       return null;
   }
 };
 
-export { Progress };
+export const Progress = forwardRef<ProgressInstance, ProgressProps>(ProgressFc);
+
+export class ProgressService {
+  ele: Element[] = [];
+
+  open(defaultPercent = 0) {
+    const instance = createRef<ProgressInstance>();
+    const container = document.createElement('div');
+    container.className = 'progress-container';
+    document.body.appendChild(container);
+    ReactDOM.render(
+      <Progress type={'line'} percent={defaultPercent} ref={instance} after={null} height={2} />,
+      container
+    );
+    this.ele.push(container);
+    return {
+      destroy: () => {
+        const index = this.ele.findIndex(val => val === container);
+        if (index > -1) {
+          this.ele.splice(index, 1);
+        }
+        ReactDOM.unmountComponentAtNode(container);
+        container.remove();
+      },
+      set(percent: number) {
+        if (instance.current?.setPercent) {
+          instance.current.setPercent(percent);
+        }
+      }
+    };
+  }
+  destroyAll() {
+    this.ele.forEach(ele => {
+      ReactDOM.unmountComponentAtNode(ele);
+      ele.remove();
+    });
+  }
+}
+
+export const progress = new ProgressService();

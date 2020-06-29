@@ -7,7 +7,7 @@ import { YField, YForm } from '../../../components/y-form';
 
 const demoDataSet = [
   [{name: '红色', value: 1}, {name: '白色', value: 2}, {name: '绿色', value: 3}],
-  [{name: '小号', value: 4}, {name: '中号', value: 5}, {name: '大号', value: 6}]
+  [{name: '小号', value: 4, disabled: true}, {name: '中号', value: 5}, {name: '大号', value: 6}]
 ];
 
 const formatCity = (cities: any) => {
@@ -119,8 +119,17 @@ const YFormDemo: FC<any> = function(): JSX.Element {
         <YField
           name={'time'}
           label={'时间'}
+          rules={[{
+            required: true
+          }]}
         >
           <Input placeholder={'时间选择器'} type={'time'} title={'时间'} column={3} />
+        </YField>
+        <YField
+          name={'selector'}
+          label={'Selector'}
+        >
+          <Input placeholder={'Selector'} type={'selector'} data={city} />
         </YField>
       </YForm>
     </Layout>

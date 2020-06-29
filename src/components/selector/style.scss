@@ -1,0 +1,56 @@
+@import "../../common/style/variable";
+
+.windy-selector{
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  display: flex;
+}
+.windy-selector-modal-mask{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  background: rgba(0, 0, 0, .2);
+  .windy-selector-modal{
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    top: 30%;
+  }
+}
+.windy-selector-enter {
+  opacity: 0;
+  .windy-selector{
+    transform: translateY(100%);
+  }
+}
+.windy-selector-enter-active {
+  opacity: 1;
+  .windy-selector{
+    transform: translateY(0);
+  }
+}
+.windy-selector-exit {
+  opacity: 1;
+  .windy-selector{
+    transform: scale(1);
+  }
+}
+.windy-selector-exit-active {
+  opacity: 0;
+  .windy-selector{
+    transform: translateY(100%);
+  }
+}
+.windy-selector-exit-done {
+  opacity: 0;
+  display: none;
+}
+.windy-selector-enter-active, .windy-selector-exit-active{
+  transition: opacity .3s ease;
+  .windy-selector{
+    transition: transform .3s ease;
+  }
+}
