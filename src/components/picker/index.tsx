@@ -108,9 +108,7 @@ Picker.defaultProps = defaultProps;
 export { Picker };
 
 interface PickerModalProps {
-  data: MultiDataChildren | MultiDataSet;
   title?: string | ReactNode;
-  defaultValue?: PickerValues;
   onSubmit?(value?: PickerValues): void;
   wrapperClassName?: string;
   afterClose?: () => void;
@@ -204,9 +202,13 @@ export class PickerModal extends Component<PickerModalProps, PickerModalState> {
     }
   }
   componentDidMount() {
-    const { data, defaultValue } = this.props;
-    this.setData(data);
-    this.setValue(defaultValue);
+    this.setState({
+      data: this.dataManager.dataSet,
+      selectedIndex: this.dataManager.selectedIndex
+    });
+    this.dataSet = this.dataManager.dataSet;
+    this.values = this.dataManager.values;
+    this.sourceValues = this.dataManager.sourceValues;
   }
 
   render() {
@@ -275,10 +277,10 @@ export class PickerService {
       this.ele = container;
       container.className = 'picker-container';
       document.body.appendChild(container);
+      this.dataManager.setData(data);
+      this.dataManager.setValues(defaultValue);
       ReactDOM.render(
         <PickerModal
-          data={data}
-          defaultValue={defaultValue}
           ref={this.pickerModal}
           onSubmit={e => resolve(e)}
           title={title}

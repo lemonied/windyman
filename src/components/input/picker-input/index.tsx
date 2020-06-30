@@ -66,8 +66,8 @@ const PickerInput: FC<PickerInputProps> = function(props): JSX.Element {
   // Echo Picker
   const echoPicker = useCallback((data: MultiDataSet | MultiDataChildren, value?: PickerValues) => {
     if (pickerService.pickerModal.current) {
-      pickerService.pickerModal.current?.setData(data);
-      pickerService.pickerModal.current?.setValue(value);
+      pickerService.pickerModal.current.setData(data);
+      pickerService.pickerModal.current.setValue(value);
     } else {
       pickerService.dataManager.setValues(value);
       pickerService.dataManager.setData(data);
@@ -112,34 +112,71 @@ export { PickerInput };
 * Selector Input
 */
 export interface SelectorInputProps {
-  placeholder?: string;
-  value?: PickerValues;
+  placeholder?: PickerInputProps['placeholder'];
+  value?: PickerInputProps['value'];
   picker?: PickerInputInstance;
-  onChange?(value: PickerValues): void;
-  data: MultiDataSet | MultiDataChildren;
+  onChange?: PickerInputProps['onChange'];
+  data: PickerInputProps['data'];
   column?: number;
+  formatNames?: PickerInputProps['formatNames'];
+
+  title?: PickerInputProps['formatNames'];
 }
 const SelectorInput: FC<SelectorInputProps> = function(props) {
-  const { placeholder, picker, data, column = 3 } = props;
+  const { placeholder, picker, data, value, column = 3, formatNames, onChange, title } = props;
 
-  const [currentValue] = useState<string>('');
+  const [currentValue, setCurrentValue] = useState<string>('');
   const selector = useMemo(() => {
     return new SelectorService(column);
   }, [column]);
+
+  // Emit Change
+  const emitChange = useCallback(() => {
+    if (typeof onChange !== 'undefined') {
+      onChange(selector.dataManager.values);
+    }
+  }, [onChange, selector]);
+  // Echo Names
+  const echoNames = useCallback(() => {
+    let names: string = '';
+    if (typeof formatNames === 'function') {
+      names = formatNames(selector.dataManager.sourceValues);
+    } else {
+      names = selector.dataManager.sourceValues.map(item => item.name).join(' ');
+    }
+    setCurrentValue(names);
+  }, [formatNames, selector]);
+  // Echo Input
+  const echoDisplay = useCallback((value: (string | number)[]) => {
+    if (selector.ref.current) {
+      selector.ref.current.setValue(value);
+    } else {
+      selector.dataManager.setValues(value);
+    }
+    echoNames();
+    emitChange();
+  }, [selector, echoNames, emitChange]);
+  const echoSelector = useCallback((data: MultiDataChildren | MultiDataSet, values?: PickerValues) => {
+    if (selector.ref.current) {
+      selector.ref.current.setData(data);
+      selector.ref.current.setValue(values);
+    } else {
+      selector.dataManager.setData(data);
+      selector.dataManager.setValues(values);
+    }
+    echoNames();
+  }, [selector, echoNames]);
 
   const instance = useMemo<PickerInputInstance>(() => {
 
     return {
       open() {
-        selector.open(data);
+        selector.open(data, selector.dataManager.values, title).then(res => {
+          echoDisplay(res);
+        });
       }
     };
-  }, [data, selector]);
-  useEffect(() => {
-    if (picker) {
-      Object.assign(picker, instance);
-    }
-  }, [picker, instance]);
+  }, [data, selector, echoDisplay, title]);
 
   const showSelector = useCallback((e?: any) => {
     e?.preventDefault();
@@ -148,6 +185,16 @@ const SelectorInput: FC<SelectorInputProps> = function(props) {
       instance.open();
     }
   }, [instance]);
+
+  useEffect(() => {
+    if (picker) {
+      Object.assign(picker, instance);
+    }
+  }, [picker, instance]);
+
+  useEffect(() => {
+    echoSelector(data, value);
+  }, [data, value, echoSelector]);
 
   return (
     <input className={'y-input'} type="text" onClick={showSelector} placeholder={placeholder} value={currentValue} readOnly={true} />

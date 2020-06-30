@@ -1,11 +1,88 @@
 @import "../../common/style/variable";
+@import "../../common/style/mixin";
 
-.windy-selector{
+$activeColor: #f23030;
+
+.windy-selector-wrapper{
   width: 100%;
   height: 100%;
-  background: #ffffff;
+  background: #f5f5f5;
   display: flex;
+  flex-direction: column;
+  .extra-info{
+    background: #ffffff;
+    .windy-selector-title{
+      padding: 8px 15px;
+      font-size: 14px;
+      text-align: center;
+      @include no-wrap;
+    }
+    .select-names{
+      padding: 0 0 0 10px;
+    }
+    .select-name{
+      display: inline-block;
+      padding: 8px;
+      font-size: 13px;
+      max-width: 33%;
+      @include no-wrap;
+      box-sizing: border-box;
+      &.active{
+        color: $activeColor;
+        position: relative;
+        &:after{
+          content: '';
+          position: absolute;
+          bottom: 0;
+          width: 100%;
+          left: 0;
+          height: 3px;
+          background: $activeColor;
+        }
+      }
+    }
+  }
+  .windy-selector-container{
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+  }
+  .windy-selector{
+    height: 100%;
+    background: #ffffff;
+    overflow: hidden;
+    @include clearFix;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: left ease .3s;
+    .windy-selector-item{
+      float: left;
+      height: 100%;
+      overflow: hidden;
+      &:nth-child(2n){
+        background: #f5f5f5;
+      }
+      .windy-selector-option{
+        padding: 8px 30px 8px 20px;
+        font-size: 13px;
+        position: relative;
+        &.active{
+          color: $activeColor;
+        }
+        .icon{
+          position: absolute;
+          top: 50%;
+          right: 15px;
+          transform: translateY(-50%);
+        }
+      }
+    }
+  }
 }
+
 .windy-selector-modal-mask{
   position: absolute;
   left: 0;
@@ -17,30 +94,31 @@
     position: absolute;
     left: 0;
     bottom: 0;
+    right: 0;
     top: 30%;
   }
 }
 .windy-selector-enter {
   opacity: 0;
-  .windy-selector{
+  .windy-selector-modal{
     transform: translateY(100%);
   }
 }
 .windy-selector-enter-active {
   opacity: 1;
-  .windy-selector{
+  .windy-selector-modal{
     transform: translateY(0);
   }
 }
 .windy-selector-exit {
   opacity: 1;
-  .windy-selector{
+  .windy-selector-modal{
     transform: scale(1);
   }
 }
 .windy-selector-exit-active {
   opacity: 0;
-  .windy-selector{
+  .windy-selector-modal{
     transform: translateY(100%);
   }
 }
@@ -50,7 +128,7 @@
 }
 .windy-selector-enter-active, .windy-selector-exit-active{
   transition: opacity .3s ease;
-  .windy-selector{
+  .windy-selector-modal{
     transition: transform .3s ease;
   }
 }

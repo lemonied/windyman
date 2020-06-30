@@ -32,6 +32,7 @@ interface InputSelectorOption extends InputSharedProps {
   type: 'selector';
   data: MultiDataSet | MultiDataChildren;
   column?: number;
+  title?: string | ReactNode;
 }
 
 type InputProps = InputNormalProps | InputPickerOption | InputDateTimePickerOption | InputTimePickerOption | InputSelectorOption;
@@ -54,7 +55,7 @@ const Input: FC<InputProps> = function(props): JSX.Element {
     case 'time':
       return (<TimePicker start={start} end={end} onChange={onChange} value={value} column={column} title={title} placeholder={placeholder} picker={picker} />);
     case 'selector':
-      return (<SelectorInput placeholder={placeholder} picker={picker} value={value} onChange={onChange} data={data} column={column} />);
+      return (<SelectorInput placeholder={placeholder} picker={picker} value={value} onChange={onChange} data={data} column={column} title={title} />);
     default:
       return (<input className={'y-input'} type={type} placeholder={placeholder} value={value || ''} onChange={onChange} />);
   }

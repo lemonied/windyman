@@ -26,7 +26,7 @@ const Header: FC<HeaderProps> = function(props): JSX.Element {
 
   return (
     <header className={'windy-header'}>
-      <div className={'left'} onClick={ onBack }>{ left }</div>
+      <div className={'left'} onClick={onBack}>{left}</div>
       <div className={'content'}>{title}</div>
       <div className={'right'}>{right}</div>
     </header>

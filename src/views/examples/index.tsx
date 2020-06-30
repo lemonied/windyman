@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { Header, Layout } from '../../components/layout';
-import { Route, Link } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import { ScrollYDemo } from './scroll-y';
 import './reducer';
 import './style.scss';
@@ -8,6 +8,7 @@ import { FixedRouter } from '../../components/layout/fixed-router';
 import { YFormDemo } from './form';
 import { ModalDemo } from './modal';
 import { ProgressDemo } from './progress';
+import { Item, List } from '../../components/list';
 
 const Examples: FC<any> = function(): JSX.Element {
 
@@ -26,10 +27,12 @@ const Examples: FC<any> = function(): JSX.Element {
       }
     >
       <div className={'demo-content'}>
-        <div>1、<Link to={'/example/scroll-y'}>ScrollY</Link></div>
-        <div>2、<Link to={'/example/y-form'}>YForm</Link></div>
-        <div>3、<Link to={'/example/modal'}>Modal</Link></div>
-        <div>4、<Link to={'/example/progress'}>Progress</Link></div>
+        <List>
+          <Item link={'/example/scroll-y'} arrow={'horizontal'} extra={'滚动容器'}>ScrollY</Item>
+          <Item link={'/example/y-form'} arrow={'horizontal'} extra={'表单控件'}>YForm</Item>
+          <Item link={'/example/modal'} arrow={'horizontal'} extra={'弹窗'}>Modal</Item>
+          <Item link={'/example/progress'} arrow={'horizontal'} extra={'进度条'}>Progress</Item>
+        </List>
       </div>
     </Layout>
   );

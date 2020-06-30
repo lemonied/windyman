@@ -2,6 +2,7 @@ import React, { FC, ReactNode } from 'react';
 import { combineClassNames } from '../../common/utils';
 import { Icon } from '../icon';
 import './style.scss';
+import { LinkProps, Link } from 'react-router-dom';
 
 interface ListProps {
   className?: string;
@@ -14,17 +15,31 @@ const List: FC<ListProps> = function(props) {
 };
 export { List };
 
+
+const Container: FC<{ link?: LinkProps['to'], className?: string, onClick?: ItemProps['onClick'] }> = (props) => {
+  const { link, children, className, onClick } = props;
+
+  if (link) {
+    return (
+      <Link to={link} className={className} onClick={onClick}>{children}</Link>
+    );
+  }
+  return (
+    <div className={className}>{children}</div>
+  );
+};
 interface ItemProps {
   arrow?: 'horizontal' | 'empty' | null;
   prefix?: string | ReactNode;
   extra?: string | ReactNode;
   onClick?: (e: any) => void;
+  link?: LinkProps['to'];
 }
 const Item: FC<ItemProps> = function(props) {
-  const { arrow, prefix, children, extra , onClick} = props;
+  const { arrow, prefix, children, extra , onClick, link } = props;
 
   return (
-    <div className={combineClassNames('windy-list-item', arrow ? 'has-arrow' : '')} onClick={onClick}>
+    <Container link={link} className={combineClassNames('windy-list-item', arrow ? 'has-arrow' : '')} onClick={onClick}>
       {
         prefix ?
           <div className={'windy-item-prefix'}>{ prefix }</div> :
@@ -43,7 +58,7 @@ const Item: FC<ItemProps> = function(props) {
           </div> :
           null
       }
-    </div>
+    </Container>
   );
 };
 export { Item };

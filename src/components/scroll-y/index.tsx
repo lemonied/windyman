@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, FC, useEffect, useState, CSSProperties, useCallback, useRef, useMemo } from 'react';
+import React, { FC, useEffect, useState, CSSProperties, useCallback, useRef, useMemo } from 'react';
 import { BScroll } from '../better-scroll';
 import { Position } from '../better-scroll/bscroll';
 import './style.scss';
@@ -31,7 +31,7 @@ export const useScrollY = (): ScrollYInstance => {
 * When set to 3, the scroll event is real-time fired during not only the screen scrolling but also the momentum and bounce animation
 * If not set, the default value 0 means there is no scroll event is fired.
 */
-interface Props extends PropsWithChildren<any> {
+interface Props {
   probeType?: 1 | 2 | 3;
   onScroll?: (position: Position) => void;
   onPullingUp?: () => void;
@@ -59,6 +59,7 @@ const ScrollY: FC<Props> = function (props): JSX.Element {
   const [ loadingTop, setLoadingTop ] = useState<number>(bubbleInit.current.initTop);
   const [ pullingDown, setPullingDown ] = useState<boolean>(false);
   const [ pullingDownSnapshot, setPullingDownSnapshot ] = useState<boolean>(false);
+  const [ isOpenPullingDown, setIsOpenPullingDown ] = useState<boolean>(!!onPullingDown);
   const propsRef = useRef<Props>(Object.assign({}, props));
   const pullUpLoadConf = useMemo(() => {
     return { threshold: 50 };
@@ -152,6 +153,7 @@ const ScrollY: FC<Props> = function (props): JSX.Element {
     };
     const openPullDown = (options = pullDownConf) => {
       instanceRef.current?.openPullDown(options);
+      setIsOpenPullingDown(true);
     };
     const instance = { finishPullUp, refresh, closePullUp, openPullUp, finishPullDown, openPullDown };
     if (typeof getInstance === 'function') {
@@ -165,18 +167,20 @@ const ScrollY: FC<Props> = function (props): JSX.Element {
   return (
     <div className={ 'windy-scroll-y-wrapper' } style={style}>
       {
-        pullingDownSnapshot ?
-          null :
-          <div className={'loading-wrapper'} style={{ top: pullingDown ? -2 : loadingTop }}>
-            {
-              pullingDown ?
-                <Loading title={'加载中...'} /> :
-                <Bubble
-                  y={bubbleY}
-                  bubble={bubble}
-                />
-            }
-          </div>
+        isOpenPullingDown ?
+          pullingDownSnapshot ?
+            null :
+            <div className={'loading-wrapper'} style={{ top: pullingDown ? -2 : loadingTop }}>
+              {
+                pullingDown ?
+                  <Loading title={'加载中...'} /> :
+                  <Bubble
+                    y={bubbleY}
+                    bubble={bubble}
+                  />
+              }
+            </div> :
+          null
       }
       <div className={ 'scroll-y' } ref={ wrapperRef }>
         <div>
@@ -211,7 +215,7 @@ interface BubbleConf {
 interface BubbleInstance {
   conf: BubbleConf;
 }
-interface BubbleProps extends PropsWithChildren<any> {
+interface BubbleProps {
   y: number;
   getInstance?: (instance: BubbleInstance) => void;
   bubble?: { [prop: string]: any };

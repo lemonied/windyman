@@ -4,12 +4,13 @@
   .windy-list-item{
     display: flex;
     align-items: center;
-    padding: 5px 0;
+    min-height: 45px;
     .windy-item-prefix{
       padding: 0 10px;
     }
     .windy-item-content{
       flex: 1;
+      padding: 0 10px;
     }
     .windy-item-extra{
       padding: 0 10px;

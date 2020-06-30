@@ -47,7 +47,7 @@ const YFormDemo: FC<any> = function(): JSX.Element {
     form.setFieldsValue({
       education: '21'
     });
-    form.validateFields().then(values => {
+    form.validateFields(['education']).then(values => {
       // validate all fields
     });
   }, [options, form]);
@@ -62,7 +62,7 @@ const YFormDemo: FC<any> = function(): JSX.Element {
         {/*单选示例*/}
         <YField
           name={'education'}
-          label={'教育程度'}
+          label={'单选'}
           rules={[{
             required: true
           }]}
@@ -79,7 +79,7 @@ const YFormDemo: FC<any> = function(): JSX.Element {
         {/*级联选择*/}
         <YField
           name={'city'}
-          label={'多列'}
+          label={'级联'}
         >
           <Input
             data={city}
@@ -104,7 +104,7 @@ const YFormDemo: FC<any> = function(): JSX.Element {
             }
           }]}
           name={'username'}
-          label={'用户名'}
+          label={'文本框'}
         >
           <Input type={'text'} placeholder={'username'} />
         </YField>
@@ -128,8 +128,12 @@ const YFormDemo: FC<any> = function(): JSX.Element {
         <YField
           name={'selector'}
           label={'Selector'}
+          initialValue={['1674', '1675', '1677']}
+          rules={[{
+            required: true
+          }]}
         >
-          <Input placeholder={'Selector'} type={'selector'} data={city} />
+          <Input placeholder={'Selector'} type={'selector'} data={city} title={'第二种多列选择器'} />
         </YField>
       </YForm>
     </Layout>

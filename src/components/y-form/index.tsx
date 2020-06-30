@@ -17,7 +17,7 @@ import './style.scss';
 import { combineClassNames } from '../../common/utils';
 import { Icon } from '../icon';
 import { modal } from '../modal';
-import { Item, List } from '../List';
+import { Item, List } from '../list';
 import { usePicker } from '../input/picker-input';
 
 interface YFormProps extends FormProps {
