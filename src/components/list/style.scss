@@ -5,12 +5,14 @@
     display: flex;
     align-items: center;
     min-height: 45px;
-    .windy-item-prefix{
-      padding: 0 10px;
+    & > * {
+      padding-right: 10px;
+      &:first-child{
+        padding-left: 10px;
+      }
     }
     .windy-item-content{
       flex: 1;
-      padding: 0 10px;
     }
     .windy-item-extra{
       padding: 0 10px 0 0;
