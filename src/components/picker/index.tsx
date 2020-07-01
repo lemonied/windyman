@@ -1,4 +1,4 @@
-import React, { Component, FC, PropsWithChildren, useEffect, useRef, createRef, RefObject, ReactNode } from 'react';
+import React, { Component, FC, useEffect, useRef, createRef, RefObject, ReactNode } from 'react';
 import ReactDOM from 'react-dom';
 import './style.scss';
 import { BScroll } from '../better-scroll';
@@ -11,7 +11,7 @@ interface PickerInstance {
   getSelectedIndex(): number;
   refresh(): void;
 }
-interface Props extends PropsWithChildren<any> {
+interface Props {
   data: DataItem[];
   defaultSelectedIndex?: number;
   getInstance?(instance: PickerInstance): void;
@@ -28,7 +28,7 @@ export const usePicker = (): PickerInstance => {
   const instance = useRef<PickerInstance>({} as PickerInstance);
   return instance.current;
 };
-const Picker: FC<Props> = function(props): JSX.Element {
+const Picker: FC<Props> = function(props) {
   const { data, getInstance, defaultSelectedIndex = 0, picker, className, onChange } = props;
   const wheelWrapperRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<BScroll>();
@@ -108,7 +108,7 @@ Picker.defaultProps = defaultProps;
 export { Picker };
 
 interface PickerModalProps {
-  title?: string | ReactNode;
+  title?: ReactNode;
   onSubmit?(value?: PickerValues): void;
   wrapperClassName?: string;
   afterClose?: () => void;
@@ -259,7 +259,7 @@ export class PickerModal extends Component<PickerModalProps, PickerModalState> {
 export interface PickerServiceOptions {
   data: MultiDataChildren | MultiDataSet;
   defaultValue?: PickerValues;
-  title?: string | ReactNode;
+  title?: ReactNode;
   wrapperClassName?: string;
 }
 export class PickerService {

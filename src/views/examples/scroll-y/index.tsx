@@ -35,6 +35,7 @@ const ScrollYDemo: FC = function(props) {
       pageBean.current = res.pageBean;
       if (query.current.currentPage === 1) {
         setLoading(false);
+        scroll.openPullUp();
         dispatch({ type: 'SET_RECOMMENDS', value: res.result });
       } else {
         dispatch({ type: 'UPDATE_RECOMMENDS', value: res.result });
@@ -77,7 +78,7 @@ const ScrollYDemo: FC = function(props) {
           <Loading title={'加载中...'} /> :
           null
       }
-      <div style={{padding: '10px 0', height: '100%'}}>
+      <div style={{height: '100%'}}>
         <ScrollY
           onPullingUp={onPullingUp}
           scroll={scroll}

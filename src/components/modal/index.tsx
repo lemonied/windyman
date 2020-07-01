@@ -1,4 +1,4 @@
-import React, { Component, PropsWithChildren, ReactNode, createRef } from 'react';
+import React, { Component, ReactNode, createRef } from 'react';
 import ReactDOM from 'react-dom';
 import './style.scss';
 import { CSSTransition } from 'react-transition-group';
@@ -7,9 +7,9 @@ interface Footer {
   text: string;
   callback?: (val?: any) => void;
 }
-interface Props extends PropsWithChildren<any>{
-  header?: string | ReactNode;
-  content?: string | ReactNode;
+interface Props {
+  header?: ReactNode;
+  content?: ReactNode;
   footer?: Footer[];
   maskClick?: (e: any) => void;
 }
@@ -72,7 +72,7 @@ export class ModalService {
   ele: Element[] = [];
 
   create(
-    options: { title: string; content: string | ReactNode; footer: Footer[]; },
+    options: { title: string; content: ReactNode; footer: Footer[]; },
     callback?: (result?: any) => void
   ): { close(): void; } {
     const { title, content, footer } = options;
@@ -100,7 +100,7 @@ export class ModalService {
     };
   }
   confirm(
-    options: { title?: string; content: string | ReactNode; cancelText?: string; confirmText?: string; }
+    options: { title?: string; content: ReactNode; cancelText?: string; confirmText?: string; }
   ): Promise<boolean> {
     const { title = '提示', content, cancelText = '取消', confirmText = '确定' } = options;
     return new Promise((resolve, reject) => {
@@ -125,7 +125,7 @@ export class ModalService {
       });
     });
   }
-  alert(content: string | ReactNode, confirmText = '好的'): Promise<boolean> {
+  alert(content: ReactNode, confirmText = '好的'): Promise<boolean> {
     return new Promise((resolve, reject) => {
       const works = this.create({
         title: '提示',

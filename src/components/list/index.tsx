@@ -19,19 +19,19 @@ export { List };
 const Container: FC<{ link?: LinkProps['to'], className?: string, onClick?: ItemProps['onClick'] }> = (props) => {
   const { link, children, className, onClick } = props;
 
-  if (link) {
+  if (typeof link !== 'undefined') {
     return (
       <Link to={link} className={className} onClick={onClick}>{children}</Link>
     );
   }
   return (
-    <div className={className}>{children}</div>
+    <div className={className} onClick={onClick}>{children}</div>
   );
 };
 interface ItemProps {
   arrow?: 'horizontal' | 'empty' | null;
-  prefix?: string | ReactNode;
-  extra?: string | ReactNode;
+  prefix?: ReactNode;
+  extra?: ReactNode;
   onClick?: (e: any) => void;
   link?: LinkProps['to'];
 }

@@ -21,8 +21,8 @@ const DefaultAppend:FC<{percent: number;}> = function(props) {
 interface NormalProgressProps {
   percent: number;
   progress?: ProgressInstance;
-  after?: string | ReactNode | null;
-  middle?: string | ReactNode | null;
+  after?: ReactNode;
+  middle?: ReactNode;
   height?: number;
 }
 

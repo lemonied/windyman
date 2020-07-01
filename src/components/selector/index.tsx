@@ -2,7 +2,7 @@ import React, {
   createRef,
   FC,
   forwardRef,
-  ForwardRefRenderFunction, ReactNode, RefObject, useCallback,
+  ForwardRefRenderFunction, ReactNode, RefObject, useCallback, useEffect,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -13,14 +13,59 @@ import './style.scss';
 import { CSSTransition } from 'react-transition-group';
 import { DataItem, MultiDataChildren, MultiDataManager, MultiDataSet, PickerValues } from '../picker/core';
 import { combineClassNames } from '../../common/utils';
-import { ScrollY } from '../scroll-y';
+import { ScrollY, useScrollY } from '../scroll-y';
 import { Icon } from '../icon';
+
+interface SelectorColumnProps {
+  onClick: (item: DataItem, key: number, index: number) => void;
+  activeKey?: number;
+  item: MultiDataChildren;
+  index: number;
+}
+const SelectorColumn: FC<SelectorColumnProps> = function(props) {
+  const { onClick, activeKey, item, index: key } = props;
+  const scroll = useScrollY();
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const activeKeyRef = useRef(activeKey);
+  useEffect(() => {
+    if (scroll.scrollToElement && wrapperRef.current && typeof activeKeyRef.current !== 'undefined') {
+      scroll.scrollToElement(
+        wrapperRef.current.getElementsByClassName('windy-selector-option')[activeKeyRef.current] as HTMLElement,
+        300,
+        0,
+        true
+      );
+    }
+  }, [scroll]);
+  return (
+    <ScrollY scroll={scroll}>
+      <div ref={wrapperRef}>
+        {
+          item.map((val, k) => (
+            <div
+              className={combineClassNames('windy-selector-option', activeKey === k ? 'active' : '')}
+              key={k}
+              onClick={e => onClick(val, key, k)}
+            >
+              {val.name}
+              {
+                activeKey === k ?
+                  <Icon type={'check'} className={'icon'} /> :
+                  null
+              }
+            </div>
+          ))
+        }
+      </div>
+    </ScrollY>
+  );
+};
 
 interface SelectorProps {
   data: MultiDataSet;
   defaultSelectedIndex?: number[];
   onChange?: (values: (string | number)[]) => void;
-  title?: string | ReactNode;
+  title?: ReactNode;
 }
 const Selector: FC<SelectorProps> = function(props) {
   const { data, defaultSelectedIndex = [], onChange, title } = props;
@@ -97,24 +142,7 @@ const Selector: FC<SelectorProps> = function(props) {
                 {
                   key > 0 && typeof selectedIndex[key - 1] === 'undefined' ?
                     null :
-                    <ScrollY>
-                      {
-                        item.map((val, k) => (
-                          <div
-                            className={combineClassNames('windy-selector-option', selectedIndex[key] === k ? 'active' : '')}
-                            key={k}
-                            onClick={e => onClick(val, key, k)}
-                          >
-                            {val.name}
-                            {
-                              selectedIndex[key] === k ?
-                                <Icon type={'check'} className={'icon'} /> :
-                                null
-                            }
-                          </div>
-                        ))
-                      }
-                    </ScrollY>
+                    <SelectorColumn onClick={onClick} index={key} activeKey={selectedIndex[key]} item={item} />
                 }
               </div>
             ))
@@ -131,7 +159,7 @@ interface SelectorModalProps {
   afterClose?: () => void;
   dataManager: MultiDataManager;
   onSubmit?: (values?: (string | number)[]) => void;
-  title?: string | ReactNode;
+  title?: ReactNode;
 }
 interface SelectorModalInstance {
   show(): void;
@@ -229,7 +257,7 @@ export class SelectorService {
     this.dataManager = new MultiDataManager(multi);
   }
 
-  open(data: MultiDataSet | MultiDataChildren = [], defaultValue?: PickerValues, title?: string | ReactNode): Promise<any> {
+  open(data: MultiDataSet | MultiDataChildren = [], defaultValue?: PickerValues, title?: ReactNode): Promise<any> {
     this.destroy();
     return new Promise((resolve, reject) => {
       const container = document.createElement('div');

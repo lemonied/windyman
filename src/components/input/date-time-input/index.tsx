@@ -10,13 +10,13 @@ export interface DateTimePickerProps {
   start?: Date;
   end?: Date;
   column?: number;
-  title?: string | ReactNode;
+  title?: ReactNode;
   value?: Date | string;
   onChange?: (value: Date) => void;
   placeholder?: string;
   picker?: PickerInputInstance;
 }
-const DateTimePicker: FC<DateTimePickerProps> = function(props): JSX.Element {
+const DateTimePicker: FC<DateTimePickerProps> = function(props) {
   const defaultStart = useMemo<Date>(() => {
     return new Date(new Date().getFullYear() - 10, 0, 1);
   }, []);
@@ -127,12 +127,12 @@ export interface TimePickerProps {
   end?: string;
   onChange?: (value: string) => void;
   value?: string;
-  title?: string | ReactNode;
+  title?: ReactNode;
   column?: 1 | 2 | 3;
   placeholder?: string;
   picker?: PickerInputInstance;
 }
-const TimePicker: FC<TimePickerProps> = (props): JSX.Element => {
+const TimePicker: FC<TimePickerProps> = (props) => {
   const { start, end, onChange, value, title, column = 3, placeholder, picker } = props;
   const [data, setData] = useState<MultiDataChildren>([]);
   const [realValue, setRealValue] = useState<PickerValues>([]);

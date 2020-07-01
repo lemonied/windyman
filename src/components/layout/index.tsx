@@ -1,15 +1,15 @@
-import React, { CSSProperties, FC, PropsWithChildren, ReactNode } from 'react';
+import React, { CSSProperties, FC, ReactNode } from 'react';
 import './style.scss';
 import { combineClassNames } from '../../common/utils';
 
-interface Props extends PropsWithChildren<any> {
-  header?: string | ReactNode;
-  footer?: string | ReactNode;
+interface Props {
+  header?: ReactNode;
+  footer?: ReactNode;
   extra?: ReactNode;
   className?: string;
   style?: CSSProperties;
 }
-const Layout: FC<Props> = function(props): JSX.Element {
+const Layout: FC<Props> = function(props) {
   const { header, footer, children, className, style, extra } = props;
 
   return (

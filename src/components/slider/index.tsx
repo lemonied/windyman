@@ -1,6 +1,5 @@
 import React, {
   FC,
-  PropsWithChildren,
   useCallback,
   useEffect,
   useRef,
@@ -22,7 +21,7 @@ interface SliderInstance {
   play(): void;
   stop(): void;
 }
-interface Props extends PropsWithChildren<any> {
+interface Props {
   children: ReactElement[];
   dot?: boolean;
   loop?: boolean;
@@ -49,7 +48,7 @@ export const useSlider = ():SliderInstance  => {
   const instance = useRef<SliderInstance>({} as SliderInstance);
   return instance.current;
 };
-const Slider: FC<Props> = function(props): JSX.Element {
+const Slider: FC<Props> = function(props) {
   const { children, dot, loop, click, interval, autoplay, threshold, speed, getInstance, data, slider } = props;
 
   const [ currentIndex, setCurrentIndex ] = useState<number>(0);

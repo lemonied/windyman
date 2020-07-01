@@ -7,7 +7,7 @@ import { combineClassNames } from '../../../common/utils';
 interface FixedRouterProps {
   defaultPath: string;
 }
-const FixedRouter: FC<FixedRouterProps> = function(props): JSX.Element {
+const FixedRouter: FC<FixedRouterProps> = function(props) {
   const { children, defaultPath } = props;
   const location = useLocation();
   return (

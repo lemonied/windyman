@@ -11,12 +11,12 @@ const Back = () => (
 );
 
 interface HeaderProps {
-  left?: string | ReactNode;
-  title?: string | ReactNode;
-  right?: string | ReactNode;
+  left?: ReactNode;
+  title?: ReactNode;
+  right?: ReactNode;
   onBack?: () => void;
 }
-const Header: FC<HeaderProps> = function(props): JSX.Element {
+const Header: FC<HeaderProps> = function(props) {
   const back = useMemo(() => (<Back />), []);
   const history = useHistory();
   const goBack = useCallback(() => {

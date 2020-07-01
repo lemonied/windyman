@@ -6,7 +6,7 @@ interface Props {
 }
 
 let cache: any = null;
-const AsyncLoad: FC<Props> = function (props): JSX.Element {
+const AsyncLoad: FC<Props> = function (props) {
   const { load } = props;
   const [ Child, setChild ] = useState<any>(cache);
   useEffect(() => {

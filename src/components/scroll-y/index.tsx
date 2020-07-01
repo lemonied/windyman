@@ -1,4 +1,14 @@
-import React, { FC, useEffect, useState, CSSProperties, useCallback, useRef, useMemo } from 'react';
+import React, {
+  FC,
+  useEffect,
+  useState,
+  CSSProperties,
+  useCallback,
+  useRef,
+  useMemo,
+  forwardRef,
+  ForwardRefRenderFunction, useImperativeHandle, ReactNode
+} from 'react';
 import { BScroll } from '../better-scroll';
 import { Position } from '../better-scroll/bscroll';
 import './style.scss';
@@ -17,8 +27,9 @@ interface ScrollYInstance {
   openPullUp: (option?: any) => void;
   finishPullDown: () => void;
   openPullDown: (options?: any) => void;
+  scrollTo: BScroller['scrollTo'];
+  scrollToElement: BScroller['scrollToElement'];
 }
-
 // ScrollY Hook
 export const useScrollY = (): ScrollYInstance => {
   const scroll = useRef<ScrollYInstance>({} as ScrollYInstance);
@@ -38,19 +49,17 @@ interface Props {
   onPullingDown?: () => void;
   style?: CSSProperties;
   scroll?: { [prop: string]: any };
-  getInstance?: (instance: ScrollYInstance) => void;
+  children?: ReactNode;
 }
-const defaultProps: Props = {
-  probeType: 1
-};
 // ScrollY Component
-const ScrollY: FC<Props> = function (props): JSX.Element {
+const ScrollYFc: ForwardRefRenderFunction<ScrollYInstance, Props> = function (props, ref) {
 
-  const { style } = props;
-  const { onScroll, onPullingDown, onPullingUp, getInstance, scroll } = props;
+  const { style, children } = props;
+  const { onScroll, onPullingDown, onPullingUp, scroll } = props;
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const instanceRef = useRef<BScroller>();
+  const enablePullUpRef = useRef<boolean>(!!onPullingUp);
   const bubble = useBubble();
   // Initial top value
   const bubbleInit = useRef({ initTop: -100 });
@@ -70,7 +79,7 @@ const ScrollY: FC<Props> = function (props): JSX.Element {
 
   // Create Scroller
   useEffect(() => {
-    const { probeType, onPullingUp, onPullingDown } = propsRef.current;
+    const { probeType = 1, onPullingUp, onPullingDown } = propsRef.current;
     instanceRef.current = new BScroll(wrapperRef.current as Element, {
       scrollY: true,
       click: true,
@@ -107,6 +116,7 @@ const ScrollY: FC<Props> = function (props): JSX.Element {
   useEffect(() => {
     const wrapper = instanceRef.current;
     const pullingUp = () => {
+      if (!enablePullUpRef.current) { return; }
       if (typeof onPullingUp === 'function') {
         setPullingUp(true);
         onPullingUp();
@@ -125,8 +135,8 @@ const ScrollY: FC<Props> = function (props): JSX.Element {
       instanceRef.current?.off('pullingDown', pullingDown);
     };
   }, [onPullingUp, onPullingDown]);
-  // use instance
-  useEffect(() => {
+  // instance
+  const instance = useMemo<ScrollYInstance>(() => {
     const refresh = () => {
       instanceRef.current?.refresh();
     };
@@ -137,9 +147,11 @@ const ScrollY: FC<Props> = function (props): JSX.Element {
     };
     const closePullUp = () => {
       finishPullUp();
+      enablePullUpRef.current = false;
       instanceRef.current?.closePullUp();
     };
     const openPullUp = (option = pullUpLoadConf) => {
+      enablePullUpRef.current = true;
       instanceRef.current?.openPullUp(option);
     };
     const finishPullDown = () => {
@@ -155,14 +167,31 @@ const ScrollY: FC<Props> = function (props): JSX.Element {
       instanceRef.current?.openPullDown(options);
       setIsOpenPullingDown(true);
     };
-    const instance = { finishPullUp, refresh, closePullUp, openPullUp, finishPullDown, openPullDown };
-    if (typeof getInstance === 'function') {
-      getInstance(instance);
-    }
+    return {
+      finishPullUp,
+      refresh,
+      closePullUp,
+      openPullUp,
+      finishPullDown,
+      openPullDown,
+      scrollTo: (...args) => {
+        instanceRef.current?.scrollTo(...args);
+      },
+      scrollToElement: (...args) => {
+        instanceRef.current?.scrollToElement(...args);
+      }
+    };
+  }, [pullDownConf, pullUpLoadConf]);
+  // use instance
+  useEffect(() => {
     if (scroll && typeof scroll === 'object') {
       Object.assign(scroll, instance);
     }
-  }, [getInstance, scroll, pullUpLoadConf, pullDownConf]);
+  }, [scroll, instance]);
+
+  useImperativeHandle(ref, () => {
+    return instance;
+  });
 
   return (
     <div className={ 'windy-scroll-y-wrapper' } style={style}>
@@ -184,7 +213,7 @@ const ScrollY: FC<Props> = function (props): JSX.Element {
       }
       <div className={ 'scroll-y' } ref={ wrapperRef }>
         <div>
-          { props.children }
+          { children }
           {
             pullingUp ?
               <Loading /> :
@@ -195,7 +224,8 @@ const ScrollY: FC<Props> = function (props): JSX.Element {
     </div>
   );
 };
-ScrollY.defaultProps = defaultProps;
+
+export const ScrollY = forwardRef<ScrollYInstance, Props>(ScrollYFc);
 
 interface BubbleConf {
   ratio: number;
@@ -220,14 +250,11 @@ interface BubbleProps {
   getInstance?: (instance: BubbleInstance) => void;
   bubble?: { [prop: string]: any };
 }
-const defaultBubbleProps: BubbleProps = {
-  y: 0
-};
 const useBubble = (): BubbleInstance => {
   const instance = useRef<BubbleInstance>({} as BubbleInstance);
   return instance.current;
 };
-const Bubble: FC<BubbleProps> = function(props): JSX.Element {
+const Bubble: FC<BubbleProps> = function(props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dataRef = useRef<BubbleConf>({
     ratio: window.devicePixelRatio,
@@ -244,9 +271,9 @@ const Bubble: FC<BubbleProps> = function(props): JSX.Element {
     headRadius: 0,
     distance: 0
   });
-  const { y, getInstance, bubble } = props;
-  const [width, setWidth] = useState<number>(50);
-  const [height, setHeight] = useState<number>(80);
+  const { y = 0, getInstance, bubble } = props;
+  const [ width, setWidth ] = useState<number>(50);
+  const [ height, setHeight ] = useState<number>(80);
 
   // draw bubble
   const drawBubble = useCallback((ctx: CanvasRenderingContext2D) => {
@@ -378,6 +405,3 @@ const Bubble: FC<BubbleProps> = function(props): JSX.Element {
     />
   );
 };
-Bubble.defaultProps = defaultBubbleProps;
-
-export { ScrollY };

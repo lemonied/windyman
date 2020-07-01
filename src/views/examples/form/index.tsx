@@ -135,6 +135,15 @@ const YFormDemo: FC<any> = function(): JSX.Element {
         >
           <Input placeholder={'Selector'} type={'selector'} data={city} title={'第二种多列选择器'} />
         </YField>
+        <YField
+          name={'password'}
+          label={'密码'}
+          rules={[{
+            required: true
+          }]}
+        >
+          <Input placeholder={'密码输入框'} type={'password'} />
+        </YField>
       </YForm>
     </Layout>
   );

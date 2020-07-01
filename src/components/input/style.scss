@@ -14,3 +14,16 @@ input.y-input{
     }
   }
 }
+.windy-password-input-wrapper{
+  display: inline-block;
+  position: relative;
+  padding: 0 20px 0 0;
+  width: 100%;
+  box-sizing: border-box;
+  .windy-password-icon{
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    transform: translateY(-50%);
+  }
+}

@@ -7,7 +7,19 @@
     padding: 0;
   }
   .title{
-    padding: 0 0 0 5px;
+    padding: 0 0 0 8px;
+    display: inline-block;
     font-size: 12px;
   }
+}
+.loading-animation{
+  @keyframes rotate {
+    0%{
+      transform: rotate(0deg);
+    }
+    100%{
+      transform: rotate(360deg);
+    }
+  }
+  animation: rotate linear 1s infinite;
 }

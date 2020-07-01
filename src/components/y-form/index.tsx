@@ -23,7 +23,7 @@ import { usePicker } from '../input/picker-input';
 interface YFormProps extends FormProps {
   children?: ReactElement<any, any>[];
 }
-const FormFc: ForwardRefRenderFunction<FormInstance, YFormProps> = function(props, ref): JSX.Element {
+const FormFc: ForwardRefRenderFunction<FormInstance, YFormProps> = function(props, ref) {
   const { form: propForm, onFieldsChange: propOnFieldsChange, children: propChildren } = props;
   const [errors, setErrors] = useState<FieldError[]>([]);
   const [formInstance] = useForm();
@@ -71,10 +71,10 @@ interface YFieldProps extends FieldProps {
   form?: FormInstance;
   children?: ReactElement;
   errors?: FieldError[];
-  label?: string | ReactNode;
-  requiredTip?: string | ReactNode;
+  label?: ReactNode;
+  requiredTip?: ReactNode;
 }
-const YField: FC<YFieldProps> = function(props): JSX.Element {
+const YField: FC<YFieldProps> = function(props) {
   const { rules = [], name, errors, label, form, initialValue, requiredTip = '该项为必填项', children } = props;
   const [value, setValue] = useState(initialValue);
   const [hasArrow, setHasArrow] = useState(false);
@@ -132,19 +132,17 @@ const YField: FC<YFieldProps> = function(props): JSX.Element {
         <span className={className}>{ label }</span>
       }
       extra={
-        <span className={'input-after'}>
-          {
-            !value && required ?
-              <span className={'required-icon'} onClick={showRequiredTip}>
-                <Icon type={'info-circle'} />
-              </span> :
-              formatErrors.length ?
-                <span className={'error-icon'} onClick={showErrorTip}>
-                  <Icon type={'warning-circle'} />
-                </span> :
-                null
-          }
-        </span>
+        !value && required ?
+          <span className={'input-after'}>
+            <span className={'required-icon'} onClick={showRequiredTip}><Icon type={'info-circle'} /></span>
+          </span> :
+          formatErrors.length ?
+            <span className={'input-after'}>
+              <span className={'error-icon'} onClick={showErrorTip}>
+                <Icon type={'warning-circle'} />
+              </span>
+            </span> :
+            null
       }
     >
       <Field {...props} children={clonedChildren} />

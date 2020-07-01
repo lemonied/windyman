@@ -11,7 +11,7 @@ export interface PickerInputProps {
   value?: PickerValues;
   defaultSelectedValues?: PickerValues;
   multi?: number;
-  title?: string | ReactNode;
+  title?: ReactNode;
   onChange?(value: PickerValues): void;
   wrapperClassName?: string;
   formatNames?: (values: MultiDataChildren) => string;
@@ -25,7 +25,7 @@ export const usePicker = (): PickerInputInstance => {
   const picker = useRef<PickerInputInstance>({});
   return picker.current;
 };
-const PickerInput: FC<PickerInputProps> = function(props): JSX.Element {
+const PickerInput: FC<PickerInputProps> = function(props) {
   const { data, value = '', onChange, placeholder, multi = 1, title, wrapperClassName, formatNames, defaultSelectedValues, picker } = props;
   const [currentValue, setCurrentValue] = useState<string>('');
   const pickerService = useMemo(() => {
@@ -119,8 +119,7 @@ export interface SelectorInputProps {
   data: PickerInputProps['data'];
   column?: number;
   formatNames?: PickerInputProps['formatNames'];
-
-  title?: PickerInputProps['formatNames'];
+  title?: PickerInputProps['title'];
 }
 const SelectorInput: FC<SelectorInputProps> = function(props) {
   const { placeholder, picker, data, value, column = 3, formatNames, onChange, title } = props;

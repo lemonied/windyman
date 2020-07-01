@@ -1,23 +1,30 @@
-import React, { CSSProperties, FC, PropsWithChildren } from 'react';
+import React, { CSSProperties, FC, ReactNode } from 'react';
 import './style.scss';
-import { LoadingIcon } from './spin/loading';
+import { Icon } from '../icon';
+import { combineClassNames } from '../../common/utils';
 
-interface LoadingProps extends PropsWithChildren<any> {
-  title?: string;
+interface LoadingProps {
+  title?: ReactNode;
   style?: CSSProperties;
-  width?: number;
-  height?: number;
+  icon?: ReactNode;
+  className?: string;
 }
 
 const defaultProps: LoadingProps = {
   style: { padding: '8px 0' }
 };
 
-const Loading: FC<LoadingProps> = function(props): JSX.Element {
-  const { title, style, width = 15, height = 15 } = props;
+const Loading: FC<LoadingProps> = function(props) {
+  const { title, style, icon, className } = props;
   return (
-    <div className={'windy-loading'} style={ style }>
-      <LoadingIcon width={width} height={height} />
+    <div className={combineClassNames('windy-loading', className)} style={ style }>
+      {
+        typeof icon === 'undefined' ?
+          <Icon type={'loading'} className={'loading-animation'} /> :
+          typeof icon === 'string' ?
+            <Icon type={icon} /> :
+            icon
+      }
       {
         title ?
           <span className={'title'}>{ title }</span> :

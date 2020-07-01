@@ -1,42 +1,35 @@
-import React, { FC, PropsWithChildren, ReactNode, useEffect } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import './style.scss';
-import { PickerInput, PickerInputInstance, SelectorInput } from './picker-input';
+import { PickerInput, PickerInputInstance, PickerInputProps, SelectorInput, SelectorInputProps } from './picker-input';
 import { DateTimePicker, DateTimePickerProps, TimePicker, TimePickerProps } from './date-time-input';
-import { MultiDataChildren, MultiDataSet } from '../picker/core';
+import { Icon } from '../icon';
 
-interface InputSharedProps extends PropsWithChildren<any> {
+type ExtendsWith<A = {}, B = {}, C = {}> = A & B & C;
+interface InputSharedProps extends ExtendsWith<any>{
   value?: any;
   onChange?: (value: any) => void;
   placeholder?: string;
   hasArrow?: (arrow: boolean) => void;
   picker?: PickerInputInstance;
 }
-interface InputNormalProps extends InputSharedProps {
-  type?: 'text';
+interface InputNormalProps extends ExtendsWith<InputSharedProps> {
+  type?: 'text' | 'password';
 }
-interface InputPickerOption extends InputSharedProps {
+interface InputPickerOption extends ExtendsWith<InputSharedProps, PickerInputProps> {
   type: 'picker';
-  data: MultiDataSet | MultiDataChildren;
-  multi?: number;
-  title?: string | ReactNode;
 }
-type InputDateTimePicker = InputSharedProps & DateTimePickerProps;
-interface InputDateTimePickerOption extends InputDateTimePicker {
+interface InputDateTimePickerOption extends ExtendsWith<InputSharedProps, DateTimePickerProps> {
   type: 'dateTime';
 }
-type InputTimePicker = InputSharedProps & TimePickerProps;
-interface InputTimePickerOption extends InputTimePicker {
+interface InputTimePickerOption extends ExtendsWith<InputSharedProps, TimePickerProps> {
   type: 'time';
 }
-interface InputSelectorOption extends InputSharedProps {
+interface InputSelectorOption extends ExtendsWith<InputSharedProps, SelectorInputProps> {
   type: 'selector';
-  data: MultiDataSet | MultiDataChildren;
-  column?: number;
-  title?: string | ReactNode;
 }
 
 type InputProps = InputNormalProps | InputPickerOption | InputDateTimePickerOption | InputTimePickerOption | InputSelectorOption;
-const Input: FC<InputProps> = function(props): JSX.Element {
+const Input: FC<InputProps> = function(props) {
   const { type = 'text', data, onChange, value, placeholder, multi, title, column, start, end, hasArrow, picker } = props;
 
   useEffect(() => {
@@ -56,9 +49,29 @@ const Input: FC<InputProps> = function(props): JSX.Element {
       return (<TimePicker start={start} end={end} onChange={onChange} value={value} column={column} title={title} placeholder={placeholder} picker={picker} />);
     case 'selector':
       return (<SelectorInput placeholder={placeholder} picker={picker} value={value} onChange={onChange} data={data} column={column} title={title} />);
+    case 'password':
+      return (<InputPassword value={value} onChange={onChange} placeholder={placeholder} />);
     default:
       return (<input className={'y-input'} type={type} placeholder={placeholder} value={value || ''} onChange={onChange} />);
   }
 
 };
 export { Input };
+
+const InputPassword: FC<InputSharedProps> = function(props) {
+  const { onChange, placeholder, value = '' } = props;
+
+  const [ visible, setVisible ] = useState<boolean>(false);
+  const onClick = useCallback((e: any) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setVisible(v => !v);
+  }, []);
+
+  return (
+    <span className={'windy-password-input-wrapper'}>
+      <input type={visible ? 'text' : 'password'} onChange={onChange} placeholder={placeholder} value={value} className={'y-input'} />
+      <Icon type={visible ? 'eye-invisible' : 'eye'} onClick={onClick} className={'windy-password-icon'} />
+    </span>
+  );
+};
