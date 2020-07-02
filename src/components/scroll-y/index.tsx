@@ -117,6 +117,7 @@ const ScrollYFc: ForwardRefRenderFunction<ScrollYInstance, Props> = function (pr
     const wrapper = instanceRef.current;
     const pullingUp = () => {
       if (!enablePullUpRef.current) { return; }
+      enablePullUpRef.current = false;
       if (typeof onPullingUp === 'function') {
         setPullingUp(true);
         onPullingUp();
@@ -143,6 +144,7 @@ const ScrollYFc: ForwardRefRenderFunction<ScrollYInstance, Props> = function (pr
     const finishPullUp = () => {
       setPullingUp(false);
       instanceRef.current?.finishPullUp();
+      enablePullUpRef.current = true;
       setTimeout(refresh, 20);
     };
     const closePullUp = () => {

@@ -14,9 +14,6 @@
     .windy-item-content{
       flex: 1;
     }
-    .windy-item-extra{
-      padding: 0 10px 0 0;
-    }
     &:not(:last-child){
       border-bottom: 1px solid $color-border;
     }

@@ -168,7 +168,7 @@ interface SelectorModalInstance {
   setData: (data?: MultiDataSet | MultiDataChildren) => void;
   setValue: (values?: PickerValues) => void;
 }
-export const useSelector = (): SelectorModalInstance => {
+export const useSelectors = (): SelectorModalInstance => {
   const instance = useRef<SelectorModalInstance>({} as SelectorModalInstance);
   return instance.current;
 };

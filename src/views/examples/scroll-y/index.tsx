@@ -40,18 +40,19 @@ const ScrollYDemo: FC = function(props) {
       } else {
         dispatch({ type: 'UPDATE_RECOMMENDS', value: res.result });
       }
+      query.current.currentPage += 1;
       scroll.finishPullUp();
       scroll.finishPullDown();
     });
   }, [dispatch, scroll]);
 
   const onPullingUp = useCallback(() => {
-    if (pageBean.current.totalPage <= pageBean.current.currentPage) {
+    if (pageBean.current && pageBean.current.totalPage <= pageBean.current.currentPage) {
       return scroll.closePullUp();
     }
-    query.current.currentPage += 1;
     getRecommends();
   }, [getRecommends, scroll]);
+  // reload
   const onPullingDown = useCallback(() => {
     query.current.currentPage = 1;
     getRecommends();

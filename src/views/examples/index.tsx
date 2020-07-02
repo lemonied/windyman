@@ -9,6 +9,7 @@ import { YFormDemo } from './form';
 import { ModalDemo } from './modal';
 import { ProgressDemo } from './progress';
 import { Item, List } from '../../components/list';
+import { IconDemo } from './icon';
 
 const Examples: FC<any> = function(): JSX.Element {
 
@@ -23,6 +24,7 @@ const Examples: FC<any> = function(): JSX.Element {
           <Route path={'/example/y-form'} component={YFormDemo} exact={true} />
           <Route path={'/example/modal'} component={ModalDemo} exact={true} />
           <Route path={'/example/progress'} component={ProgressDemo} exact={true} />
+          <Route path={'/example/icon'} component={IconDemo} exact={true} />
         </FixedRouter>
       }
     >
@@ -32,6 +34,7 @@ const Examples: FC<any> = function(): JSX.Element {
           <Item link={'/example/y-form'} arrow={'horizontal'} extra={'表单控件'}>YForm</Item>
           <Item link={'/example/modal'} arrow={'horizontal'} extra={'弹窗'}>Modal</Item>
           <Item link={'/example/progress'} arrow={'horizontal'} extra={'进度条'}>Progress</Item>
+          <Item link={'/example/icon'} arrow={'horizontal'} extra={'图标'}>Icon</Item>
         </List>
       </div>
     </Layout>
