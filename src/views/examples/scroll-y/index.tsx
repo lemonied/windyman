@@ -84,6 +84,7 @@ const ScrollYDemo: FC = function(props) {
           onPullingUp={onPullingUp}
           scroll={scroll}
           onPullingDown={onPullingDown}
+          data={recommends}
         >
           <div style={{padding: '0 10px'}}>
             {

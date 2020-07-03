@@ -113,7 +113,8 @@ const Slider: FC<Props> = function(props) {
       bounce: false,
       stopPropagation: true,
       click: click,
-      observeDOM: false
+      observeDOM: false,
+      eventPassthrough: 'vertical'
     });
     setCurrentIndex(0);
     instance.play();

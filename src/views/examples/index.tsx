@@ -10,6 +10,8 @@ import { ModalDemo } from './modal';
 import { ProgressDemo } from './progress';
 import { Item, List } from '../../components/list';
 import { IconDemo } from './icon';
+import { SliderDemo } from './slider';
+import { ScrollXDemo } from './scroll-x';
 
 const Examples: FC<any> = function(): JSX.Element {
 
@@ -25,16 +27,20 @@ const Examples: FC<any> = function(): JSX.Element {
           <Route path={'/example/modal'} component={ModalDemo} exact={true} />
           <Route path={'/example/progress'} component={ProgressDemo} exact={true} />
           <Route path={'/example/icon'} component={IconDemo} exact={true} />
+          <Route path={'/example/slider'} component={SliderDemo} exact={true} />
+          <Route path={'/example/scroll-x'} component={ScrollXDemo} exact={true} />
         </FixedRouter>
       }
     >
       <div className={'demo-content'}>
         <List>
           <Item link={'/example/scroll-y'} arrow={'horizontal'} extra={'滚动容器'}>ScrollY</Item>
+          <Item link={'/example/scroll-x'} arrow={'horizontal'} extra={'横向滚动'}>ScrollX</Item>
           <Item link={'/example/y-form'} arrow={'horizontal'} extra={'表单控件'}>YForm</Item>
           <Item link={'/example/modal'} arrow={'horizontal'} extra={'弹窗'}>Modal</Item>
           <Item link={'/example/progress'} arrow={'horizontal'} extra={'进度条'}>Progress</Item>
           <Item link={'/example/icon'} arrow={'horizontal'} extra={'图标'}>Icon</Item>
+          <Item link={'/example/slider'} arrow={'horizontal'} extra={'轮播图'}>Slider</Item>
         </List>
       </div>
     </Layout>

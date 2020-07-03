@@ -14,12 +14,14 @@ interface HeaderProps {
   left?: ReactNode;
   title?: ReactNode;
   right?: ReactNode;
-  onBack?: () => void;
+  onBack?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 }
 const Header: FC<HeaderProps> = function(props) {
   const back = useMemo(() => (<Back />), []);
   const history = useHistory();
-  const goBack = useCallback(() => {
+  const goBack = useCallback((e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.stopPropagation();
+    e.preventDefault();
     history.go(-1);
   }, [history]);
   const { left = back, title, right, onBack = goBack } = props;

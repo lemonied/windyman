@@ -50,11 +50,12 @@ interface Props {
   style?: CSSProperties;
   scroll?: { [prop: string]: any };
   children?: ReactNode;
+  data?: any;
 }
 // ScrollY Component
 const ScrollYFc: ForwardRefRenderFunction<ScrollYInstance, Props> = function (props, ref) {
 
-  const { style, children } = props;
+  const { style, children, data } = props;
   const { onScroll, onPullingDown, onPullingUp, scroll } = props;
 
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -145,7 +146,6 @@ const ScrollYFc: ForwardRefRenderFunction<ScrollYInstance, Props> = function (pr
       setPullingUp(false);
       instanceRef.current?.finishPullUp();
       enablePullUpRef.current = true;
-      setTimeout(refresh, 20);
     };
     const closePullUp = () => {
       finishPullUp();
@@ -190,6 +190,10 @@ const ScrollYFc: ForwardRefRenderFunction<ScrollYInstance, Props> = function (pr
       Object.assign(scroll, instance);
     }
   }, [scroll, instance]);
+  // watch data change
+  useEffect(() => {
+    instance.refresh();
+  }, [instance, data]);
 
   useImperativeHandle(ref, () => {
     return instance;

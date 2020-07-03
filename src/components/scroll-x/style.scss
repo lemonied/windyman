@@ -1,0 +1,28 @@
+@import "../../common/style/variable";
+
+.windy-scroll-x{
+  width: 100%;
+  overflow: hidden;
+  &.has-dot{
+    padding-bottom: 20px;
+    position: relative;
+  }
+  .scroll-x-dot-group{
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translate(-50%, 50%);
+    width: 8%;
+    height: 6px;
+    background: #d9d9d9;
+    overflow: hidden;
+    border-radius: 3px;
+    .scroll-x-dot{
+      height: 100%;
+      background: $color-theme;
+      position: absolute;
+      width: 50%;
+      border-radius: inherit;
+    }
+  }
+}
