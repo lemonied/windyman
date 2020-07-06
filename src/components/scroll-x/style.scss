@@ -13,15 +13,14 @@
     left: 50%;
     transform: translate(-50%, 50%);
     width: 8%;
-    height: 6px;
     background: #d9d9d9;
     overflow: hidden;
-    border-radius: 3px;
+    height: 4px;
+    border-radius: 2px;
     .scroll-x-dot{
       height: 100%;
       background: $color-theme;
       position: absolute;
-      width: 50%;
       border-radius: inherit;
     }
   }

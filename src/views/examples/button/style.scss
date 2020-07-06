@@ -1,0 +1,7 @@
+.demo-btn-list{
+  .windy-button{
+    &:not(:first-child){
+      margin-left: 8px;
+    }
+  }
+}

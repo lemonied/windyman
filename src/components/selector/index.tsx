@@ -160,6 +160,7 @@ interface SelectorModalProps {
   dataManager: MultiDataManager;
   onSubmit?: (values?: (string | number)[]) => void;
   title?: ReactNode;
+  wrapperClassName?: string;
 }
 interface SelectorModalInstance {
   show(): void;
@@ -173,7 +174,7 @@ export const useSelectors = (): SelectorModalInstance => {
   return instance.current;
 };
 const SelectorModalFc: ForwardRefRenderFunction<SelectorModalInstance, SelectorModalProps> = function(props, ref) {
-  const { afterClose, dataManager, onSubmit, title } = props;
+  const { afterClose, dataManager, onSubmit, title, wrapperClassName } = props;
 
   const defaultSelectedRef = useRef(dataManager.values.length ? dataManager.selectedIndex : []);
 
@@ -238,7 +239,7 @@ const SelectorModalFc: ForwardRefRenderFunction<SelectorModalInstance, SelectorM
       timeout={300}
       onExited={onExited}
     >
-      <div className={'windy-selector-modal-mask'} onClick={instance.hide}>
+      <div className={combineClassNames('windy-selector-modal-mask', wrapperClassName)} onClick={instance.hide}>
         <div className={'windy-selector-modal'} onClick={stopDefault}>
           <Selector data={data} defaultSelectedIndex={defaultSelectedRef.current} onChange={onChange} title={title} />
         </div>
@@ -249,6 +250,12 @@ const SelectorModalFc: ForwardRefRenderFunction<SelectorModalInstance, SelectorM
 
 const SelectorModal = forwardRef<SelectorModalInstance, SelectorModalProps>(SelectorModalFc);
 
+interface SelectorServiceOption {
+  data: MultiDataSet | MultiDataChildren;
+  defaultValue?: PickerValues;
+  title?: ReactNode;
+  wrapperClassName?: string;
+}
 export class SelectorService {
   ele: Element | null = null;
   dataManager: MultiDataManager;
@@ -257,7 +264,8 @@ export class SelectorService {
     this.dataManager = new MultiDataManager(multi);
   }
 
-  open(data: MultiDataSet | MultiDataChildren = [], defaultValue?: PickerValues, title?: ReactNode): Promise<any> {
+  open(options: SelectorServiceOption): Promise<any> {
+    const { data = [], title, defaultValue, wrapperClassName } = options;
     this.destroy();
     return new Promise((resolve, reject) => {
       const container = document.createElement('div');
@@ -272,6 +280,7 @@ export class SelectorService {
           dataManager={this.dataManager}
           onSubmit={e => resolve(e)}
           title={title}
+          wrapperClassName={wrapperClassName}
         />,
         container,
         () => {

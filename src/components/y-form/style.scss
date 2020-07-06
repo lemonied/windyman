@@ -10,19 +10,29 @@
         position: absolute;
         top: 0;
         right: 100%;
-        color: $color-error;
+        color: $color-danger;
       }
     }
   }
+  .windy-item-extra{
+    display: flex;
+    align-items: center;
+  }
   .input-after{
     display: inline-block;
+    .windy-icon{
+      font-size: 18px;
+    }
     .required-icon{
       color: $color-theme;
-      @include extend-click;
     }
     .error-icon{
-      color: $color-error;
+      color: $color-danger;
+    }
+    .required-icon, .error-icon{
       @include extend-click;
+      display: flex;
+      align-items: center;
     }
   }
 }

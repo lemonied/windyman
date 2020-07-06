@@ -12,6 +12,7 @@ import { Item, List } from '../../components/list';
 import { IconDemo } from './icon';
 import { SliderDemo } from './slider';
 import { ScrollXDemo } from './scroll-x';
+import { ButtonDemo } from './button';
 
 const Examples: FC<any> = function(): JSX.Element {
 
@@ -29,6 +30,7 @@ const Examples: FC<any> = function(): JSX.Element {
           <Route path={'/example/icon'} component={IconDemo} exact={true} />
           <Route path={'/example/slider'} component={SliderDemo} exact={true} />
           <Route path={'/example/scroll-x'} component={ScrollXDemo} exact={true} />
+          <Route path={'/example/button'} component={ButtonDemo} exact={true} />
         </FixedRouter>
       }
     >
@@ -41,6 +43,7 @@ const Examples: FC<any> = function(): JSX.Element {
           <Item link={'/example/progress'} arrow={'horizontal'} extra={'进度条'}>Progress</Item>
           <Item link={'/example/icon'} arrow={'horizontal'} extra={'图标'}>Icon</Item>
           <Item link={'/example/slider'} arrow={'horizontal'} extra={'轮播图'}>Slider</Item>
+          <Item link={'/example/button'} arrow={'horizontal'} extra={'按钮'}>Button</Item>
         </List>
       </div>
     </Layout>

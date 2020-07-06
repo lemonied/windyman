@@ -74,7 +74,7 @@ const YFormDemo: FC<any> = function(): JSX.Element {
           name={'multi'}
           label={'多列'}
         >
-          <Input type={'picker'} multi={2} data={demoDataSet} placeholder={'多列选择'} />
+          <Input type={'picker'} column={2} data={demoDataSet} placeholder={'多列选择'} />
         </YField>
         {/*级联选择*/}
         <YField
@@ -83,7 +83,7 @@ const YFormDemo: FC<any> = function(): JSX.Element {
         >
           <Input
             data={city}
-            multi={3}
+            column={3}
             type={'picker'}
             placeholder={'级联选择'}
             title={'选择城市'}

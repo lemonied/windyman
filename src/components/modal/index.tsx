@@ -2,6 +2,10 @@ import React, { Component, ReactNode, createRef } from 'react';
 import ReactDOM from 'react-dom';
 import './style.scss';
 import { CSSTransition } from 'react-transition-group';
+import { YField, YForm } from '../y-form';
+import { Input } from '../input';
+import { FormInstance } from 'rc-field-form';
+import { Rule } from 'rc-field-form/es/interface';
 
 interface Footer {
   text: string;
@@ -68,11 +72,57 @@ export class Modal extends Component<Props, any> {
   }
 }
 
+interface PromptInputProps {
+  rules?: Rule[];
+  placeholder?: string;
+  initialValue?: any;
+}
+class PromptInput extends Component<PromptInputProps, any> {
+  ref = createRef<FormInstance>();
+
+  componentDidMount() {}
+
+  render() {
+    const { rules, placeholder, initialValue } = this.props;
+
+    return (
+      <YForm ref={this.ref} className={'windy-modal-form'}>
+        <YField
+          name={'prompt'}
+          rules={rules}
+          initialValue={initialValue}
+        >
+          <Input className={'windy-modal-input'} type={'text'} placeholder={placeholder} />
+        </YField>
+      </YForm>
+    );
+  }
+}
+
+interface ModalServiceOptions {
+  title: string;
+  content: ReactNode;
+  footer: Footer[];
+}
+interface ConfirmOptions {
+  title?: string;
+  cancelText?: string;
+  content?: ReactNode;
+  confirmText?: string;
+}
+interface PromptOptions {
+  title?: string;
+  cancelText?: string;
+  confirmText?: string;
+  placeholder?: string;
+  rules?: Rule[];
+  initialValue?: any;
+}
 export class ModalService {
   ele: Element[] = [];
 
   create(
-    options: { title: string; content: ReactNode; footer: Footer[]; },
+    options: ModalServiceOptions,
     callback?: (result?: any) => void
   ): { close(): void; } {
     const { title, content, footer } = options;
@@ -82,7 +132,7 @@ export class ModalService {
     const instance = createRef<Modal>();
     ReactDOM.render(
       <Modal
-        ref={instance}
+        ref={ instance }
         header={ title }
         content={ content }
         maskClick={ callback }
@@ -100,7 +150,7 @@ export class ModalService {
     };
   }
   confirm(
-    options: { title?: string; content: ReactNode; cancelText?: string; confirmText?: string; }
+    options: ConfirmOptions
   ): Promise<boolean> {
     const { title = '提示', content, cancelText = '取消', confirmText = '确定' } = options;
     return new Promise((resolve, reject) => {
@@ -119,6 +169,37 @@ export class ModalService {
             callback: () => {
               works.close();
               resolve(true);
+            }
+          }]
+        )
+      });
+    });
+  }
+  prompt(
+    options: PromptOptions
+  ): Promise<boolean> {
+    const { title = '提示', cancelText = '取消', confirmText = '确定', placeholder, rules, initialValue } = options;
+    const prompt = createRef<PromptInput>();
+    return new Promise((resolve, reject) => {
+      const works = this.create({
+        title,
+        content: <PromptInput ref={prompt} placeholder={placeholder} rules={rules} initialValue={initialValue} />,
+        footer: (
+          [{
+            text: cancelText,
+            callback: () => {
+              works.close();
+              resolve();
+            }
+          }, {
+            text: confirmText,
+            callback: () => {
+              if (prompt.current) {
+                prompt.current.ref.current?.validateFields().then(val => {
+                  works.close();
+                  resolve(val.prompt);
+                });
+              }
             }
           }]
         )

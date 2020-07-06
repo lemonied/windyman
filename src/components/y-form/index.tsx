@@ -21,7 +21,7 @@ import { Item, List } from '../list';
 import { usePicker } from '../input/picker-input';
 
 interface YFormProps extends FormProps {
-  children?: ReactElement<any, any>[];
+  children?: ReactElement<any, any>[] | ReactElement<any, any>;
 }
 const FormFc: ForwardRefRenderFunction<FormInstance, YFormProps> = function(props, ref) {
   const { form: propForm, onFieldsChange: propOnFieldsChange, children: propChildren } = props;
@@ -31,7 +31,8 @@ const FormFc: ForwardRefRenderFunction<FormInstance, YFormProps> = function(prop
     return propForm || formInstance;
   }, [propForm, formInstance]);
   const children = useMemo(() => {
-    return Children.map(propChildren, (item, key) => {
+    const array = Array.isArray(propChildren) ? propChildren : [propChildren];
+    return Children.map(array, (item, key) => {
       if (item) {
         return cloneElement(item, { form, errors });
       }
@@ -129,7 +130,9 @@ const YField: FC<YFieldProps> = function(props) {
       onClick={onItemClick}
       arrow={hasArrow ? 'horizontal' : null}
       prefix={
-        <span className={className}>{ label }</span>
+        label ?
+          <span className={className}>{ label }</span> :
+          null
       }
       extra={
         !value && required ?

@@ -1,8 +1,9 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { cloneElement, CSSProperties, FC, useCallback, useEffect, useMemo, useState } from 'react';
 import './style.scss';
 import { PickerInput, PickerInputInstance, PickerInputProps, SelectorInput, SelectorInputProps } from './picker-input';
 import { DateTimePicker, DateTimePickerProps, TimePicker, TimePickerProps } from './date-time-input';
 import { Icon } from '../icon';
+import { combineClassNames } from '../../common/utils';
 
 type ExtendsWith<A = {}, B = {}, C = {}> = A & B & C;
 interface InputSharedProps extends ExtendsWith<any>{
@@ -11,6 +12,8 @@ interface InputSharedProps extends ExtendsWith<any>{
   placeholder?: string;
   hasArrow?: (arrow: boolean) => void;
   picker?: PickerInputInstance;
+  className?: string;
+  style?: CSSProperties;
 }
 interface InputNormalProps extends ExtendsWith<InputSharedProps> {
   type?: 'text' | 'password';
@@ -30,7 +33,7 @@ interface InputSelectorOption extends ExtendsWith<InputSharedProps, SelectorInpu
 
 type InputProps = InputNormalProps | InputPickerOption | InputDateTimePickerOption | InputTimePickerOption | InputSelectorOption;
 const Input: FC<InputProps> = function(props) {
-  const { type = 'text', data, onChange, value, placeholder, multi, title, column, start, end, hasArrow, picker } = props;
+  const { type = 'text', data, onChange, value, placeholder, title, column, start, end, hasArrow, picker, wrapperClassName, className, style } = props;
 
   useEffect(() => {
     if (typeof hasArrow === 'function') {
@@ -38,28 +41,53 @@ const Input: FC<InputProps> = function(props) {
     }
   }, [hasArrow, type]);
 
-  switch (type) {
-    case 'text':
-      return (<input type="text" className={'y-input'} placeholder={placeholder} onChange={onChange} value={value || ''} />);
-    case 'picker':
-      return (<PickerInput data={data} onChange={onChange} value={value} placeholder={placeholder} multi={multi} title={title} picker={picker} />);
-    case 'dateTime':
-      return (<DateTimePicker column={column} title={title} placeholder={placeholder} onChange={onChange} start={start} end={end} picker={picker} />);
-    case 'time':
-      return (<TimePicker start={start} end={end} onChange={onChange} value={value} column={column} title={title} placeholder={placeholder} picker={picker} />);
-    case 'selector':
-      return (<SelectorInput placeholder={placeholder} picker={picker} value={value} onChange={onChange} data={data} column={column} title={title} />);
-    case 'password':
-      return (<InputPassword value={value} onChange={onChange} placeholder={placeholder} />);
-    default:
-      return (<input className={'y-input'} type={type} placeholder={placeholder} value={value || ''} onChange={onChange} />);
-  }
+  const input = useMemo(() => {
+    switch (type) {
+      case 'text':
+        return (
+          <input type="text" value={value || ''} />
+        );
+      case 'picker':
+        return (
+          <PickerInput wrapperClassName={wrapperClassName} data={data} value={value} column={column} title={title} picker={picker}/>
+        );
+      case 'dateTime':
+        return (
+          <DateTimePicker value={value} column={column} title={title} start={start} end={end} picker={picker} />
+        );
+      case 'time':
+        return (
+          <TimePicker start={start} end={end} value={value} column={column} title={title} picker={picker} />
+        );
+      case 'selector':
+        return (
+          <SelectorInput wrapperClassName={wrapperClassName} picker={picker} value={value} data={data} column={column} title={title}/>
+        );
+      case 'password':
+        return (
+          <InputPassword value={value} wrapperClassName={wrapperClassName} />
+        );
+      default:
+        return (
+          <input type={type} value={value || ''} />
+        );
+    }
+  }, [column, data, end, picker, start, title, type, value, wrapperClassName]);
 
+  return cloneElement(input, {
+    className: combineClassNames('y-input', className),
+    onChange,
+    style,
+    placeholder
+  });
 };
 export { Input };
 
-const InputPassword: FC<InputSharedProps> = function(props) {
-  const { onChange, placeholder, value = '' } = props;
+interface InputPassword extends InputSharedProps {
+  wrapperClassName?: string;
+}
+const InputPassword: FC<InputPassword> = function(props) {
+  const { onChange, placeholder, value = '', className, style, wrapperClassName } = props;
 
   const [ visible, setVisible ] = useState<boolean>(false);
   const onClick = useCallback((e: any) => {
@@ -69,8 +97,8 @@ const InputPassword: FC<InputSharedProps> = function(props) {
   }, []);
 
   return (
-    <span className={'windy-password-input-wrapper'}>
-      <input type={visible ? 'text' : 'password'} onChange={onChange} placeholder={placeholder} value={value} className={'y-input'} />
+    <span className={combineClassNames('windy-password-input-wrapper', wrapperClassName)} style={style}>
+      <input type={visible ? 'text' : 'password'} onChange={onChange} placeholder={placeholder} value={value} className={className} />
       <Icon type={visible ? 'eye-invisible' : 'eye'} onClick={onClick} className={'windy-password-icon'} />
     </span>
   );

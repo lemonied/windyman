@@ -2,21 +2,26 @@
 * Picker Input
 */
 import { PickerService } from '../../picker';
-import React, { FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { CSSProperties, FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MultiDataChildren, MultiDataSet, PickerValues } from '../../picker/core';
 import { SelectorService } from '../../selector';
 
-export interface PickerInputProps {
-  data: MultiDataSet | MultiDataChildren;
-  value?: PickerValues;
-  defaultSelectedValues?: PickerValues;
-  multi?: number;
-  title?: ReactNode;
-  onChange?(value: PickerValues): void;
-  wrapperClassName?: string;
-  formatNames?: (values: MultiDataChildren) => string;
+interface PickerSharedProps {
   placeholder?: string;
+  value?: PickerValues;
   picker?: PickerInputInstance;
+  onChange?(value: PickerValues): void;
+  data: MultiDataSet | MultiDataChildren;
+  column?: number;
+  formatNames?: (values: MultiDataChildren) => string;
+  title?: ReactNode;
+  style?: CSSProperties;
+  className?: string;
+  wrapperClassName?: string;
+}
+
+export interface PickerInputProps extends PickerSharedProps {
+  defaultSelectedValues?: PickerValues;
 }
 export interface PickerInputInstance {
   open?: (e?: any) => void;
@@ -26,23 +31,23 @@ export const usePicker = (): PickerInputInstance => {
   return picker.current;
 };
 const PickerInput: FC<PickerInputProps> = function(props) {
-  const { data, value = '', onChange, placeholder, multi = 1, title, wrapperClassName, formatNames, defaultSelectedValues, picker } = props;
+  const { data, value = '', onChange, placeholder, column = 1, title, wrapperClassName, formatNames, defaultSelectedValues, picker, className, style } = props;
   const [currentValue, setCurrentValue] = useState<string>('');
   const pickerService = useMemo(() => {
-    return new PickerService(multi);
-  }, [multi]);
+    return new PickerService(column);
+  }, [column]);
 
   const emitChange = useCallback(() => {
     let emitValue: string | number | Array<string | number> = '';
-    if (multi === 1 && pickerService.dataManager.values.length) {
+    if (column === 1 && pickerService.dataManager.values.length) {
       emitValue = pickerService.dataManager.values[0];
-    } else if (multi > 1) {
+    } else if (column > 1) {
       emitValue = pickerService.dataManager.values;
     }
     if (typeof onChange === 'function') {
       onChange(emitValue);
     }
-  }, [multi, onChange, pickerService]);
+  }, [column, onChange, pickerService]);
   // Echo Names
   const echoNames = useCallback(() => {
     let valueNames: string;
@@ -103,7 +108,7 @@ const PickerInput: FC<PickerInputProps> = function(props) {
     }
   }, [picker, showPicker]);
   return (
-    <input className={'y-input'} type="text" onClick={showPicker} placeholder={placeholder} value={currentValue} readOnly={true} />
+    <input style={style} className={className} type="text" onClick={showPicker} placeholder={placeholder} value={currentValue} readOnly={true} />
   );
 };
 export { PickerInput };
@@ -111,18 +116,9 @@ export { PickerInput };
 /*
 * Selector Input
 */
-export interface SelectorInputProps {
-  placeholder?: PickerInputProps['placeholder'];
-  value?: PickerInputProps['value'];
-  picker?: PickerInputInstance;
-  onChange?: PickerInputProps['onChange'];
-  data: PickerInputProps['data'];
-  column?: number;
-  formatNames?: PickerInputProps['formatNames'];
-  title?: PickerInputProps['title'];
-}
+export interface SelectorInputProps extends PickerSharedProps { }
 const SelectorInput: FC<SelectorInputProps> = function(props) {
-  const { placeholder, picker, data, value, column = 3, formatNames, onChange, title } = props;
+  const { placeholder, picker, data, value, column = 3, formatNames, onChange, title, style, className, wrapperClassName } = props;
 
   const [currentValue, setCurrentValue] = useState<string>('');
   const selector = useMemo(() => {
@@ -170,12 +166,17 @@ const SelectorInput: FC<SelectorInputProps> = function(props) {
 
     return {
       open() {
-        selector.open(data, selector.dataManager.values, title).then(res => {
+        selector.open({
+          data,
+          defaultValue: selector.dataManager.values,
+          title,
+          wrapperClassName
+        }).then(res => {
           echoDisplay(res);
         });
       }
     };
-  }, [data, selector, echoDisplay, title]);
+  }, [data, selector, echoDisplay, title, wrapperClassName]);
 
   const showSelector = useCallback((e?: any) => {
     e?.preventDefault();
@@ -196,7 +197,15 @@ const SelectorInput: FC<SelectorInputProps> = function(props) {
   }, [data, value, echoSelector]);
 
   return (
-    <input className={'y-input'} type="text" onClick={showSelector} placeholder={placeholder} value={currentValue} readOnly={true} />
+    <input
+      style={style}
+      className={className}
+      type="text"
+      onClick={showSelector}
+      placeholder={placeholder}
+      value={currentValue}
+      readOnly={true}
+    />
   );
 };
 export { SelectorInput };

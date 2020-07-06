@@ -28,10 +28,14 @@ export const useScrollX = (): ScrollXInstance => {
 const ScrollXFc: ForwardRefRenderFunction<ScrollXInstance, ScrollXProps> = (props, ref) => {
   const { children, className, scroll, style, dot } = props;
 
+  const [ isInit, setIsInit ] = useState<boolean>(false);
+  const [ showDot, setShowDot ] = useState<boolean>(true);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<BScroll>();
   const dotRef = useRef<HTMLDivElement>(null);
-  const [ isInit, setIsInit ] = useState<boolean>(false);
+  const childRef = useRef({
+    widthPercent: 0
+  });
 
   useEffect(() => {
     const scroll = scrollRef.current = new BScroll(wrapperRef.current as Element, {
@@ -45,7 +49,7 @@ const ScrollXFc: ForwardRefRenderFunction<ScrollXInstance, ScrollXProps> = (prop
       const wrapper = wrapperRef.current;
       if (dot && wrapper) {
         const x = Math.min(Math.max(pos.x, scroll.maxScrollX), 0) * 100;
-        dot.style.left = Math.abs(x / scroll.maxScrollX) * 0.5 + '%';
+        dot.style.left = Math.abs(x / scroll.maxScrollX) * childRef.current.widthPercent + '%';
       }
     });
     setIsInit(true);
@@ -62,6 +66,15 @@ const ScrollXFc: ForwardRefRenderFunction<ScrollXInstance, ScrollXProps> = (prop
       Object.assign(scroll, instance);
     }
   }, [scroll, instance]);
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    const dot = dotRef.current;
+    if (dot && wrapper && wrapper.children && wrapper.children[0]) {
+      const percent = childRef.current.widthPercent = wrapper.clientWidth / wrapper.children[0].clientWidth;
+      dot.style.width = percent * 100 + '%';
+      setShowDot(percent < 1);
+    }
+  }, [children]);
 
   useImperativeHandle(ref, () => {
     return instance;
@@ -75,7 +88,7 @@ const ScrollXFc: ForwardRefRenderFunction<ScrollXInstance, ScrollXProps> = (prop
     >
       { children }
       {
-        dot ?
+        dot && showDot ?
           <div className={'scroll-x-dot-group'}>
             <div className={'scroll-x-dot'} ref={dotRef} />
           </div> :

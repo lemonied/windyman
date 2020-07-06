@@ -1,0 +1,101 @@
+@import "../../common/style/variable";
+@import "../../common/style/mixin";
+
+.windy-button{
+  padding: 6px 12px;
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+  border-radius: 3px;
+  color: #ffffff;
+  text-align: center;
+  &.windy-primary-btn{
+    background: $color-theme;
+    &:active{
+      background: darken($color-theme, 10%);
+    }
+  }
+  &.windy-warn-btn{
+    background: $color-warn;
+    &:active{
+      background: darken($color-warn, 5%);
+    }
+  }
+  &.windy-danger-btn{
+    background: $color-danger;
+    &:active{
+      background: darken($color-danger, 20%);
+    }
+  }
+  &.windy-default-btn{
+    color: #454545;
+    border: 1px solid #eaeaea;
+    &:active{
+      background: #f7f7f7;
+    }
+  }
+  &.windy-btn-ghost{
+    background-color: unset;
+    &.windy-primary-btn{
+      color: $color-theme;
+      border: 1px solid $color-theme;
+      &:active{
+        background-color: unset;
+        color: lighten($color-theme, 15%);
+        border-color: lighten($color-theme, 15%);
+      }
+    }
+    &.windy-warn-btn{
+      color: $color-warn;
+      border: 1px solid $color-warn;
+      &:active{
+        background-color: unset;
+        color: lighten($color-warn, 15%);
+        border-color: lighten($color-warn, 15%);
+      }
+    }
+    &.windy-danger-btn{
+      color: $color-danger;
+      border: 1px solid $color-danger;
+      &:active{
+        background-color: unset;
+        color: lighten($color-danger, 10%);
+        border-color: lighten($color-danger, 10%);
+      }
+    }
+  }
+  &.windy-disabled-btn{
+    color: rgba(0,0,0,.25);
+    background: #f5f5f5;
+    border-color: #d9d9d9;
+    &:active{
+      background-color: #f5f5f5;
+    }
+  }
+  &.windy-loading-btn{
+    position: relative;
+    pointer-events: none;
+    &:after{
+      position: absolute;
+      top: -1px;
+      right: -1px;
+      bottom: -1px;
+      left: -1px;
+      z-index: 1;
+      background: #fff;
+      border-radius: inherit;
+      opacity: .35;
+      transition: opacity .2s;
+      content: '';
+    }
+  }
+  .windy-btn-loading{
+    @include rotate-animation;
+  }
+  & > *{
+    &:not(:first-child){
+      margin-left: 6px;
+    }
+    vertical-align: middle;
+  }
+}

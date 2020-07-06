@@ -1,12 +1,19 @@
 /*
 * DateTimePicker
 */
-import React, { FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { CSSProperties, FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { dateFormat, DateTimeManager, TimeManager } from '../date';
 import { PickerInput, PickerInputInstance } from '../picker-input';
 import { MultiDataChildren, PickerValues } from '../../picker/core';
+import { combineClassNames } from '../../../common/utils';
 
-export interface DateTimePickerProps {
+interface TimePickerSharedProps {
+  wrapperClassName?: string;
+  style?: CSSProperties;
+  className?: string;
+}
+
+export interface DateTimePickerProps extends TimePickerSharedProps {
   start?: Date;
   end?: Date;
   column?: number;
@@ -25,7 +32,7 @@ const DateTimePicker: FC<DateTimePickerProps> = function(props) {
   }, []);
   const dateManager = useRef<DateTimeManager>(new DateTimeManager());
 
-  const { start = defaultStart, end = defaultEnd, column = 5, placeholder, onChange, value, title, picker } = props;
+  const { start = defaultStart, end = defaultEnd, column = 5, placeholder, onChange, value, title, picker, wrapperClassName, style, className } = props;
   const [data, setData] = useState<MultiDataChildren>([]);
   /* init data */
   useEffect(() => {
@@ -103,11 +110,13 @@ const DateTimePicker: FC<DateTimePickerProps> = function(props) {
   return (
     <PickerInput
       data={data}
-      multi={column}
+      column={column}
       placeholder={placeholder}
       onChange={handleChange}
       value={realValue}
-      wrapperClassName={'date-time-picker'}
+      wrapperClassName={combineClassNames('date-time-picker', wrapperClassName)}
+      className={className}
+      style={style}
       formatNames={formatNames}
       title={title}
       defaultSelectedValues={defaultSelectedValue}
@@ -121,7 +130,7 @@ export { DateTimePicker };
 * Time Picker
 * value: string = xx:xx:xx
 */
-export interface TimePickerProps {
+export interface TimePickerProps extends TimePickerSharedProps {
   /* example 20:08:53 */
   start?: string;
   end?: string;
@@ -133,7 +142,7 @@ export interface TimePickerProps {
   picker?: PickerInputInstance;
 }
 const TimePicker: FC<TimePickerProps> = (props) => {
-  const { start, end, onChange, value, title, column = 3, placeholder, picker } = props;
+  const { start, end, onChange, value, title, column = 3, placeholder, picker, style, className, wrapperClassName } = props;
   const [data, setData] = useState<MultiDataChildren>([]);
   const [realValue, setRealValue] = useState<PickerValues>([]);
   const defaultStart = useMemo(() => {
@@ -176,10 +185,13 @@ const TimePicker: FC<TimePickerProps> = (props) => {
       title={title}
       value={realValue}
       onChange={handleChange}
-      multi={column}
+      column={column}
       placeholder={placeholder}
       defaultSelectedValues={defaultSelectedValue}
       picker={picker}
+      wrapperClassName={wrapperClassName}
+      className={className}
+      style={style}
     />
   );
 };

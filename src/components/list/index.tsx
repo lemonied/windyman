@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import React, { CSSProperties, FC, ReactNode } from 'react';
 import { combineClassNames } from '../../common/utils';
 import { Icon } from '../icon';
 import './style.scss';
@@ -15,17 +15,22 @@ const List: FC<ListProps> = function(props) {
 };
 export { List };
 
-
-const Container: FC<{ link?: LinkProps['to'], className?: string, onClick?: ItemProps['onClick'] }> = (props) => {
-  const { link, children, className, onClick } = props;
+interface ContainerProps {
+  link?: LinkProps['to'];
+  className?: string;
+  onClick?: ItemProps['onClick'];
+  style?: ItemProps['style'];
+}
+const Container: FC<ContainerProps> = (props) => {
+  const { link, children, className, onClick, style } = props;
 
   if (typeof link !== 'undefined') {
     return (
-      <Link to={link} className={className} onClick={onClick}>{children}</Link>
+      <Link to={link} className={className} onClick={onClick} style={style}>{children}</Link>
     );
   }
   return (
-    <div className={className} onClick={onClick}>{children}</div>
+    <div className={className} onClick={onClick} style={style}>{children}</div>
   );
 };
 interface ItemProps {
@@ -34,12 +39,25 @@ interface ItemProps {
   extra?: ReactNode;
   onClick?: (e: any) => void;
   link?: LinkProps['to'];
+  style?: CSSProperties;
+  className?: string;
 }
 const Item: FC<ItemProps> = function(props) {
-  const { arrow, prefix, children, extra , onClick, link } = props;
+  const { arrow, prefix, children, extra , onClick, link, style, className } = props;
 
   return (
-    <Container link={link} className={combineClassNames('windy-list-item', arrow ? 'has-arrow' : '')} onClick={onClick}>
+    <Container
+      link={link}
+      className={
+        combineClassNames(
+          'windy-list-item',
+          arrow ? 'has-arrow' : '',
+          className
+        )
+      }
+      onClick={onClick}
+      style={style}
+    >
       {
         prefix ?
           <div className={'windy-item-prefix'}>{ prefix }</div> :

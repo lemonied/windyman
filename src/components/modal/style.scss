@@ -20,6 +20,20 @@
     border-radius: 7px;
     background: $color-background;
     overflow: hidden;
+    .windy-modal-form{
+      .windy-item-content{
+        padding: 0 10px 0 0;
+      }
+      .windy-list-item{
+        min-height: auto;
+      }
+    }
+    .windy-modal-input{
+      user-select: auto;
+      border: 1px solid #d9d9d9;
+      border-radius: 5px;
+      padding: 4px 8px;
+    }
     .modal-header{
       color: $color-text;
       font-size: 16px;

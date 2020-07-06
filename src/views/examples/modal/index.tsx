@@ -1,6 +1,8 @@
 import React, { FC, useCallback } from 'react';
 import { Header, Layout } from '../../../components/layout';
 import { modal } from '../../../components/modal';
+import { Item, List } from '../../../components/list';
+import { Button } from '../../../components/button';
 
 const ModalDemo: FC = function(): JSX.Element {
 
@@ -22,6 +24,26 @@ const ModalDemo: FC = function(): JSX.Element {
       console.log('好的');
     });
   }, []);
+  const onPrompt = useCallback(() => {
+    modal.prompt({
+      title: '请输入邮箱',
+      placeholder: '请输入邮箱',
+      rules: [{
+        required: true
+      }, {
+        validator(rule, value) {
+          if (/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(value)) {
+            return Promise.resolve();
+          }
+          return Promise.reject('请输入正确格式的邮箱');
+        }
+      }]
+    }).then(res => {
+      if (res) {
+        console.log(res);
+      }
+    });
+  }, []);
 
   return (
     <Layout
@@ -29,10 +51,17 @@ const ModalDemo: FC = function(): JSX.Element {
         <Header title={'Modal'} />
       }
     >
-      <div className={'demo-content'}>
-        <button onClick={onConfirm}>Confirm</button>
-        <button onClick={onAlert}>Alert</button>
-      </div>
+      <List>
+        <Item extra={'确认弹窗'}>
+          <Button type={'danger'} onClick={onConfirm}>Confirm</Button>
+        </Item>
+        <Item extra={'提示弹窗'}>
+          <Button onClick={onAlert} type={'primary'} ghost>Alert</Button>
+        </Item>
+        <Item>
+          <Button onClick={onPrompt} ghost>Prompt</Button>
+        </Item>
+      </List>
     </Layout>
   );
 };
