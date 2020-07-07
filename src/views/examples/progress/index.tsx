@@ -1,6 +1,7 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Header, Layout } from '../../../components/layout';
-import { Progress } from '../../../components/progress';
+import { progressBar, Progress } from '../../../components/progress';
+import { Button } from '../../../components/button';
 
 const ProgressDemo = function():JSX.Element {
   const [percent, setPercent] = useState(50);
@@ -13,6 +14,12 @@ const ProgressDemo = function():JSX.Element {
     }
   }, []);
 
+  useEffect(() => {
+    return () => {
+      progressBar.destroyAll();
+    };
+  }, []);
+
   return (
     <Layout
       header={
@@ -20,19 +27,37 @@ const ProgressDemo = function():JSX.Element {
       }
     >
       <div style={{padding: 15}}>
+        <div>
+          线形 Line：
+        </div>
         <Progress percent={percent} />
+        <div>
+          环形 Circle：
+        </div>
         <div
           style={{
             width: '40%',
-            padding: '15px 0'
+            padding: '15px 0',
+            margin: '0 auto'
           }}
         >
           <Progress type={'circle'} percent={percent} />
         </div>
-        <div>
-          <button onClick={e => changePercent(false)}>-</button>
+        <div style={{textAlign: 'center'}}>
+          <Button onClick={e => changePercent(false)} ghost type={'primary'}>减少 -5%</Button>
           &nbsp;
-          <button onClick={e => changePercent(true)}>+</button>
+          <Button onClick={e => changePercent(true)} ghost type={'primary'}>增加 +5%</Button>
+        </div>
+        <div style={{padding: '20px 0 10px 0'}}>页面顶部进度（用于页面加载等）：</div>
+        <div>
+          <Button type={'primary'} onClick={e => progressBar.open({ height: 4, defaultPercent: 10 })}>显示</Button>
+          &nbsp;
+          <Button type={'primary'} onClick={e => progressBar.set(50)} ghost>设置为50%</Button>
+          &nbsp;
+          <Button type={'default'} onClick={e => progressBar.set(100)} ghost>设置为100%</Button>
+        </div>
+        <div style={{padding: '10px 0'}}>
+          <Button type={'danger'} onClick={e => progressBar.destroyAll()}>关闭 Progress Bar</Button>
         </div>
       </div>
     </Layout>

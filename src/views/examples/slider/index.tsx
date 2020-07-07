@@ -18,6 +18,7 @@ const SliderDemo: FC = function () {
     <Layout
       header={<Header title={'Slider'}/>}
     >
+      <div style={{padding: 10}}>横向轮播图：</div>
       <Sliders
         dot={true}
       >
@@ -27,8 +28,31 @@ const SliderDemo: FC = function () {
           ))
         }
       </Sliders>
-      <div style={{height: 300}} />
-      <div>Bottom</div>
+      <div style={{padding: 10}}>纵向轮播图：</div>
+      <div
+        style={{
+          height: 0,
+          padding: 360 / 640 / 2 * 100 + '% 0',
+          position: 'relative'
+        }}
+      >
+        <Sliders
+          dot={true}
+          direction={'y'}
+          style={{
+            height: '100%',
+            position: 'absolute',
+            top: 0,
+            left: 0
+          }}
+        >
+          {
+            sliders.map((item, key) => (
+              <img src={item} key={key} alt={'banner'} width={'100%'} />
+            ))
+          }
+        </Sliders>
+      </div>
     </Layout>
   );
 };

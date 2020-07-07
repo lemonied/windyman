@@ -2,17 +2,22 @@ import React, {
   CSSProperties,
   forwardRef,
   ForwardRefRenderFunction,
-  ReactElement, useEffect,
+  ReactElement,
+  useEffect,
   useImperativeHandle,
   useMemo,
-  useRef, useState
+  useRef,
+  useState
 } from 'react';
 import './style.scss';
 import { combineClassNames } from '../../common/utils';
-import { BScroll } from '../better-scroll';
+import BScroll from '@better-scroll/core';
+import { ScrollYInstance } from '../scroll-y';
 
-interface ScrollXInstance extends BScroll {
-
+export interface ScrollXInstance {
+  refresh: ScrollYInstance['refresh'];
+  scrollTo: ScrollYInstance['scrollTo'];
+  scrollToElement: ScrollYInstance['scrollToElement'];
 }
 interface ScrollXProps {
   children?: ReactElement;
@@ -28,7 +33,6 @@ export const useScrollX = (): ScrollXInstance => {
 const ScrollXFc: ForwardRefRenderFunction<ScrollXInstance, ScrollXProps> = (props, ref) => {
   const { children, className, scroll, style, dot } = props;
 
-  const [ isInit, setIsInit ] = useState<boolean>(false);
   const [ showDot, setShowDot ] = useState<boolean>(true);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<BScroll>();
@@ -38,7 +42,7 @@ const ScrollXFc: ForwardRefRenderFunction<ScrollXInstance, ScrollXProps> = (prop
   });
 
   useEffect(() => {
-    const scroll = scrollRef.current = new BScroll(wrapperRef.current as Element, {
+    const scroll = scrollRef.current = new BScroll(wrapperRef.current as HTMLElement, {
       probeType: 3,
       scrollX: true,
       scrollY: false,
@@ -48,19 +52,27 @@ const ScrollXFc: ForwardRefRenderFunction<ScrollXInstance, ScrollXProps> = (prop
       const dot = dotRef.current;
       const wrapper = wrapperRef.current;
       if (dot && wrapper) {
-        const x = Math.min(Math.max(pos.x, scroll.maxScrollX), 0) * 100;
-        dot.style.left = Math.abs(x / scroll.maxScrollX) * childRef.current.widthPercent + '%';
+        const x = pos.x * 100;
+        dot.style.left = x / scroll.maxScrollX * childRef.current.widthPercent + '%';
       }
     });
-    setIsInit(true);
     return () => {
       scrollRef.current?.destroy();
     };
   }, []);
   const instance = useMemo<ScrollXInstance>(() => {
-    if (!isInit) { return {} as ScrollXInstance; }
-    return scrollRef.current || {} as ScrollXInstance;
-  }, [isInit]);
+    return {
+      refresh() {
+        scrollRef.current?.refresh();
+      },
+      scrollTo(...args) {
+        scrollRef.current?.scrollTo(...args);
+      },
+      scrollToElement(...args) {
+        scrollRef.current?.scrollToElement(...args);
+      }
+    };
+  }, []);
   useEffect(() => {
     if (scroll) {
       Object.assign(scroll, instance);

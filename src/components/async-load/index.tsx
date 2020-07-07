@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import { progress } from '../progress';
+import { progressBar } from '../progress';
 
 interface Props {
   load: () => Promise<any>;
@@ -10,15 +10,15 @@ const AsyncLoad: FC<Props> = function (props) {
   const { load } = props;
   const [ Child, setChild ] = useState<any>(cache);
   useEffect(() => {
-    const pro = progress.open();
-    setTimeout(() => pro.set(100));
+    progressBar.open();
+    setTimeout(() => progressBar.set(100));
     load().then(res => {
       setChild(res);
-      pro.destroy();
       cache = res;
+      progressBar.destroyAll();
     });
     return () => {
-      progress.destroyAll();
+      progressBar.destroyAll();
     };
   }, [load]);
 

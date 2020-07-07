@@ -16,8 +16,9 @@ const FixedRouter: FC<FixedRouterProps> = function(props) {
         key={location.key}
         timeout={300}
         classNames={'windy-slide'}
+        unmountOnExit
       >
-        <div className={combineClassNames('windy-fixed-router', location.pathname === defaultPath ? 'windy-fixed-router-exited' : '')}>
+        <div className={combineClassNames('windy-fixed-router', location.pathname === defaultPath ? 'windy-fixed-router-exited' : null)}>
           <Switch location={location}>{children}</Switch>
         </div>
       </CSSTransition>

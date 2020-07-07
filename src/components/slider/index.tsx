@@ -1,17 +1,21 @@
 import React, {
-  FC,
   useCallback,
   useEffect,
   useRef,
   useState,
-  memo,
   Children,
   useMemo,
-  ReactElement
+  ReactElement,
+  forwardRef,
+  ForwardRefRenderFunction,
+  useImperativeHandle, CSSProperties
 } from 'react';
 import './style.scss';
-import { BScroll } from '../better-scroll';
-import { debounce } from '../../common/utils';
+import BScroll from '@better-scroll/core';
+import Slide from '@better-scroll/slide';
+import { combineClassNames, debounce } from '../../common/utils';
+
+BScroll.use(Slide);
 
 interface SliderInstance {
   next(time?: number, easing?: object): void;
@@ -21,7 +25,7 @@ interface SliderInstance {
   play(): void;
   stop(): void;
 }
-interface Props {
+interface SliderProps {
   children: ReactElement[];
   dot?: boolean;
   loop?: boolean;
@@ -30,26 +34,33 @@ interface Props {
   autoplay?: boolean;
   threshold?: number;
   speed?: number;
-  getInstance?: (instance: SliderInstance) => void;
   data?: any;
   slider?: { [prop: string]: any };
+  direction?: 'x' | 'y';
+  className?: string;
+  style?: CSSProperties;
 }
-const defaultProps: Props = {
-  children: [],
-  loop: true,
-  click: true,
-  interval: 4000,
-  autoplay: true,
-  threshold: 0.3,
-  speed: 400
-};
 // Slider Hook
 export const useSlider = ():SliderInstance  => {
   const instance = useRef<SliderInstance>({} as SliderInstance);
   return instance.current;
 };
-const Slider: FC<Props> = function(props) {
-  const { children, dot, loop, click, interval, autoplay, threshold, speed, getInstance, data, slider } = props;
+const Slider: ForwardRefRenderFunction<SliderInstance, SliderProps> = function(props, ref) {
+  const {
+    children = [],
+    dot = true,
+    loop = true,
+    click = true,
+    interval = 4000,
+    autoplay = true,
+    threshold = 0.3,
+    speed = 400,
+    data,
+    slider,
+    direction = 'x',
+    className,
+    style
+  } = props;
 
   const [ currentIndex, setCurrentIndex ] = useState<number>(0);
   const scrollRef = useRef<BScroll>();
@@ -61,6 +72,7 @@ const Slider: FC<Props> = function(props) {
   }, [children]);
 
   const initSlideWidth = useCallback(() => {
+    if (direction === 'y') { return; }
     const wrapper = wrapperRef.current;
     const slideGroup: any = slideGroupRef.current;
     const items: any = slideGroupRef.current?.children;
@@ -70,7 +82,8 @@ const Slider: FC<Props> = function(props) {
         item.style.width = wrapper.clientWidth + 'px';
       });
     }
-  }, [loop, childrenLength]);
+  }, [loop, childrenLength, direction]);
+  // Instance
   const instance = useMemo<SliderInstance>(() => {
     return {
       prev: (...args) => {
@@ -99,27 +112,33 @@ const Slider: FC<Props> = function(props) {
       }
     };
   }, [autoplay, interval]);
+  // Create Scroller
   useEffect(() => {
     initSlideWidth();
-    const scroll = scrollRef.current = new BScroll(wrapperRef.current as Element, {
-      scrollX: true,
-      scrollY: false,
+    const scroll = scrollRef.current = new BScroll(wrapperRef.current as HTMLElement, {
+      probeType: 3,
+      scrollX: direction === 'x',
+      scrollY: direction === 'y',
       momentum: false,
-      snap: {
+      slide: {
         loop: loop,
         threshold: threshold,
         speed: speed
       },
+      useTransition: true,
       bounce: false,
       stopPropagation: true,
       click: click,
-      observeDOM: false,
-      eventPassthrough: 'vertical'
+      eventPassthrough: direction === 'x' ? 'vertical' : 'horizontal'
     });
     setCurrentIndex(0);
     instance.play();
     scroll.on('scrollEnd', () => {
-      setCurrentIndex(scroll.getCurrentPage().pageX);
+      if (direction === 'x') {
+        setCurrentIndex(scroll.getCurrentPage().pageX);
+      } else {
+        setCurrentIndex(scroll.getCurrentPage().pageY);
+      }
       instance.play();
     });
     scroll.on('touchEnd', () => {
@@ -137,20 +156,20 @@ const Slider: FC<Props> = function(props) {
       window.removeEventListener('resize', onResize);
       instance.destroy();
     };
-  }, [initSlideWidth, loop, threshold, speed, click, instance, data]);
+  }, [initSlideWidth, loop, threshold, speed, click, instance, data, direction]);
   // use instance
   useEffect(() => {
-    if (typeof getInstance === 'function') {
-      getInstance(instance);
-    }
     if (slider && typeof slider === 'object') {
       Object.assign(slider, instance);
     }
-  }, [instance, getInstance, slider]);
+  }, [instance, slider]);
+  useImperativeHandle(ref, () => {
+    return instance;
+  });
 
   return (
-    <div ref={wrapperRef} className={'windy-slider'}>
-      <div className={'slider-group'} ref={slideGroupRef}>
+    <div ref={wrapperRef} className={combineClassNames('windy-slider', className)} style={style}>
+      <div className={direction === 'x' ? 'slider-group' : 'slider-group-vertical'} ref={slideGroupRef}>
         {
           Children.map(children, ((item, key) => (
             <div
@@ -162,7 +181,7 @@ const Slider: FC<Props> = function(props) {
       </div>
       {
         dot ?
-          <div className={'dot-group'}>
+          <div className={combineClassNames('dot-group', direction === 'y' ? 'dot-group-right' : null)}>
             { Children.map(children, (item, key) => (<span key={key} className={currentIndex === key ? 'active' : ''} />)) }
           </div> :
           null
@@ -170,6 +189,5 @@ const Slider: FC<Props> = function(props) {
     </div>
   );
 };
-Slider.defaultProps = defaultProps;
 
-export const Sliders = memo(Slider);
+export const Sliders = forwardRef<SliderInstance, SliderProps>(Slider);

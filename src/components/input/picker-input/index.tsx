@@ -24,7 +24,7 @@ export interface PickerInputProps extends PickerSharedProps {
   defaultSelectedValues?: PickerValues;
 }
 export interface PickerInputInstance {
-  open?: (e?: any) => void;
+  open?: (e?: React.MouseEvent) => void;
 }
 export const usePicker = (): PickerInputInstance => {
   const picker = useRef<PickerInputInstance>({});
@@ -79,7 +79,7 @@ const PickerInput: FC<PickerInputProps> = function(props) {
     }
     echoNames();
   }, [pickerService, echoNames]);
-  const showPicker = useCallback((e?: any) => {
+  const showPicker = useCallback((e?: React.MouseEvent) => {
     e?.stopPropagation();
     e?.preventDefault();
     const defaultValue = !pickerService.dataManager.values.length && defaultSelectedValues ?

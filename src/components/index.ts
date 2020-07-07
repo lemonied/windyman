@@ -12,8 +12,6 @@ export { Picker, PickerModal, PickerService } from './picker';
 
 export { Selector, SelectorService } from './selector';
 
-export { BScroll } from './better-scroll';
-
 export  { ScrollY } from './scroll-y';
 
 export { ScrollX } from './scroll-x';

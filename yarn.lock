@@ -1161,6 +1161,46 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
+"@better-scroll/core@^2.0.0-beta.10":
+  version "2.0.0-beta.10"
+  resolved "https://registry.npm.taobao.org/@better-scroll/core/download/@better-scroll/core-2.0.0-beta.10.tgz#d76eb4b11e599b4c5b91e64d496f630d74f1ad84"
+  integrity sha1-1260sR5Zm0xbkeZNSW9jDXTxrYQ=
+  dependencies:
+    "@better-scroll/shared-utils" "^2.0.0-beta.10"
+
+"@better-scroll/pull-up@^2.0.0-beta.10":
+  version "2.0.0-beta.10"
+  resolved "https://registry.npm.taobao.org/@better-scroll/pull-up/download/@better-scroll/pull-up-2.0.0-beta.10.tgz#09d88697693f96ea18b51f545124f3b4937c9a76"
+  integrity sha1-CdiGl2k/luoYtR9UUSTztJN8mnY=
+  dependencies:
+    "@better-scroll/core" "^2.0.0-beta.10"
+
+"@better-scroll/scroll-bar@^2.0.0-beta.10":
+  version "2.0.0-beta.10"
+  resolved "https://registry.npm.taobao.org/@better-scroll/scroll-bar/download/@better-scroll/scroll-bar-2.0.0-beta.10.tgz#17c6ac41c8302cac38596f62a670b742401d9a91"
+  integrity sha1-F8asQcgwLKw4WW9ipnC3QkAdmpE=
+  dependencies:
+    "@better-scroll/core" "^2.0.0-beta.10"
+
+"@better-scroll/shared-utils@^2.0.0-beta.10":
+  version "2.0.0-beta.10"
+  resolved "https://registry.npm.taobao.org/@better-scroll/shared-utils/download/@better-scroll/shared-utils-2.0.0-beta.10.tgz#077a245926ddcdbf5493aeda6724e2bf3bebf42f"
+  integrity sha1-B3okWSbdzb9Uk67aZyTivzvr9C8=
+
+"@better-scroll/slide@^2.0.0-beta.10":
+  version "2.0.0-beta.10"
+  resolved "https://registry.npm.taobao.org/@better-scroll/slide/download/@better-scroll/slide-2.0.0-beta.10.tgz#171e71c3b78421d58027e1c5b867dcf9e248abe4"
+  integrity sha1-Fx5xw7eEIdWAJ+HFuGfc+eJIq+Q=
+  dependencies:
+    "@better-scroll/core" "^2.0.0-beta.10"
+
+"@better-scroll/wheel@^2.0.0-beta.10":
+  version "2.0.0-beta.10"
+  resolved "https://registry.npm.taobao.org/@better-scroll/wheel/download/@better-scroll/wheel-2.0.0-beta.10.tgz#c671b2158ab5af11adda8ad188e5e9fd27096659"
+  integrity sha1-xnGyFYq1rxGt2orRiOXp/ScJZlk=
+  dependencies:
+    "@better-scroll/core" "^2.0.0-beta.10"
+
 "@cnakazawa/watch@^1.0.3":
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/@cnakazawa/watch/-/watch-1.0.4.tgz#f864ae85004d0fcab6f50be9141c4da368d1656a"

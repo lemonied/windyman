@@ -5,7 +5,7 @@ import { routes } from './routes';
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={'/windy'}>
       <Switch>
         {
           routes.map(item => (

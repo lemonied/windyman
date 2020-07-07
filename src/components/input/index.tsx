@@ -33,7 +33,7 @@ interface InputSelectorOption extends ExtendsWith<InputSharedProps, SelectorInpu
 
 type InputProps = InputNormalProps | InputPickerOption | InputDateTimePickerOption | InputTimePickerOption | InputSelectorOption;
 const Input: FC<InputProps> = function(props) {
-  const { type = 'text', data, onChange, value, placeholder, title, column, start, end, hasArrow, picker, wrapperClassName, className, style } = props;
+  const { type = 'text', data, onChange, value, placeholder, title, column, start, end, hasArrow, picker, wrapperClassName, className, style, formatNames } = props;
 
   useEffect(() => {
     if (typeof hasArrow === 'function') {
@@ -49,7 +49,7 @@ const Input: FC<InputProps> = function(props) {
         );
       case 'picker':
         return (
-          <PickerInput wrapperClassName={wrapperClassName} data={data} value={value} column={column} title={title} picker={picker}/>
+          <PickerInput formatNames={formatNames} wrapperClassName={wrapperClassName} data={data} value={value} column={column} title={title} picker={picker}/>
         );
       case 'dateTime':
         return (
@@ -61,7 +61,7 @@ const Input: FC<InputProps> = function(props) {
         );
       case 'selector':
         return (
-          <SelectorInput wrapperClassName={wrapperClassName} picker={picker} value={value} data={data} column={column} title={title}/>
+          <SelectorInput formatNames={formatNames} wrapperClassName={wrapperClassName} picker={picker} value={value} data={data} column={column} title={title}/>
         );
       case 'password':
         return (
@@ -72,7 +72,7 @@ const Input: FC<InputProps> = function(props) {
           <input type={type} value={value || ''} />
         );
     }
-  }, [column, data, end, picker, start, title, type, value, wrapperClassName]);
+  }, [column, data, end, picker, start, title, type, value, wrapperClassName, formatNames]);
 
   return cloneElement(input, {
     className: combineClassNames('y-input', className),
@@ -90,7 +90,7 @@ const InputPassword: FC<InputPassword> = function(props) {
   const { onChange, placeholder, value = '', className, style, wrapperClassName } = props;
 
   const [ visible, setVisible ] = useState<boolean>(false);
-  const onClick = useCallback((e: any) => {
+  const onClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
     setVisible(v => !v);

@@ -72,6 +72,7 @@ const Selector: FC<SelectorProps> = function(props) {
 
   const [ selectedIndex, setSelectedIndex ] = useState<number[]>(defaultSelectedIndex);
   const [ currentColumn, setCurrentColumn ] = useState<number>(selectedIndex.length);
+  const [ activeName, setActiveName ] = useState<number>(selectedIndex.length);
   const valuesRef = useRef<(string | number)[]>(selectedIndex.map((val, key) => data[key][val].value));
 
   const left = useMemo(() => {
@@ -88,7 +89,14 @@ const Selector: FC<SelectorProps> = function(props) {
       return data[key][val];
     });
   }, [selectedIndex, data]);
+  const selectedNameMaxWidth = useMemo(() => {
+    return 1 / Math.min(selectedItems.length + 1, data.length) * 100 + '%';
+  }, [data, selectedItems]);
 
+  const onSelectedNameClick = useCallback((column: number) => {
+    setCurrentColumn(Math.min(column, valuesRef.current.length));
+    setActiveName(column);
+  }, []);
   const onClick = useCallback((item: DataItem, key: number, index: number) => {
     valuesRef.current[key] = item.value;
     valuesRef.current.splice(key + 1);
@@ -98,11 +106,11 @@ const Selector: FC<SelectorProps> = function(props) {
       copy.splice(key + 1);
       return copy;
     });
-    setCurrentColumn(valuesRef.current.length);
+    onSelectedNameClick(valuesRef.current.length);
     if (typeof onChange === 'function') {
       onChange(valuesRef.current);
     }
-  }, [onChange]);
+  }, [onChange, onSelectedNameClick]);
 
   return (
     <div className={'windy-selector-wrapper'}>
@@ -116,9 +124,10 @@ const Selector: FC<SelectorProps> = function(props) {
           {
             selectedItems.map((item, key) => (
               <span
-                className={combineClassNames('select-name', key === currentColumn - 1 && (currentColumn < selectedIndex.length || selectedItems.length === data.length) ? 'active' : '')}
+                className={combineClassNames('select-name', key === activeName - 1 ? 'active' : null)}
                 key={key}
-                onClick={e => setCurrentColumn(key + 1)}
+                onClick={e => onSelectedNameClick(key + 1)}
+                style={{maxWidth: selectedNameMaxWidth}}
               >
                 {item.name}
               </span>
@@ -127,8 +136,9 @@ const Selector: FC<SelectorProps> = function(props) {
           {
             selectedItems.length < data.length ?
               <span
-                className={combineClassNames('select-name', currentColumn === selectedIndex.length ? 'active' : '')}
-                onClick={e => setCurrentColumn(selectedIndex.length)}
+                className={combineClassNames('select-name', activeName === selectedIndex.length + 1 ? 'active' : null)}
+                onClick={e => onSelectedNameClick(selectedIndex.length + 1)}
+                style={{maxWidth: selectedNameMaxWidth}}
               >请选择</span> :
               null
           }

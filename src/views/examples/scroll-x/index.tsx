@@ -1,6 +1,6 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import { Header, Layout } from '../../../components/layout';
-import { ScrollX } from '../../../components/scroll-x';
+import { ScrollX, useScrollX } from '../../../components/scroll-x';
 import { Icon } from '../../../components/icon';
 import './style.scss';
 
@@ -31,6 +31,11 @@ const list = [{
 }];
 
 const ScrollXDemo: FC = function() {
+  const scroll = useScrollX();
+  useEffect(() => {
+    console.log(scroll);
+  }, [scroll]);
+
   return (
     <Layout
       header={<Header title={'ScrollX'} />}
@@ -40,6 +45,7 @@ const ScrollXDemo: FC = function() {
         style={{
           background: '#f3f3f3'
         }}
+        scroll={scroll}
       >
         <div
           className={'scroll-x-demo-wrapper'}

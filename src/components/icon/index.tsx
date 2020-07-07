@@ -5,7 +5,7 @@ import { combineClassNames } from '../../common/utils';
 interface IconProps {
   type?: string;
   className?: string;
-  onClick?(e: any): void;
+  onClick?(e: React.MouseEvent): void;
 }
 const Icon: FC<IconProps> = function(props) {
   const { type, className, onClick } = props;

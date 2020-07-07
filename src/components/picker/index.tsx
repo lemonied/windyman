@@ -1,42 +1,51 @@
-import React, { Component, FC, useEffect, useRef, createRef, RefObject, ReactNode } from 'react';
+import React, {
+  Component,
+  useEffect,
+  useRef,
+  createRef,
+  RefObject,
+  ReactNode,
+  ForwardRefRenderFunction,
+  forwardRef,
+  useMemo,
+  useImperativeHandle
+} from 'react';
 import ReactDOM from 'react-dom';
 import './style.scss';
-import { BScroll } from '../better-scroll';
+import BScroll from '@better-scroll/core';
+import Wheel from '@better-scroll/wheel';
 import { combineClassNames } from '../../common/utils';
 import { CSSTransition } from 'react-transition-group';
 import { DataItem, MultiDataChildren, MultiDataManager, MultiDataSet, PickerValues } from './core';
+
+BScroll.use(Wheel);
 
 interface PickerInstance {
   wheelTo(index: number): void;
   getSelectedIndex(): number;
   refresh(): void;
 }
-interface Props {
+interface PickerProps {
   data: DataItem[];
   defaultSelectedIndex?: number;
-  getInstance?(instance: PickerInstance): void;
   picker?: { [prop: string]: any };
   className?: string;
   onChange?: (index: number) => void;
 }
-const defaultProps: Props = {
-  data: [],
-  defaultSelectedIndex: 0
-};
 // Picker Hook
 export const usePicker = (): PickerInstance => {
   const instance = useRef<PickerInstance>({} as PickerInstance);
   return instance.current;
 };
-const Picker: FC<Props> = function(props) {
-  const { data, getInstance, defaultSelectedIndex = 0, picker, className, onChange } = props;
+const PickerFc: ForwardRefRenderFunction<PickerInstance, PickerProps> = function(props, ref) {
+  const { data = [], defaultSelectedIndex = 0, picker, className, onChange } = props;
   const wheelWrapperRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<BScroll>();
-  const instanceRef = useRef<PickerInstance>();
   const defaultSelectedIndexRef = useRef<number>(defaultSelectedIndex);
 
-  useEffect(() => {
-    const instance = instanceRef.current = {
+  // instance
+  const instance = useMemo<PickerInstance>(() => {
+    return {
       wheelTo(index: number) {
         scrollRef.current?.wheelTo(index);
       },
@@ -47,15 +56,14 @@ const Picker: FC<Props> = function(props) {
         scrollRef.current?.refresh();
       }
     };
-    if (typeof getInstance === 'function') {
-      getInstance(instance);
-    }
+  }, []);
+  useEffect(() => {
     if (picker && typeof picker === 'object') {
       Object.assign(picker, instance);
     }
-  }, [getInstance, picker]);
+  }, [picker, instance]);
   useEffect(() => {
-    const scroll = scrollRef.current = new BScroll(wheelWrapperRef.current as Element, {
+    const scroll = scrollRef.current = new BScroll(wheelWrapperRef.current as HTMLElement, {
       wheel:{
         selectedIndex: defaultSelectedIndexRef.current,
         rotate: 25,
@@ -63,19 +71,18 @@ const Picker: FC<Props> = function(props) {
         wheelWrapperClass: 'wheel-scroll',
         wheelItemClass: 'wheel-item',
         wheelDisabledItemClass: 'wheel-disabled-item'
-      } as any,
-      probeType: 3
+      }
     });
     return () => {
       scroll.destroy();
     };
   }, []);
   useEffect(() => {
-    instanceRef.current?.refresh();
-  }, [data]);
+    instance.refresh();
+  }, [data, instance]);
   useEffect(() => {
-    instanceRef.current?.wheelTo(defaultSelectedIndex);
-  }, [defaultSelectedIndex]);
+    instance.wheelTo(defaultSelectedIndex);
+  }, [defaultSelectedIndex, instance]);
   useEffect(() => {
     const listen = () => {
       if (typeof onChange === 'function') {
@@ -87,6 +94,9 @@ const Picker: FC<Props> = function(props) {
       scrollRef.current?.off('scrollEnd', listen);
     };
   }, [onChange]);
+  useImperativeHandle(ref, () => {
+    return instance;
+  });
 
   return (
     <div ref={wheelWrapperRef} className={combineClassNames('windy-wheel-wrapper', className)}>
@@ -103,9 +113,8 @@ const Picker: FC<Props> = function(props) {
     </div>
   );
 };
-Picker.defaultProps = defaultProps;
 
-export { Picker };
+export const Picker = forwardRef<PickerInstance, PickerProps>(PickerFc);
 
 interface PickerModalProps {
   title?: ReactNode;
@@ -119,7 +128,6 @@ interface PickerModalState {
   data: MultiDataSet;
   selectedIndex: number[];
 }
-
 export class PickerModal extends Component<PickerModalProps, PickerModalState> {
   readonly state: PickerModalState = {
     show: false,
@@ -148,7 +156,8 @@ export class PickerModal extends Component<PickerModalProps, PickerModalState> {
   show() {
     this.setState({ show: true });
   }
-  getPickerInstance(instance: PickerInstance, index: number) {
+  getPickerInstance(instance: PickerInstance | null, index: number) {
+    if (!instance) { return; }
     if (this.picker[index]) {
       this.picker[index] = instance;
     } else {
@@ -184,7 +193,7 @@ export class PickerModal extends Component<PickerModalProps, PickerModalState> {
     if (onSubmit) {
       if (save) {
         this.dataManager.setIndex(
-          data.map((item, key) => Math.max(this.picker[key]?.getSelectedIndex(), 0))
+          data.map((item, key) => Math.max(this.picker[key]?.getSelectedIndex() || 0, 0))
         );
         this.values = this.dataManager.values;
         this.sourceValues = this.dataManager.sourceValues;
@@ -240,7 +249,7 @@ export class PickerModal extends Component<PickerModalProps, PickerModalState> {
                   className={'picker-item'}
                   key={key}
                   data={item}
-                  getInstance={e => this.getPickerInstance(e, key)}
+                  ref={e => this.getPickerInstance(e, key)}
                   defaultSelectedIndex={selectedIndex[key]}
                   onChange={e => this.onChange(e, key)}
                 />

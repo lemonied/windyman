@@ -1,5 +1,4 @@
 import React, {
-  FC,
   useEffect,
   useState,
   CSSProperties,
@@ -7,28 +6,35 @@ import React, {
   useRef,
   useMemo,
   forwardRef,
-  ForwardRefRenderFunction, useImperativeHandle, ReactNode
+  ForwardRefRenderFunction,
+  useImperativeHandle,
+  ReactNode
 } from 'react';
-import { BScroll } from '../better-scroll';
-import { Position } from '../better-scroll/bscroll';
+import BScroll from '@better-scroll/core';
+/*
+* examples for ease
+* import { ease } from '@better-scroll/shared-utils';
+*/
+import PullUp from '@better-scroll/pull-up';
+import PullDown from './pull-down/index';
+import ScrollBar from '@better-scroll/scroll-bar';
 import './style.scss';
 import { Loading } from '../loading';
 
-interface BScroller extends BScroll {
-  closePullUp: () => void;
-  openPullUp: (option?: any) => void;
-  openPullDown: (options?: any) => void;
-}
+BScroll
+  .use(PullDown)
+  .use(PullUp)
+  .use(ScrollBar);
 
-interface ScrollYInstance {
+export interface ScrollYInstance {
   finishPullUp: () => void;
   refresh: () => void;
   closePullUp: () => void;
   openPullUp: (option?: any) => void;
   finishPullDown: () => void;
   openPullDown: (options?: any) => void;
-  scrollTo: BScroller['scrollTo'];
-  scrollToElement: BScroller['scrollToElement'];
+  scrollTo: (x: number, y: number, time?: number, easing?: object, extraTransform?: object, isSilent?: boolean) => void;
+  scrollToElement: (el: HTMLElement, time?: number, offsetX?: number | boolean, offsetY?: number | boolean, easing?: object) => void;
 }
 // ScrollY Hook
 export const useScrollY = (): ScrollYInstance => {
@@ -42,7 +48,7 @@ export const useScrollY = (): ScrollYInstance => {
 * When set to 3, the scroll event is real-time fired during not only the screen scrolling but also the momentum and bounce animation
 * If not set, the default value 0 means there is no scroll event is fired.
 */
-interface Props {
+export interface ScrollYProps {
   probeType?: 1 | 2 | 3;
   onScroll?: (position: Position) => void;
   onPullingUp?: () => void;
@@ -51,47 +57,72 @@ interface Props {
   scroll?: { [prop: string]: any };
   children?: ReactNode;
   data?: any;
+  scrollbar?: { fade: boolean; interactive: boolean; } | boolean;
+}
+// check if event type exists
+function checkEventAndBind(scroll: BScroll, eventType: string, handler: (e: any) => void) {
+  if (typeof scroll.eventTypes[eventType] !== 'undefined') {
+    scroll.on(eventType, handler);
+  }
+}
+function checkEventAndUnBind(scroll: BScroll, eventType: string, handler: (e: any) => void) {
+  if (typeof scroll.eventTypes[eventType] !== 'undefined') {
+    scroll.off(eventType, handler);
+  }
 }
 // ScrollY Component
-const ScrollYFc: ForwardRefRenderFunction<ScrollYInstance, Props> = function (props, ref) {
+const ScrollYFc: ForwardRefRenderFunction<ScrollYInstance, ScrollYProps> = function (props, ref) {
 
   const { style, children, data } = props;
-  const { onScroll, onPullingDown, onPullingUp, scroll } = props;
+  const { onScroll, onPullingDown, onPullingUp, scroll, scrollbar } = props;
 
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const instanceRef = useRef<BScroller>();
-  const enablePullUpRef = useRef<boolean>(!!onPullingUp);
+  const instanceRef = useRef<BScroll>();
   const bubble = useBubble();
   // Initial top value
-  const bubbleInit = useRef({ initTop: -100 });
+  const bubbleInit = useRef({
+    initTop: -100,
+    maxTop: 0,
+    loadingTopCorrect: -50
+  });
   const [ pullingUp, setPullingUp ] = useState<boolean>(false);
   const [ bubbleY, setBubbleY ] = useState<number>(0);
   const [ loadingTop, setLoadingTop ] = useState<number>(bubbleInit.current.initTop);
   const [ pullingDown, setPullingDown ] = useState<boolean>(false);
   const [ pullingDownSnapshot, setPullingDownSnapshot ] = useState<boolean>(false);
   const [ isOpenPullingDown, setIsOpenPullingDown ] = useState<boolean>(!!onPullingDown);
-  const propsRef = useRef<Props>(Object.assign({}, props));
+  const propsRef = useRef<ScrollYProps>(Object.assign({}, props));
   const pullUpLoadConf = useMemo(() => {
-    return { threshold: 50 };
+    return { threshold: 0 };
   }, []);
   const pullDownConf = useMemo(() => {
     return { threshold: 60, stop: 30 };
   }, []);
+  const scrollBarConf = useMemo(() => {
+    if (typeof scrollbar === 'undefined') {
+      return {
+        fade: true,
+        interactive: false
+      };
+    }
+    return scrollbar;
+  }, [scrollbar]);
 
   // Create Scroller
   useEffect(() => {
     const { probeType = 1, onPullingUp, onPullingDown } = propsRef.current;
-    instanceRef.current = new BScroll(wrapperRef.current as Element, {
+    instanceRef.current = new BScroll(wrapperRef.current as HTMLElement, {
       scrollY: true,
       click: true,
       probeType,
       pullUpLoad: onPullingUp ? pullUpLoadConf : false,
-      pullDownRefresh: onPullingDown ? pullDownConf : false
-    }) as BScroller;
+      pullDownRefresh: onPullingDown ? pullDownConf : false,
+      scrollbar: scrollBarConf
+    });
     return function () {
       instanceRef.current?.destroy();
     };
-  }, [pullDownConf, pullUpLoadConf]);
+  }, [pullDownConf, pullUpLoadConf, scrollBarConf]);
   // onScroll
   useEffect(() => {
     const wrapper = instanceRef.current;
@@ -104,7 +135,7 @@ const ScrollYFc: ForwardRefRenderFunction<ScrollYInstance, Props> = function (pr
       if (typeof onPullingDown === 'function' && bubbleConf) {
         const bubbleHeight = bubbleConf.headRadius / bubbleConf.ratio * 2.5;
         setBubbleY(Math.max(0, e.y - bubbleHeight));
-        const loadingPosTop = Math.min(-2, e.y - pullDownConf.threshold);
+        const loadingPosTop = Math.min(bubbleInit.current.maxTop, e.y + bubbleInit.current.loadingTopCorrect);
         setLoadingTop(loadingPosTop);
       }
     };
@@ -117,8 +148,6 @@ const ScrollYFc: ForwardRefRenderFunction<ScrollYInstance, Props> = function (pr
   useEffect(() => {
     const wrapper = instanceRef.current;
     const pullingUp = () => {
-      if (!enablePullUpRef.current) { return; }
-      enablePullUpRef.current = false;
       if (typeof onPullingUp === 'function') {
         setPullingUp(true);
         onPullingUp();
@@ -130,11 +159,15 @@ const ScrollYFc: ForwardRefRenderFunction<ScrollYInstance, Props> = function (pr
         onPullingDown();
       }
     };
-    wrapper?.on('pullingUp', pullingUp);
-    wrapper?.on('pullingDown', pullingDown);
+    if (wrapper) {
+      checkEventAndBind(wrapper, 'pullingUp', pullingUp);
+      checkEventAndBind(wrapper, 'pullingDown', pullingDown);
+    }
     return () => {
-      instanceRef.current?.off('pullingUp', pullingUp);
-      instanceRef.current?.off('pullingDown', pullingDown);
+      if (instanceRef.current) {
+        checkEventAndUnBind(instanceRef.current, 'pullingUp', pullingUp);
+        checkEventAndUnBind(instanceRef.current, 'pullingDown', pullingDown);
+      }
     };
   }, [onPullingUp, onPullingDown]);
   // instance
@@ -145,15 +178,12 @@ const ScrollYFc: ForwardRefRenderFunction<ScrollYInstance, Props> = function (pr
     const finishPullUp = () => {
       setPullingUp(false);
       instanceRef.current?.finishPullUp();
-      enablePullUpRef.current = true;
     };
     const closePullUp = () => {
       finishPullUp();
-      enablePullUpRef.current = false;
       instanceRef.current?.closePullUp();
     };
     const openPullUp = (option = pullUpLoadConf) => {
-      enablePullUpRef.current = true;
       instanceRef.current?.openPullUp(option);
     };
     const finishPullDown = () => {
@@ -163,7 +193,7 @@ const ScrollYFc: ForwardRefRenderFunction<ScrollYInstance, Props> = function (pr
       setTimeout(() => {
         setLoadingTop(bubbleInit.current.initTop);
         setPullingDownSnapshot(false);
-      }, 500);
+      }, 800);
     };
     const openPullDown = (options = pullDownConf) => {
       instanceRef.current?.openPullDown(options);
@@ -193,22 +223,29 @@ const ScrollYFc: ForwardRefRenderFunction<ScrollYInstance, Props> = function (pr
   // watch data change
   useEffect(() => {
     instance.refresh();
-  }, [instance, data]);
+  }, [instance, data, pullingUp]);
 
   useImperativeHandle(ref, () => {
     return instance;
   });
 
+  const loadingWrapperTop = pullingDown ? bubbleInit.current.maxTop : loadingTop;
   return (
     <div className={ 'windy-scroll-y-wrapper' } style={style}>
       {
         isOpenPullingDown ?
           pullingDownSnapshot ?
             null :
-            <div className={'loading-wrapper'} style={{ top: pullingDown ? -2 : loadingTop }}>
+            <div
+              className={'loading-wrapper'}
+              style={{
+                top: loadingWrapperTop,
+                opacity: loadingWrapperTop <= bubbleInit.current.loadingTopCorrect ? 0 : 1
+              }}
+            >
               {
                 pullingDown ?
-                  <Loading title={'加载中...'} /> :
+                  <Loading className={'loading-y'} title={'加载中...'} /> :
                   <Bubble
                     y={bubbleY}
                     bubble={bubble}
@@ -222,7 +259,7 @@ const ScrollYFc: ForwardRefRenderFunction<ScrollYInstance, Props> = function (pr
           { children }
           {
             pullingUp ?
-              <Loading /> :
+              <Loading title={'正在加载...'} className={'loading-y'} /> :
               null
           }
         </div>
@@ -231,7 +268,7 @@ const ScrollYFc: ForwardRefRenderFunction<ScrollYInstance, Props> = function (pr
   );
 };
 
-export const ScrollY = forwardRef<ScrollYInstance, Props>(ScrollYFc);
+export const ScrollY = forwardRef<ScrollYInstance, ScrollYProps>(ScrollYFc);
 
 interface BubbleConf {
   ratio: number;
@@ -253,14 +290,13 @@ interface BubbleInstance {
 }
 interface BubbleProps {
   y: number;
-  getInstance?: (instance: BubbleInstance) => void;
   bubble?: { [prop: string]: any };
 }
 const useBubble = (): BubbleInstance => {
   const instance = useRef<BubbleInstance>({} as BubbleInstance);
   return instance.current;
 };
-const Bubble: FC<BubbleProps> = function(props) {
+const BubbleFc: ForwardRefRenderFunction<BubbleInstance, BubbleProps> = function(props, ref) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dataRef = useRef<BubbleConf>({
     ratio: window.devicePixelRatio,
@@ -277,7 +313,7 @@ const Bubble: FC<BubbleProps> = function(props) {
     headRadius: 0,
     distance: 0
   });
-  const { y = 0, getInstance, bubble } = props;
+  const { y = 0, bubble } = props;
   const [ width, setWidth ] = useState<number>(50);
   const [ height, setHeight ] = useState<number>(80);
 
@@ -372,16 +408,16 @@ const Bubble: FC<BubbleProps> = function(props) {
       y: conf.initCenterY
     };
   }, []);
+  // instance
+  const instance = useMemo<BubbleInstance>(() => {
+    return { conf: dataRef.current };
+  }, []);
   // use instance
   useEffect(() => {
-    const instance = { conf: dataRef.current };
-    if (typeof getInstance === 'function') {
-      getInstance(instance);
-    }
     if (bubble && typeof bubble === 'object') {
       Object.assign(bubble, instance);
     }
-  }, [getInstance, bubble]);
+  }, [bubble, instance]);
   // Initial width and height when the component is created
   useEffect(() => {
     const conf = dataRef.current;
@@ -399,6 +435,10 @@ const Bubble: FC<BubbleProps> = function(props) {
     draw();
   }, [width, height, draw]);
 
+  useImperativeHandle(ref, () => {
+    return instance;
+  });
+
   return (
     <canvas
       ref={canvasRef}
@@ -411,3 +451,5 @@ const Bubble: FC<BubbleProps> = function(props) {
     />
   );
 };
+
+const Bubble = forwardRef<BubbleInstance, BubbleProps>(BubbleFc);

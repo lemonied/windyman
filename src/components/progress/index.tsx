@@ -6,7 +6,10 @@ import React, {
   useEffect,
   useRef,
   forwardRef,
-  ForwardRefRenderFunction, useImperativeHandle, useMemo, createRef
+  ForwardRefRenderFunction,
+  useImperativeHandle,
+  useMemo,
+  createRef
 } from 'react';
 import './style.scss';
 import ReactDOM from 'react-dom';
@@ -88,10 +91,10 @@ const LineProgress: FC<LineProgressProps> = function (props) {
 };
 
 interface ProgressInstance {
-  setPercent?: (percent: number) => void;
+  setPercent: (percent: number) => void;
 }
 export const useProgress = (): ProgressInstance => {
-  const instance = useRef<ProgressInstance>({});
+  const instance = useRef<ProgressInstance>({} as ProgressInstance);
   return instance.current;
 };
 type ProgressProps = LineProgressProps | CircleProgressProps;
@@ -127,41 +130,37 @@ const ProgressFc: ForwardRefRenderFunction<ProgressInstance, ProgressProps> = fu
 
 export const Progress = forwardRef<ProgressInstance, ProgressProps>(ProgressFc);
 
+interface ProgressServiceOptions {
+  defaultPercent?: number;
+  height?: number;
+}
 export class ProgressService {
-  ele: Element[] = [];
+  ele: Element | null = null;
+  instance = createRef<ProgressInstance>();
 
-  open(defaultPercent = 0) {
-    const instance = createRef<ProgressInstance>();
+  // 1 ~ 100
+  set(percent: number) {
+    this.instance.current?.setPercent(percent);
+  }
+  open(options: ProgressServiceOptions = {}) {
+    const { defaultPercent = 0, height = 2 } = options;
+    this.destroyAll();
     const container = document.createElement('div');
     container.className = 'progress-container';
     document.body.appendChild(container);
     ReactDOM.render(
-      <Progress type={'line'} percent={defaultPercent} ref={instance} after={null} height={2} />,
-      container
+      <Progress type={'line'} percent={0} ref={this.instance} after={null} height={height} />,
+      container,
+      () => setTimeout(() => this.set(defaultPercent))
     );
-    this.ele.push(container);
-    return {
-      destroy: () => {
-        const index = this.ele.findIndex(val => val === container);
-        if (index > -1) {
-          this.ele.splice(index, 1);
-        }
-        ReactDOM.unmountComponentAtNode(container);
-        container.remove();
-      },
-      set(percent: number) {
-        if (instance.current?.setPercent) {
-          instance.current.setPercent(percent);
-        }
-      }
-    };
+    this.ele = container;
   }
   destroyAll() {
-    this.ele.forEach(ele => {
-      ReactDOM.unmountComponentAtNode(ele);
-      ele.remove();
-    });
+    if (this.ele) {
+      ReactDOM.unmountComponentAtNode(this.ele);
+      this.ele.remove();
+    }
   }
 }
 
-export const progress = new ProgressService();
+export const progressBar = new ProgressService();

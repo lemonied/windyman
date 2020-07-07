@@ -26,6 +26,11 @@
     "mobile"
   ],
   "dependencies": {
+    "@better-scroll/core": "^2.0.0-beta.10",
+    "@better-scroll/pull-up": "^2.0.0-beta.10",
+    "@better-scroll/scroll-bar": "^2.0.0-beta.10",
+    "@better-scroll/slide": "^2.0.0-beta.10",
+    "@better-scroll/wheel": "^2.0.0-beta.10",
     "rc-field-form": "^1.4.4",
     "react-transition-group": "^4.4.1"
   },
