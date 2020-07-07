@@ -14,7 +14,7 @@ React 移动端 UI 框架
 ## 安装
 使用npm
 ```bash
-npm i windyman
+npm i windyman --save
 ```
 使用yarn
 ```bash

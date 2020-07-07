@@ -25,3 +25,5 @@ const Layout: FC<Props> = function(props) {
 export { Layout };
 
 export { Header } from './header';
+
+export { FixedRouter } from './fixed-router';
