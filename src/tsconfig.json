@@ -13,5 +13,8 @@
     "components",
     "common",
     "react-app-env.d.ts"
+  ],
+  "exclude": [
+    "__tests__"
   ]
 }

@@ -6,8 +6,9 @@ const source = resolve(__dirname, '../src').replace(/\\/g, '/');
 const entry = {};
 
 const files = glob.sync(
-  `{${resolve(source, './components/**/{index.tsx,index.ts}')},${resolve(source, './common/**/*.ts')}}`
+  `{${resolve(source, './components/**/{index.tsx,index.ts}')},${resolve(source, './common/**/!(__tests__)/*.ts')}}`
 );
+console.log(files);
 files.forEach(item => {
   entry[item.replace(/(\/)[^/]+$/, '$1index').replace(source, '')] = item;
 });

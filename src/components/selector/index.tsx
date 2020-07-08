@@ -2,7 +2,11 @@ import React, {
   createRef,
   FC,
   forwardRef,
-  ForwardRefRenderFunction, ReactNode, RefObject, useCallback, useEffect,
+  ForwardRefRenderFunction,
+  ReactNode,
+  RefObject,
+  useCallback,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -43,7 +47,12 @@ const SelectorColumn: FC<SelectorColumnProps> = function(props) {
         {
           item.map((val, k) => (
             <div
-              className={combineClassNames('windy-selector-option', activeKey === k ? 'active' : '')}
+              className={
+                combineClassNames('windy-selector-option',
+                  activeKey === k ? 'active' : null,
+                  val.disabled ? 'disabled' : null
+                )
+              }
               key={k}
               onClick={e => onClick(val, key, k)}
             >
@@ -98,6 +107,7 @@ const Selector: FC<SelectorProps> = function(props) {
     setActiveName(column);
   }, []);
   const onClick = useCallback((item: DataItem, key: number, index: number) => {
+    if (item.disabled) { return; }
     valuesRef.current[key] = item.value;
     valuesRef.current.splice(key + 1);
     setSelectedIndex(val => {
