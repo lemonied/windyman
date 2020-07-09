@@ -1,6 +1,6 @@
 import React, {
   Children,
-  cloneElement,
+  cloneElement, CSSProperties,
   FC,
   forwardRef,
   ForwardRefRenderFunction,
@@ -74,9 +74,22 @@ interface YFieldProps extends FieldProps {
   errors?: FieldError[];
   label?: ReactNode;
   requiredTip?: ReactNode;
+  className?: string;
+  style?: CSSProperties;
 }
 const YField: FC<YFieldProps> = function(props) {
-  const { rules = [], name, errors, label, form, initialValue, requiredTip = '该项为必填项', children } = props;
+  const {
+    rules = [],
+    name,
+    errors,
+    label,
+    form,
+    initialValue,
+    requiredTip = '该项为必填项',
+    children,
+    className,
+    style
+  } = props;
   const [value, setValue] = useState(initialValue);
   const [hasArrow, setHasArrow] = useState(false);
   useEffect(() => {
@@ -91,8 +104,8 @@ const YField: FC<YFieldProps> = function(props) {
   const required = useMemo(() => {
     return rules.some((val: any) => val && val.required);
   }, [rules]);
-  const className = useMemo(() => {
-    return combineClassNames('y-label', required ? 'required' : '');
+  const labelClassName = useMemo(() => {
+    return combineClassNames('y-label', required ? 'required' : null);
   }, [required]);
   const showErrorTip = useCallback((e) => {
     e.preventDefault();
@@ -127,11 +140,13 @@ const YField: FC<YFieldProps> = function(props) {
   }, [picker]);
   return (
     <Item
+      className={className}
+      style={style}
       onClick={onItemClick}
       arrow={hasArrow ? 'horizontal' : null}
       prefix={
         label ?
-          <span className={className}>{ label }</span> :
+          <span className={labelClassName}>{ label }</span> :
           null
       }
       extra={

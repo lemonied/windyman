@@ -16,7 +16,15 @@ import BScroll from '@better-scroll/core';
 import Wheel from '@better-scroll/wheel';
 import { combineClassNames } from '../../common/utils';
 import { CSSTransition } from 'react-transition-group';
-import { DataItem, MultiDataChildren, MultiDataManager, MultiDataSet, PickerValues } from './core';
+import {
+  DataItem,
+  MultiDataChildren,
+  MultiDataManager,
+  MultiDataSet,
+  PickerValues,
+  SelectorInterface,
+  SelectorOpenOptions
+} from './core';
 
 BScroll.use(Wheel);
 
@@ -197,7 +205,11 @@ export class PickerModal extends Component<PickerModalProps, PickerModalState> {
         );
         this.values = this.dataManager.values;
         this.sourceValues = this.dataManager.sourceValues;
-        onSubmit(this.values);
+        if (this.sourceValues.some(item => item.disabled)) {
+          onSubmit();
+        } else {
+          onSubmit(this.values);
+        }
       } else {
         onSubmit();
       }
@@ -265,23 +277,32 @@ export class PickerModal extends Component<PickerModalProps, PickerModalState> {
 /*
 * class PickerService
 */
-export interface PickerServiceOptions {
-  data: MultiDataChildren | MultiDataSet;
-  defaultValue?: PickerValues;
-  title?: ReactNode;
-  wrapperClassName?: string;
-}
-export class PickerService {
+
+export class PickerService implements SelectorInterface {
   ele: Element | null = null;
   dataManager: MultiDataManager;
-  pickerModal: RefObject<PickerModal> = createRef<PickerModal>();
+  ref: RefObject<PickerModal> = createRef<PickerModal>();
   constructor(multi: number) {
     this.dataManager = new MultiDataManager(multi);
   }
-  open(options: PickerServiceOptions): Promise<any> {
+  setData(data: MultiDataChildren | MultiDataSet) {
+    if (this.ref.current) {
+      this.ref.current.setData(data);
+    } else {
+      this.dataManager.setData(data);
+    }
+  }
+  setValue(value?: PickerValues) {
+    if (this.ref.current) {
+      this.ref.current.setValue(value);
+    } else {
+      this.dataManager.setValues(value);
+    }
+  }
+  open(options: SelectorOpenOptions): Promise<any> {
     this.destroy();
     return new Promise((resolve, reject) => {
-      const {data, defaultValue, title, wrapperClassName} = options;
+      const { data, defaultValue, title, wrapperClassName } = options;
       const container = document.createElement('div');
       this.ele = container;
       container.className = 'picker-container';
@@ -290,7 +311,7 @@ export class PickerService {
       this.dataManager.setValues(defaultValue);
       ReactDOM.render(
         <PickerModal
-          ref={this.pickerModal}
+          ref={this.ref}
           onSubmit={e => resolve(e)}
           title={title}
           wrapperClassName={wrapperClassName}
@@ -299,13 +320,13 @@ export class PickerService {
         />,
         container,
         () => {
-          this.pickerModal.current?.show();
+          this.ref.current?.show();
         }
       );
     });
   }
   destroy() {
-    this.pickerModal = createRef();
+    this.ref = createRef();
     if (this.ele) {
       ReactDOM.unmountComponentAtNode(this.ele);
       this.ele.remove();

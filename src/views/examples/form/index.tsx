@@ -4,6 +4,7 @@ import { useForm } from 'rc-field-form';
 import { Input } from '../../../components/input';
 import { post } from '../../../helpers/http';
 import { YField, YForm } from '../../../components/y-form';
+import { Multinput } from '../../../components/multinput';
 
 const demoDataSet = [
   [{name: '红色', value: 1}, {name: '白色', value: 2}, {name: '绿色', value: 3}],
@@ -143,6 +144,12 @@ const YFormDemo: FC<any> = function(): JSX.Element {
           }]}
         >
           <Input placeholder={'密码输入框'} type={'password'} />
+        </YField>
+        <YField
+          name={'multi'}
+          label={'多项选择'}
+        >
+          <Multinput column={2} data={city} placeholder={'选择多个城市'} />
         </YField>
       </YForm>
     </Layout>

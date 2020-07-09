@@ -6,7 +6,7 @@ import React, { CSSProperties, FC, ReactNode, useCallback, useEffect, useMemo, u
 import { MultiDataChildren, MultiDataSet, PickerValues } from '../../picker/core';
 import { SelectorService } from '../../selector';
 
-interface PickerSharedProps {
+export interface PickerSharedProps {
   placeholder?: string;
   value?: PickerValues;
   picker?: PickerInputInstance;
@@ -33,59 +33,48 @@ export const usePicker = (): PickerInputInstance => {
 const PickerInput: FC<PickerInputProps> = function(props) {
   const { data, value = '', onChange, placeholder, column = 1, title, wrapperClassName, formatNames, defaultSelectedValues, picker, className, style } = props;
   const [currentValue, setCurrentValue] = useState<string>('');
-  const pickerService = useMemo(() => {
-    return new PickerService(column);
-  }, [column]);
+  const pickerServiceRef = useRef<PickerService>(new PickerService(column));
 
   const emitChange = useCallback(() => {
     let emitValue: string | number | Array<string | number> = '';
-    if (column === 1 && pickerService.dataManager.values.length) {
-      emitValue = pickerService.dataManager.values[0];
+    if (column === 1 && pickerServiceRef.current.dataManager.values.length) {
+      emitValue = pickerServiceRef.current.dataManager.values[0];
     } else if (column > 1) {
-      emitValue = pickerService.dataManager.values;
+      emitValue = pickerServiceRef.current.dataManager.values;
     }
     if (typeof onChange === 'function') {
       onChange(emitValue);
     }
-  }, [column, onChange, pickerService]);
+  }, [column, onChange]);
   // Echo Names
   const echoNames = useCallback(() => {
     let valueNames: string;
     if (typeof formatNames === 'function') {
-      valueNames = formatNames(pickerService.dataManager.sourceValues);
+      valueNames = formatNames(pickerServiceRef.current.dataManager.sourceValues);
     } else {
-      valueNames = pickerService.dataManager.sourceValues.map(item => item.name).join(' ');
+      valueNames = pickerServiceRef.current.dataManager.sourceValues.map(item => item.name).join(' ');
     }
     setCurrentValue(valueNames);
-  }, [formatNames, pickerService]);
+  }, [formatNames]);
   // Echo Input
   const echoDisplay = useCallback((value: (string | number)[]) => {
-    if (pickerService.pickerModal.current) {
-      pickerService.pickerModal.current.setValue(value);
-    } else {
-      pickerService.dataManager.setValues(value);
-    }
+    pickerServiceRef.current.setValue(value);
     echoNames();
     emitChange();
-  }, [emitChange, pickerService, echoNames]);
+  }, [emitChange, echoNames]);
   // Echo Picker
   const echoPicker = useCallback((data: MultiDataSet | MultiDataChildren, value?: PickerValues) => {
-    if (pickerService.pickerModal.current) {
-      pickerService.pickerModal.current.setData(data);
-      pickerService.pickerModal.current.setValue(value);
-    } else {
-      pickerService.dataManager.setValues(value);
-      pickerService.dataManager.setData(data);
-    }
+    pickerServiceRef.current.setData(data);
+    pickerServiceRef.current.setValue(value);
     echoNames();
-  }, [pickerService, echoNames]);
+  }, [echoNames]);
   const showPicker = useCallback((e?: React.MouseEvent) => {
     e?.stopPropagation();
     e?.preventDefault();
-    const defaultValue = !pickerService.dataManager.values.length && defaultSelectedValues ?
+    const defaultValue = !pickerServiceRef.current.dataManager.values.length && defaultSelectedValues ?
       defaultSelectedValues :
-      pickerService.dataManager.values;
-    pickerService.open({
+      pickerServiceRef.current.dataManager.values;
+    pickerServiceRef.current.open({
       title,
       data: data,
       defaultValue,
@@ -95,11 +84,11 @@ const PickerInput: FC<PickerInputProps> = function(props) {
         echoDisplay(res);
       }
     });
-  }, [echoDisplay, pickerService, title, wrapperClassName, defaultSelectedValues, data]);
+  }, [echoDisplay, title, wrapperClassName, defaultSelectedValues, data]);
+
   useEffect(() => {
     echoPicker(data, value);
   }, [data, value, echoPicker]);
-
   useEffect(() => {
     if (picker) {
       Object.assign(picker, {
@@ -107,6 +96,12 @@ const PickerInput: FC<PickerInputProps> = function(props) {
       });
     }
   }, [picker, showPicker]);
+  useEffect(() => {
+    const pickerService = pickerServiceRef.current;
+    return () => {
+      pickerService.destroy();
+    };
+  }, []);
   return (
     <input style={style} className={className} type="text" onClick={showPicker} placeholder={placeholder} value={currentValue} readOnly={true} />
   );
@@ -121,54 +116,43 @@ const SelectorInput: FC<SelectorInputProps> = function(props) {
   const { placeholder, picker, data, value, column = 3, formatNames, onChange, title, style, className, wrapperClassName } = props;
 
   const [currentValue, setCurrentValue] = useState<string>('');
-  const selector = useMemo(() => {
-    return new SelectorService(column);
-  }, [column]);
+  const selectorRef = useRef<SelectorService>(new SelectorService(column));
 
   // Emit Change
   const emitChange = useCallback(() => {
     if (typeof onChange !== 'undefined') {
-      onChange(selector.dataManager.values);
+      onChange(selectorRef.current.dataManager.values);
     }
-  }, [onChange, selector]);
+  }, [onChange]);
   // Echo Names
   const echoNames = useCallback(() => {
     let names: string = '';
     if (typeof formatNames === 'function') {
-      names = formatNames(selector.dataManager.sourceValues);
+      names = formatNames(selectorRef.current.dataManager.sourceValues);
     } else {
-      names = selector.dataManager.sourceValues.map(item => item.name).join(' ');
+      names = selectorRef.current.dataManager.sourceValues.map(item => item.name).join(' ');
     }
     setCurrentValue(names);
-  }, [formatNames, selector]);
+  }, [formatNames]);
   // Echo Input
   const echoDisplay = useCallback((value: (string | number)[]) => {
-    if (selector.ref.current) {
-      selector.ref.current.setValue(value);
-    } else {
-      selector.dataManager.setValues(value);
-    }
+    selectorRef.current.setValue(value);
     echoNames();
     emitChange();
-  }, [selector, echoNames, emitChange]);
+  }, [echoNames, emitChange]);
   const echoSelector = useCallback((data: MultiDataChildren | MultiDataSet, values?: PickerValues) => {
-    if (selector.ref.current) {
-      selector.ref.current.setData(data);
-      selector.ref.current.setValue(values);
-    } else {
-      selector.dataManager.setData(data);
-      selector.dataManager.setValues(values);
-    }
+    selectorRef.current.setData(data);
+    selectorRef.current.setValue(values);
     echoNames();
-  }, [selector, echoNames]);
+  }, [echoNames]);
 
   const instance = useMemo<PickerInputInstance>(() => {
 
     return {
       open() {
-        selector.open({
+        selectorRef.current.open({
           data,
-          defaultValue: selector.dataManager.values,
+          defaultValue: selectorRef.current.dataManager.values,
           title,
           wrapperClassName
         }).then(res => {
@@ -176,7 +160,7 @@ const SelectorInput: FC<SelectorInputProps> = function(props) {
         });
       }
     };
-  }, [data, selector, echoDisplay, title, wrapperClassName]);
+  }, [data, echoDisplay, title, wrapperClassName]);
 
   const showSelector = useCallback((e?: any) => {
     e?.preventDefault();
@@ -191,10 +175,15 @@ const SelectorInput: FC<SelectorInputProps> = function(props) {
       Object.assign(picker, instance);
     }
   }, [picker, instance]);
-
   useEffect(() => {
     echoSelector(data, value);
   }, [data, value, echoSelector]);
+  useEffect(() => {
+    const selector = selectorRef.current;
+    return () => {
+      selector.destroy();
+    };
+  }, []);
 
   return (
     <input

@@ -15,7 +15,14 @@ import React, {
 import ReactDOM from 'react-dom';
 import './style.scss';
 import { CSSTransition } from 'react-transition-group';
-import { DataItem, MultiDataChildren, MultiDataManager, MultiDataSet, PickerValues } from '../picker/core';
+import {
+  DataItem,
+  MultiDataChildren,
+  MultiDataManager,
+  MultiDataSet,
+  PickerValues,
+  SelectorInterface, SelectorOpenOptions
+} from '../picker/core';
 import { combineClassNames } from '../../common/utils';
 import { ScrollY, useScrollY } from '../scroll-y';
 import { Icon } from '../icon';
@@ -270,13 +277,7 @@ const SelectorModalFc: ForwardRefRenderFunction<SelectorModalInstance, SelectorM
 
 const SelectorModal = forwardRef<SelectorModalInstance, SelectorModalProps>(SelectorModalFc);
 
-interface SelectorServiceOption {
-  data: MultiDataSet | MultiDataChildren;
-  defaultValue?: PickerValues;
-  title?: ReactNode;
-  wrapperClassName?: string;
-}
-export class SelectorService {
+export class SelectorService implements SelectorInterface {
   ele: Element | null = null;
   dataManager: MultiDataManager;
   ref: RefObject<SelectorModalInstance> = createRef<SelectorModalInstance>();
@@ -284,8 +285,22 @@ export class SelectorService {
     this.dataManager = new MultiDataManager(multi);
   }
 
-  open(options: SelectorServiceOption): Promise<any> {
-    const { data = [], title, defaultValue, wrapperClassName } = options;
+  setData(data: MultiDataChildren | MultiDataSet) {
+    if (this.ref.current) {
+      this.ref.current.setData(data);
+    } else {
+      this.dataManager.setData(data);
+    }
+  }
+  setValue(value?: PickerValues) {
+    if (this.ref.current) {
+      this.ref.current.setValue(value);
+    } else {
+      this.dataManager.setValues(value);
+    }
+  }
+  open(options: SelectorOpenOptions): Promise<any> {
+    const { data, title, defaultValue, wrapperClassName } = options;
     this.destroy();
     return new Promise((resolve, reject) => {
       const container = document.createElement('div');

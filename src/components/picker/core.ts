@@ -1,7 +1,7 @@
-import { ReactNode } from 'react';
+import { ReactNode, RefObject } from 'react';
 
 export interface DataItem {
-  name: string | number | ReactNode;
+  name: ReactNode;
   value: string | number;
   disabled?: boolean;
   [prop: string]: any;
@@ -12,6 +12,21 @@ export interface MultiPickerDataItem extends DataItem {
 export type MultiDataChildren = MultiPickerDataItem[];
 export type MultiDataSet = MultiPickerDataItem[][];
 export type PickerValues = string | number | (string | number)[];
+
+export interface SelectorOpenOptions {
+  data?: MultiDataChildren | MultiDataSet;
+  defaultValue?: PickerValues;
+  title?: ReactNode;
+  wrapperClassName?: string;
+}
+export interface SelectorInterface {
+  ele: Element | null;
+  dataManager: MultiDataManager;
+  ref: RefObject<any>;
+  open(options: SelectorOpenOptions): Promise<any>;
+  setData(data: MultiDataSet | MultiDataChildren): void;
+  setValue(values?: PickerValues): void;
+}
 
 /*
 * Data Manager
@@ -43,6 +58,21 @@ export class MultiDataManager {
   }
   static isMultiDataSet(data: MultiDataChildren | MultiDataSet): data is MultiDataSet {
     return data.every((item: any) => Array.isArray(item));
+  }
+  disableSomeone(values: PickerValues) {
+    if (!Array.isArray(values)) {
+      values = [values];
+    }
+    const length = Math.min(this.dataSet.length, values.length);
+    for (let i = 0; i < length; i++) {
+      const index = this.dataSet[i].findIndex(val => val.value === (values as (string | number)[])[i]);
+      if (index === -1) {
+        break;
+      }
+      if (i === length - 1) {
+        this.dataSet[i][index].disabled = true;
+      }
+    }
   }
   setData(data?: MultiDataChildren | MultiDataSet) {
     if (data) {
