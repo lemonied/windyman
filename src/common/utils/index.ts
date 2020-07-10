@@ -23,14 +23,13 @@ export function isEmpty(val: any): boolean {
 
 // return a new object.
 export function deepMerge(...args: any[]): any {
-  let ret: any;
-  if (args.every(item => Array.isArray(item))) {
-    ret = [];
-  } else if (args.every(item => isPlainObject(item))) {
-    ret = Object.create(null);
-  } else {
-    throw new Error('Arguments must be all objects or arrays');
+  if (args.length < 1) {
+    return null;
   }
+  if (args.some(item => !isPlainObject(item) && !Array.isArray(item))) {
+    throw new Error('Arguments must be all object or array');
+  }
+  const ret = Array.isArray(args[0]) ? [] : Object.create(null);
   function deep(val: any, key: any) {
     if (isPlainObject(val)) {
       if (isPlainObject(ret[key])) {
@@ -38,8 +37,12 @@ export function deepMerge(...args: any[]): any {
       } else {
         ret[key] = deepMerge(val);
       }
-    } else if (Array.isArray(val) && Array.isArray(ret[key])) {
-      ret[key] = deepMerge(ret[key], val);
+    } else if (Array.isArray(val)) {
+      if (Array.isArray(ret[key])) {
+        ret[key] = deepMerge(ret[key], val);
+      } else {
+        ret[key] = deepMerge(val);
+      }
     } else {
       ret[key] = val;
     }

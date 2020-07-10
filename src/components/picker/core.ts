@@ -37,6 +37,7 @@ export class MultiDataManager {
   values: (string | number)[] = [];
   sourceValues: MultiDataChildren = [];
   selectedIndex: number[] = [];
+  realSelectedIndex: number[] = [];
   multi = 1;
   constructor(multi = 1) {
     this.multi = multi;
@@ -122,11 +123,13 @@ export class MultiDataManager {
     const data = this.dataSet;
     this.sourceValues = [];
     this.selectedIndex = [];
+    this.realSelectedIndex = [];
     data.forEach((item, key) => {
       const value = this.values[key];
       const index = item.findIndex(val => val.value === value);
       this.selectedIndex.push(Math.max(0, index));
       if (index > -1) {
+        this.realSelectedIndex.push(index);
         this.sourceValues.push(item[index]);
       }
     });

@@ -203,7 +203,7 @@ export const useSelectors = (): SelectorModalInstance => {
 const SelectorModalFc: ForwardRefRenderFunction<SelectorModalInstance, SelectorModalProps> = function(props, ref) {
   const { afterClose, dataManager, onSubmit, title, wrapperClassName } = props;
 
-  const defaultSelectedRef = useRef(dataManager.values.length ? dataManager.selectedIndex : []);
+  const defaultSelectedRef = useRef(dataManager.values.length ? dataManager.realSelectedIndex : []);
 
   const [ show, setShow ] = useState(false);
   const [ data, setDatas ] = useState<MultiDataSet>(dataManager.dataSet);

@@ -91,7 +91,7 @@ const YField: FC<YFieldProps> = function(props) {
     style
   } = props;
   const [value, setValue] = useState(initialValue);
-  const [hasArrow, setHasArrow] = useState(false);
+  const [hasArrow, setHasArrow] = useState<boolean>(false);
   useEffect(() => {
     if (form && name) {
       setValue(form.getFieldValue(name));
@@ -134,10 +134,13 @@ const YField: FC<YFieldProps> = function(props) {
     return children;
   }, [children, picker]);
   const onItemClick = useCallback((e) => {
+    if (!hasArrow) {
+      return;
+    }
     if (picker.open) {
       picker.open();
     }
-  }, [picker]);
+  }, [hasArrow, picker]);
   return (
     <Item
       className={className}

@@ -6,21 +6,41 @@
   color: #666666;
 }
 .windy-multinput-list{
-  .windy-multinput-item{
+  .windy-multinput-item {
     display: inline-block;
     padding: 5px 26px 5px 8px;
     border: 1px solid #d9d9d9;
     margin: 2px;
     font-size: 14px;
     position: relative;
-    .windy-multinput-del{
+    vertical-align: middle;
+
+    .windy-multinput-del {
       @include extend-click;
       position: absolute;
-      color: #333333;
-      right: 8px;
+      color: #666666;
+      right: 6px;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 12px;
+      font-size: 14px;
+
+      &:active {
+        color: #333333;
+        transform: scale(1.1) translate(50%);
+        transform-origin: 50% 0;
+      }
+
+      transition: transform ease 0.2s;
     }
+  }
+  .windy-multinput-plus{
+    display: inline-block;
+    padding: 5px 10px;
+    font-size: 16px;
+    vertical-align: middle;
+    &:active{
+      transform: scale(1.1);
+    }
+    transition: transform ease 0.2s;
   }
 }

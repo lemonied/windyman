@@ -33,11 +33,13 @@ interface MultinputProps {
   wrapperClassName?: string;
   picker?: PickerSharedProps['picker'];
   formatNames?: (values: DataItem[][]) => ReactNode[];
+  maxNum?: number;
 }
 const MultinputFc: ForwardRefRenderFunction<MultinputInstance, MultinputProps> = function(props, ref) {
-  const { placeholder, type = 'picker', column = 3, title, data, wrapperClassName, picker, hasArrow, onChange, formatNames, value } = props;
+  const { placeholder, type = 'picker', column = 3, title, data, wrapperClassName, picker, hasArrow, onChange, formatNames, value, maxNum = 3 } = props;
 
   const [ currentValue, setCurrentValue ] = useState<ReactNode[]>([]);
+  const [ showPlus, setShowPlus ] = useState<boolean>(false);
   const serviceRef = useRef<(PickerService | SelectorService)>(
     type === 'picker' ? new PickerService(column) : new SelectorService(column)
   );
@@ -65,8 +67,12 @@ const MultinputFc: ForwardRefRenderFunction<MultinputInstance, MultinputProps> =
     } else {
       valueNames = valuesRef.current.map(item => item.map(val => val.name).join(' '));
     }
+    if (typeof hasArrow === 'function') {
+      hasArrow(valuesRef.current.length === 0);
+    }
+    setShowPlus(valuesRef.current.length < maxNum);
     setCurrentValue(valueNames);
-  }, [formatNames]);
+  }, [formatNames, hasArrow, maxNum]);
   // Echo display(onSubmit)
   const echoDisplay = useCallback((value: (string | number)[]) => {
     const dataManager = dataManagerRef.current;
@@ -100,6 +106,9 @@ const MultinputFc: ForwardRefRenderFunction<MultinputInstance, MultinputProps> =
     currentColumnRef.current = typeof index === 'undefined' ? valuesRef.current.length : index;
     serviceRef.current.setData(deepMerge(data));
     disableItem();
+    const oldValue = serviceRef.current.dataManager.values.slice(0);
+    oldValue.splice(-1);
+    serviceRef.current.setValue(oldValue);
     serviceRef.current.open({
       title,
       wrapperClassName,
@@ -131,13 +140,12 @@ const MultinputFc: ForwardRefRenderFunction<MultinputInstance, MultinputProps> =
     e.preventDefault();
     modal.confirm({content: `是否删除 ${currentValue[index]} ?`}).then(res => {
       if (res) {
-        echoPicker(
-          data,
-          valuesRef.current.filter((item, key) => key !== index).map(item => item.map(val => val.value))
-        );
+        valuesRef.current = valuesRef.current.filter((item, key) => key !== index);
+        emitChange();
+        echoNames();
       }
     });
-  }, [currentValue, echoPicker, data]);
+  }, [currentValue, emitChange, echoNames]);
 
   useEffect(() => {
     echoPicker(data, value);
@@ -147,7 +155,7 @@ const MultinputFc: ForwardRefRenderFunction<MultinputInstance, MultinputProps> =
       Object.assign(picker, instance);
     }
     if (typeof hasArrow === 'function') {
-      hasArrow(true);
+      hasArrow(valuesRef.current.length === 0);
     }
   }, [picker, instance, hasArrow]);
   useEffect(() => {
@@ -167,9 +175,16 @@ const MultinputFc: ForwardRefRenderFunction<MultinputInstance, MultinputProps> =
           currentValue.map((item, key) => (
             <li key={key} className={'windy-multinput-item'} onClick={e => onClick(e, key)}>
               {item}
-              <Icon onClick={e => onDel(e, key)} className={'windy-multinput-del'} type={'times'} />
+              <Icon onClick={e => onDel(e, key)} className={'windy-multinput-del'} type={'close-circle'} />
             </li>
           ))
+        }
+        {
+          showPlus ?
+            <li className={'windy-multinput-plus'} onClick={onClick}>
+              <Icon type={'plus-circle'} className={'windy-multinput-plus-icon'} />
+            </li> :
+            null
         }
       </ul>
     );

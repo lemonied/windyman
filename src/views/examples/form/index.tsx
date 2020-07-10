@@ -149,7 +149,23 @@ const YFormDemo: FC<any> = function(): JSX.Element {
           name={'multi'}
           label={'多项选择'}
         >
-          <Multinput column={2} data={city} placeholder={'选择多个城市'} />
+          <Multinput column={2} maxNum={4} data={city} placeholder={'选择多个城市'} />
+        </YField>
+        <YField
+          name={'multi2'}
+          label={'多项选择 2'}
+          rules={[{
+            required: true
+          }, {
+            validator(rule, value) {
+              if (value.length > 1) {
+                return Promise.resolve();
+              }
+              return Promise.reject('至少选择两项');
+            }
+          }]}
+        >
+          <Multinput type={'selector'} column={3} maxNum={4} data={city} placeholder={'选择多个城市'} />
         </YField>
       </YForm>
     </Layout>
