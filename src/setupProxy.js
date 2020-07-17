@@ -11,7 +11,27 @@ module.exports = function (app) {
     },
     changeOrigin: true,
     secure: false,
-    timeout: 10000,
+    timeout: 20000,
+    logLevel: 'debug'
+  }));
+  app.use('/cgi-bin', createProxyMiddleware({
+    target: 'https://u.y.qq.com',
+    headers: {
+      referer: 'https://u.y.qq.com'
+    },
+    changeOrigin: true,
+    secure: false,
+    timeout: 20000,
+    logLevel: 'debug'
+  }));
+  app.use('/lyric', createProxyMiddleware({
+    target: 'https://c.y.qq.com',
+    headers: {
+      referer: 'https://c.y.qq.com'
+    },
+    changeOrigin: true,
+    secure: false,
+    timeout: 20000,
     logLevel: 'debug'
   }));
   app.use('/socket.io', createProxyMiddleware({

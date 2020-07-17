@@ -1,4 +1,4 @@
-import React, { Component, ReactNode, createRef } from 'react';
+import React, { Component, ReactNode, createRef, ReactElement } from 'react';
 import ReactDOM from 'react-dom';
 import './style.scss';
 import { CSSTransition } from 'react-transition-group';
@@ -72,6 +72,38 @@ export class Modal extends Component<Props, any> {
   }
 }
 
+interface ToastProps {
+  content?: ReactNode;
+}
+interface ToastState {
+  show: boolean;
+}
+export class Toast extends Component<ToastProps, ToastState> {
+  readonly state = {
+    show: false
+  };
+  show() {
+    this.setState({ show: true });
+  }
+  hide() {
+    this.setState({ show: false });
+  }
+  render() {
+    const { content } = this.props;
+    const { show } = this.state;
+
+    return (
+      <CSSTransition
+        classNames={'windy-toast'}
+        timeout={300}
+        in={show}
+      >
+        <div className={'windy-toast-modal'}>{ content }</div>
+      </CSSTransition>
+    );
+  }
+}
+
 interface PromptInputProps {
   rules?: Rule[];
   placeholder?: string;
@@ -99,11 +131,6 @@ class PromptInput extends Component<PromptInputProps, any> {
   }
 }
 
-interface ModalServiceOptions {
-  title: string;
-  content: ReactNode;
-  footer: Footer[];
-}
 interface ConfirmOptions {
   title?: string;
   cancelText?: string;
@@ -122,103 +149,135 @@ export class ModalService {
   ele: Element[] = [];
 
   create(
-    options: ModalServiceOptions,
-    callback?: (result?: any) => void
-  ): { close(): void; } {
-    const { title, content, footer } = options;
+    ele: ReactElement,
+    callback?: () => void
+  ): HTMLElement {
     const container = document.createElement('div');
     container.className = 'modal-container';
     document.body.appendChild(container);
-    const instance = createRef<Modal>();
-    ReactDOM.render(
-      <Modal
-        ref={ instance }
-        header={ title }
-        content={ content }
-        maskClick={ callback }
-        footer={ footer }
-      />,
-      container
-    );
+    ReactDOM.render(ele, container, callback);
     this.ele.push(container);
-    instance.current?.show();
-    return {
-      close: () => {
-        instance.current?.hide();
-        setTimeout(() => this.destroy(container), 300);
-      }
-    };
+    return container;
   }
   confirm(
     options: ConfirmOptions
   ): Promise<boolean> {
     const { title = '提示', content, cancelText = '取消', confirmText = '确定' } = options;
+    const instance = createRef<Modal>();
+    const close = (ele: HTMLElement) => {
+      instance.current?.hide();
+      setTimeout(() => this.destroy(ele), 500);
+    };
     return new Promise((resolve, reject) => {
-      const works = this.create({
-        title,
-        content,
-        footer: (
-          [{
-            text: cancelText,
-            callback: () => {
-              works.close();
-              resolve();
-            }
-          }, {
-            text: confirmText,
-            callback: () => {
-              works.close();
-              resolve(true);
-            }
-          }]
-        )
-      });
+      const container = this.create(
+        <Modal
+          ref={ instance }
+          header={ title }
+          content={ content }
+          maskClick={ e => close(container) }
+          footer={
+            [{
+              text: cancelText,
+              callback: () => {
+                close(container);
+                resolve(false);
+              }
+            }, {
+              text: confirmText,
+              callback: () => {
+                close(container);
+                resolve(true);
+              }
+            }]
+          }
+        />,
+        () => instance.current?.show()
+      );
     });
   }
   prompt(
     options: PromptOptions
-  ): Promise<boolean> {
+  ): Promise<any> {
     const { title = '提示', cancelText = '取消', confirmText = '确定', placeholder, rules, initialValue } = options;
     const prompt = createRef<PromptInput>();
+    const instance = createRef<Modal>();
+    const close = (ele: HTMLElement) => {
+      instance.current?.hide();
+      setTimeout(() => this.destroy(ele), 500);
+    };
     return new Promise((resolve, reject) => {
-      const works = this.create({
-        title,
-        content: <PromptInput ref={prompt} placeholder={placeholder} rules={rules} initialValue={initialValue} />,
-        footer: (
-          [{
-            text: cancelText,
-            callback: () => {
-              works.close();
-              resolve();
-            }
-          }, {
-            text: confirmText,
-            callback: () => {
-              if (prompt.current) {
-                prompt.current.ref.current?.validateFields().then(val => {
-                  works.close();
-                  resolve(val.prompt);
-                });
+      const container = this.create(
+        <Modal
+          ref={instance}
+          header={title}
+          content={
+            <PromptInput ref={prompt} placeholder={placeholder} rules={rules} initialValue={initialValue} />
+          }
+          footer={
+            [{
+              text: cancelText,
+              callback: () => {
+                close(container);
+                resolve();
               }
-            }
-          }]
-        )
-      });
+            }, {
+              text: confirmText,
+              callback: () => {
+                if (prompt.current) {
+                  prompt.current.ref.current?.validateFields().then(val => {
+                    close(container);
+                    resolve(val.prompt);
+                  });
+                }
+              }
+            }]
+          }
+        />,
+        () => instance.current?.show()
+      );
     });
   }
   alert(content: ReactNode, confirmText = '好的'): Promise<boolean> {
+    const instance = createRef<Modal>();
+    const close = (ele: HTMLElement) => {
+      instance.current?.hide();
+      setTimeout(() => this.destroy(ele), 500);
+    };
     return new Promise((resolve, reject) => {
-      const works = this.create({
-        title: '提示',
-        content,
-        footer: [{
-          text: confirmText,
-          callback: () => {
-            works.close();
-            resolve(true);
+      const container = this.create(
+        <Modal
+          ref={instance}
+          header={'提示'}
+          content={content}
+          footer={
+            [{
+              text: confirmText,
+              callback: () => {
+                close(container);
+                resolve(true);
+              }
+            }]
           }
-        }]
-      });
+        />,
+        () => instance.current?.show()
+      );
+    });
+  }
+  toast(content: ReactNode, timeout = 3000): Promise<boolean> {
+    const instance = createRef<Toast>();
+    return new Promise((resolve, reject) => {
+      const container = this.create(
+        <Toast
+          ref={instance}
+          content={content}
+        />,
+        () => instance.current?.show()
+      );
+      setTimeout(() => {
+        instance.current?.hide();
+        resolve(true);
+        setTimeout(() => this.destroy(container), 500);
+      }, timeout);
     });
   }
 

@@ -36,11 +36,11 @@ export function http(params: RequestConfig): Observable<any> {
   });
 }
 
-export function get(url: string, params: { [prop: string]: any }): Observable<any> {
+export function get(url: string, params?: { [prop: string]: any }): Observable<any> {
   return http({ method: 'get', url, data: params });
 }
 
-export function post(url: string, data: { [prop: string]: any }): Observable<any> {
+export function post(url: string, data?: { [prop: string]: any } | string): Observable<any> {
   return http({ method: 'post', url, data: queryString(data) });
 }
 

@@ -9,6 +9,7 @@
   padding: 8px 0;
   position: relative;
   min-height: 30px;
+  z-index: 1;
   .back-icon{
     path{
       fill: $color-theme;

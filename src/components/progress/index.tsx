@@ -13,6 +13,7 @@ import React, {
 } from 'react';
 import './style.scss';
 import ReactDOM from 'react-dom';
+import { combineClassNames } from '../../common/utils';
 
 const DefaultAppend:FC<{percent: number;}> = function(props) {
   const { percent = 0 } = props;
@@ -27,16 +28,17 @@ interface NormalProgressProps {
   after?: ReactNode;
   middle?: ReactNode;
   height?: number;
+  className?: string;
 }
 
 interface CircleProgressProps extends NormalProgressProps {
   type?: 'circle';
 }
 const CircleProgress: FC<CircleProgressProps> = function(props) {
-  const { percent, middle } = props;
+  const { percent, middle, className } = props;
 
   return (
-    <div className={'windy-circle-progress'}>
+    <div className={combineClassNames('windy-circle-progress', className)}>
       <svg className="circle-progress" viewBox="0 0 100 100">
         <path
           style={{ strokeDasharray: `${94 * 3.14}px, ${94 * 3.14}px` }}
@@ -71,10 +73,10 @@ interface LineProgressProps extends NormalProgressProps {
   type?: 'line';
 }
 const LineProgress: FC<LineProgressProps> = function (props) {
-  const { percent = 0, after, height = 5 } = props;
+  const { percent = 0, after, height = 5, className } = props;
 
   return (
-    <div className={'windy-progress-outer'}>
+    <div className={combineClassNames('windy-progress-outer', className)}>
       <div className={'windy-progress-inner'} style={{height}}>
         <div className={'windy-progress-bg'} style={{width: `${percent}%`}} />
       </div>
@@ -99,7 +101,7 @@ export const useProgress = (): ProgressInstance => {
 };
 type ProgressProps = LineProgressProps | CircleProgressProps;
 const ProgressFc: ForwardRefRenderFunction<ProgressInstance, ProgressProps> = function(props, ref) {
-  const { type = 'line', percent = 0, progress, after, middle, height } = props;
+  const { type = 'line', percent = 0, progress, after, middle, height, className } = props;
   const [count, setCount] = useState(percent);
   useEffect(() => {
     setCount(percent);
@@ -120,9 +122,9 @@ const ProgressFc: ForwardRefRenderFunction<ProgressInstance, ProgressProps> = fu
 
   switch (type) {
     case 'line':
-      return <LineProgress percent={count} after={after} height={height} />;
+      return <LineProgress percent={count} after={after} height={height} className={className} />;
     case 'circle':
-      return <CircleProgress percent={count} middle={middle} />;
+      return <CircleProgress percent={count} middle={middle} className={className} />;
     default:
       return null;
   }

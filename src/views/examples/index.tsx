@@ -13,6 +13,7 @@ import { IconDemo } from './icon';
 import { SliderDemo } from './slider';
 import { ScrollXDemo } from './scroll-x';
 import { ButtonDemo } from './button';
+import { PlayerDemo } from './player';
 
 const Examples: FC<any> = function(): JSX.Element {
 
@@ -31,6 +32,7 @@ const Examples: FC<any> = function(): JSX.Element {
           <Route path={'/example/slider'} component={SliderDemo} exact={true} />
           <Route path={'/example/scroll-x'} component={ScrollXDemo} exact={true} />
           <Route path={'/example/button'} component={ButtonDemo} exact={true} />
+          <Route path={'/example/player'} component={PlayerDemo} exact={true} />
         </FixedRouter>
       }
     >
@@ -44,6 +46,7 @@ const Examples: FC<any> = function(): JSX.Element {
           <Item link={'/example/icon'} arrow={'horizontal'} extra={'图标'}>Icon</Item>
           <Item link={'/example/slider'} arrow={'horizontal'} extra={'轮播图'}>Slider</Item>
           <Item link={'/example/button'} arrow={'horizontal'} extra={'按钮'}>Button</Item>
+          <Item link={'/example/player'} arrow={'horizontal'} extra={'音乐播放器'}>Player</Item>
         </List>
       </div>
     </Layout>

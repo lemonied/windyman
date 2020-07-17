@@ -44,6 +44,11 @@ const ModalDemo: FC = function(): JSX.Element {
       }
     });
   }, []);
+  const onToast = useCallback(() => {
+    modal.toast('这是一句话').then(() => {
+      // after closed
+    });
+  }, []);
 
   return (
     <Layout
@@ -60,6 +65,9 @@ const ModalDemo: FC = function(): JSX.Element {
         </Item>
         <Item>
           <Button onClick={onPrompt} ghost>Prompt</Button>
+        </Item>
+        <Item>
+          <Button type={'warn'} onClick={onToast} ghost>Toast</Button>
         </Item>
       </List>
     </Layout>

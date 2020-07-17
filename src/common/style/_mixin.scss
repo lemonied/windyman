@@ -29,6 +29,7 @@
   &:before{
     content: '';
     position: absolute;
+    display: block;
     top: 0;
     left: 0;
     width: 100%;
@@ -43,6 +44,7 @@
   &:before{
     content: '';
     position: absolute;
+    display: block;
     top: 0;
     right: 0;
     width: 1px;
