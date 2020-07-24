@@ -166,7 +166,7 @@ $color-favorite: #d93f30;
         margin: 0 auto;
         padding: 10px 0;
         .time {
-          color: $color-text;
+          color: #ffffff;
           font-size: $font-size-small;
           flex: 0 0 30px;
           line-height: 30px;
@@ -188,11 +188,9 @@ $color-favorite: #d93f30;
         .icon {
           flex: 1;
           color: $color-windy;
+          font-size: 32px;
           &.disable {
             color: $color-windy-l;
-          }
-          i {
-            font-size: 30px;
           }
         }
         .i-left {
@@ -201,9 +199,7 @@ $color-favorite: #d93f30;
         .i-center {
           padding: 0 20px;
           text-align: center;
-          i {
-            font-size: 40px;
-          }
+          font-size: 42px;
         }
         .i-right {
           text-align: left;

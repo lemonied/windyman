@@ -30,7 +30,7 @@ const ProgressDemo = function():JSX.Element {
         <div>
           线形 Line：
         </div>
-        <Progress percent={percent} />
+        <Progress percent={percent} onChange={(e: number) => setPercent(e * 100)} />
         <div>
           环形 Circle：
         </div>

@@ -36,6 +36,7 @@ const PlayerFc: ForwardRefRenderFunction<PlayerInstance, PlayerProps> = function
   const [ playing, setPlaying ] = useState(false);
   const [ percent, setPercent ] = useState(0);
   const [ fmtTime, setFmtTime ] = useState('');
+  const [ totalTime, setTotalTime ] = useState('');
   const [ currentLyric, setCurrentLyric ] = useState('');
   const [ lyricLines, setLyricLines ] = useState<LyricLine[]>([]);
   const [ currentLine, setCurrentLine ] = useState<number>(0);
@@ -61,6 +62,7 @@ const PlayerFc: ForwardRefRenderFunction<PlayerInstance, PlayerProps> = function
       playingRef.current = false;
       setPlaying(false);
     };
+    setTotalTime(timeFormat(song?.duration));
   }, [song]);
   useEffect(() => {
     if (song) {
@@ -86,7 +88,17 @@ const PlayerFc: ForwardRefRenderFunction<PlayerInstance, PlayerProps> = function
   const middleTouchStart = useCallback(() => {}, []);
   const middleTouchMove = useCallback(() => {}, []);
   const middleTouchEnd = useCallback(() => {}, []);
-  const changeMode = useCallback(() => {}, []);
+
+  const changeMode = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const playModes: PlayModes[] = ['sequence', 'random', 'loop'];
+    setPlayMode(prevState => {
+      const index = (playModes.indexOf(prevState) + 1) % playModes.length;
+      return playModes[index];
+    });
+  }, []);
+
   const onEnter = useCallback(() => {}, []);
   const onAfterEnter = useCallback(() => {}, []);
   const onLeave = useCallback(() => {}, []);
@@ -160,31 +172,32 @@ const PlayerFc: ForwardRefRenderFunction<PlayerInstance, PlayerProps> = function
             <div className="progress-wrapper">
               <span className="time time-l">{fmtTime}</span>
               <div className="progress-bar-wrapper">
-
+                <Progress percent={percent * 100} after={null} />
               </div>
-              <span className="time time-r">{fmtTime}</span>
+              <span className="time time-r">{totalTime}</span>
             </div>
             <div className="operators">
               <div
                 className="icon i-left"
                 onClick={changeMode}
               >
-
+                <Icon type={playMode} />
               </div>
               <div
                 className={`icon i-left`}
               >
-                <i className="icon-prev" />
+                <Icon type={'previous'} />
               </div>
               <div
                 className={`icon i-center`}
+                onClick={togglePlay}
               >
-                <i className={playing ? 'icon-pause' : 'icon-play'} />
+                <Icon type={playing ? 'pause-missing' : 'play-missing'} />
               </div>
               <div
                 className={`icon i-right`}
               >
-                <i className="icon-next" />
+                <Icon type={'next'} />
               </div>
               <div
                 className="icon i-right"
