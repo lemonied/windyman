@@ -3,6 +3,9 @@ import './style.scss';
 import { CSSTransition } from 'react-transition-group';
 import { combineClassNames } from '../../common/utils';
 import { Progress } from '../progress';
+import { Icon } from '../icon';
+import { ScrollY } from '../scroll-y';
+import { LyricLine } from './lyric';
 
 function timeFormat(t = 0) {
   const m = Math.round(t % 60);
@@ -16,7 +19,7 @@ export interface Song {
   singer: string; // singer name
   url: string; // play url
 }
-type PlayMode = 'loop' | 'sequence' | 'random';
+type PlayModes = 'loop' | 'sequence' | 'random';
 interface PlayerInstance {
 
 }
@@ -33,6 +36,11 @@ const PlayerFc: ForwardRefRenderFunction<PlayerInstance, PlayerProps> = function
   const [ playing, setPlaying ] = useState(false);
   const [ percent, setPercent ] = useState(0);
   const [ fmtTime, setFmtTime ] = useState('');
+  const [ currentLyric, setCurrentLyric ] = useState('');
+  const [ lyricLines, setLyricLines ] = useState<LyricLine[]>([]);
+  const [ currentLine, setCurrentLine ] = useState<number>(0);
+  const [ currentShow, setCurrentShow ] = useState<'cd' | 'lyric'>('cd');
+  const [ playMode, setPlayMode ] = useState<PlayModes>('sequence');
 
   useEffect(() => {
     audioRef.current.autoplay = true;
@@ -72,12 +80,120 @@ const PlayerFc: ForwardRefRenderFunction<PlayerInstance, PlayerProps> = function
       });
     }
   }, []);
+  const toggleFullScreen = useCallback(() => {
+    setFullScreen(pre => !pre);
+  }, []);
+  const middleTouchStart = useCallback(() => {}, []);
+  const middleTouchMove = useCallback(() => {}, []);
+  const middleTouchEnd = useCallback(() => {}, []);
+  const changeMode = useCallback(() => {}, []);
+  const onEnter = useCallback(() => {}, []);
+  const onAfterEnter = useCallback(() => {}, []);
+  const onLeave = useCallback(() => {}, []);
+  const onAfterLeave = useCallback(() => {}, []);
 
   if (!song) {
     return null;
   }
   return (
     <div className={'windy-player-wrapper'}>
+      <CSSTransition
+        in={fullScreen}
+        timeout={400}
+        classNames="normal"
+        unmountOnExit
+        key={'full'}
+        onEnter={onEnter}
+        onEntered={onAfterEnter}
+        onExit={onLeave}
+        onExited={onAfterLeave}
+      >
+        <div className="normal-player">
+          <div className="background">
+            <img width="100%" height="100%" src={song.image} alt={'song'} />
+          </div>
+          <div className="top">
+            <div className="back" onClick={toggleFullScreen}>
+              <Icon type={'back'} className={'icon-back'} />
+            </div>
+            <h1 className="title">{song.name}</h1>
+            <h2 className="subtitle">{song.singer}</h2>
+          </div>
+          <div
+            className="middle"
+            onTouchStart={middleTouchStart}
+            onTouchMove={middleTouchMove}
+            onTouchEnd={middleTouchEnd}
+          >
+            <div className="middle-l">
+              <div className="cd-wrapper">
+                <div className={`cd play${playing ? '' : ' pause'}`}>
+                  <img className="image" src={song.image} alt={'song'} />
+                </div>
+              </div>
+              <div
+                className="playing-lyric-wrapper"
+                style={{
+                  margin: `${(document.body.clientHeight - 80 - 170 - document.body.clientWidth * 0.8) / 2}px auto 0 auto`
+                }}
+              >
+                <div className="playing-lyric" >{currentLyric}</div>
+              </div>
+            </div>
+            <ScrollY
+              className="middle-r"
+            >
+              <div className="lyric-wrapper">
+                {
+                  lyricLines.map((item, key) => (
+                    <p className={`text${currentLine === key ? ' current' : ''}`} key={key}>{item.txt}</p>
+                  ))
+                }
+              </div>
+            </ScrollY>
+          </div>
+          <div className="bottom">
+            <div className="dot-wrapper">
+              <span className={combineClassNames('dot', currentShow === 'cd' ? ' active' : null)} />
+              <span className={combineClassNames('dot', currentShow === 'lyric' ? ' active' : null)} />
+            </div>
+            <div className="progress-wrapper">
+              <span className="time time-l">{fmtTime}</span>
+              <div className="progress-bar-wrapper">
+
+              </div>
+              <span className="time time-r">{fmtTime}</span>
+            </div>
+            <div className="operators">
+              <div
+                className="icon i-left"
+                onClick={changeMode}
+              >
+
+              </div>
+              <div
+                className={`icon i-left`}
+              >
+                <i className="icon-prev" />
+              </div>
+              <div
+                className={`icon i-center`}
+              >
+                <i className={playing ? 'icon-pause' : 'icon-play'} />
+              </div>
+              <div
+                className={`icon i-right`}
+              >
+                <i className="icon-next" />
+              </div>
+              <div
+                className="icon i-right"
+              >
+              </div>
+            </div>
+          </div>
+        </div>
+      </CSSTransition>
       <CSSTransition
         key={'mini'}
         in={!fullScreen}
@@ -94,7 +210,7 @@ const PlayerFc: ForwardRefRenderFunction<PlayerInstance, PlayerProps> = function
           </div>
           <div
             className="text"
-            onClick={() => setFullScreen(pre => !pre)}
+            onClick={toggleFullScreen}
           >
             <h2 className="name">{song.name}</h2>
             <p className="desc">{song.singer}</p>
@@ -108,14 +224,14 @@ const PlayerFc: ForwardRefRenderFunction<PlayerInstance, PlayerProps> = function
               percent={percent * 100}
               type={'circle'}
               middle={
-                <i className={`icon-mini ${playing ? 'icon-pause-mini' : 'icon-play-mini'}`} />
+                playing ? <Icon type={'pause'} className={'pause-icon'} /> : <Icon type={'play'} className={'play-icon'} />
               }
             />
           </div>
           <div
-            className="control"
+            className="control right-control"
           >
-            <i className="icon-playlist" />
+            <Icon type={'play-list'} className={'ctrl-icon'} />
           </div>
         </div>
       </CSSTransition>

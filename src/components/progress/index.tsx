@@ -29,13 +29,15 @@ interface NormalProgressProps {
   middle?: ReactNode;
   height?: number;
   className?: string;
+  trailColor?: string;
+  color?: string;
 }
 
 interface CircleProgressProps extends NormalProgressProps {
   type?: 'circle';
 }
 const CircleProgress: FC<CircleProgressProps> = function(props) {
-  const { percent, middle, className } = props;
+  const { percent, middle, className, trailColor, color } = props;
 
   return (
     <div className={combineClassNames('windy-circle-progress', className)}>
@@ -47,6 +49,7 @@ const CircleProgress: FC<CircleProgressProps> = function(props) {
           strokeLinecap="round"
           strokeWidth="6"
           fillOpacity="0"
+          stroke={trailColor}
         />
         <path
           style={{ strokeDasharray: `${94 * percent / 100 * 3.14}px, ${94 * 3.14}px` }}
@@ -56,6 +59,7 @@ const CircleProgress: FC<CircleProgressProps> = function(props) {
           strokeWidth="6"
           opacity="1"
           fillOpacity="0"
+          stroke={color}
         />
       </svg>
       {
@@ -63,7 +67,9 @@ const CircleProgress: FC<CircleProgressProps> = function(props) {
           <div className={'windy-circle-progress-middle'}>
             <DefaultAppend percent={percent} />
           </div> :
-          middle
+          middle !== null ?
+            <div className={'windy-circle-progress-middle'}>{middle}</div> :
+            null
       }
     </div>
   );
@@ -73,12 +79,12 @@ interface LineProgressProps extends NormalProgressProps {
   type?: 'line';
 }
 const LineProgress: FC<LineProgressProps> = function (props) {
-  const { percent = 0, after, height = 5, className } = props;
+  const { percent = 0, after, height = 5, className, trailColor, color } = props;
 
   return (
     <div className={combineClassNames('windy-progress-outer', className)}>
-      <div className={'windy-progress-inner'} style={{height}}>
-        <div className={'windy-progress-bg'} style={{width: `${percent}%`}} />
+      <div className={'windy-progress-inner'} style={{height, backgroundColor: trailColor}}>
+        <div className={'windy-progress-bg'} style={{width: `${percent}%`, backgroundColor: color}} />
       </div>
       {
         typeof after === 'undefined' ?

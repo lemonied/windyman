@@ -13,7 +13,7 @@ const tagRegMap: any = {
 
 function noop() {}
 
-interface Line {
+export interface LyricLine {
   time: number;
   txt: string;
 }
@@ -21,8 +21,8 @@ export class Lyric {
   lrc: string;
   tags: any = {};
   curLine: number;
-  lines: Line[];
-  handler: (line: { lineNum: number } & Line) => void;
+  lines: LyricLine[];
+  handler: (line: { lineNum: number } & LyricLine) => void;
   state: 0 | 1;
   curNum = 0;
   startStamp = 0;

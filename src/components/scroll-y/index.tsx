@@ -20,6 +20,7 @@ import PullDown from './pull-down/index';
 import ScrollBar from '@better-scroll/scroll-bar';
 import './style.scss';
 import { Loading } from '../loading';
+import { combineClassNames } from '../../common/utils';
 
 BScroll
   .use(PullDown)
@@ -58,6 +59,7 @@ export interface ScrollYProps {
   children?: ReactNode;
   data?: any;
   scrollbar?: { fade: boolean; interactive: boolean; } | boolean;
+  className?: string;
 }
 // check if event type exists
 function checkEventAndBind(scroll: BScroll, eventType: string, handler: (e: any) => void) {
@@ -73,7 +75,7 @@ function checkEventAndUnBind(scroll: BScroll, eventType: string, handler: (e: an
 // ScrollY Component
 const ScrollYFc: ForwardRefRenderFunction<ScrollYInstance, ScrollYProps> = function (props, ref) {
 
-  const { style, children, data } = props;
+  const { style, children, data, className } = props;
   const { onScroll, onPullingDown, onPullingUp, scroll, scrollbar } = props;
 
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -231,7 +233,7 @@ const ScrollYFc: ForwardRefRenderFunction<ScrollYInstance, ScrollYProps> = funct
 
   const loadingWrapperTop = pullingDown ? bubbleInit.current.maxTop : loadingTop;
   return (
-    <div className={ 'windy-scroll-y-wrapper' } style={style}>
+    <div className={ combineClassNames('windy-scroll-y-wrapper', className) } style={style}>
       {
         isOpenPullingDown ?
           pullingDownSnapshot ?
