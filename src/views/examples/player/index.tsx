@@ -2,7 +2,6 @@ import React, { FC, useCallback, useState } from 'react';
 import { Header, Layout } from '../../../components/layout';
 import { Button } from '../../../components/button';
 import { get, post } from '../../../helpers/http';
-import { zip } from 'rxjs';
 import { Player, Song } from '../../../components/player';
 
 const unescapeHTML = function(lrc: string){
@@ -25,6 +24,7 @@ const song1 = {
 const PlayerDemo: FC = function() {
 
   const [ song, setSong ] = useState<Song>();
+  const [ lyric, setLyric ] = useState();
 
   const getPlayUrl = useCallback(() => {
     const data = JSON.stringify(
@@ -44,16 +44,9 @@ const PlayerDemo: FC = function() {
         }, 'comm': {'uin': 0, 'format': 'json', 'ct': 23, 'cv': 0}
       }
     );
-    zip(
-      post(`/cgi-bin/musicu.fcg?_=${Date.now()}`, data),
-      get(`/lyric/fcgi-bin/fcg_query_lyric.fcg?uin=0&format=json&inCharset=utf-8&outCharset=utf-8&notice=0&platform=h5&needNewCode=1&nobase64=1&musicid=${song1.songid}&songtype=0&_=${Date.now()}`)
-    ).subscribe(res => {
-      const [ info, lyricRes ] = res;
-      // eslint-disable-next-line no-eval
-      const lyric = eval(`function MusicJsonCallback(r) {return r}${lyricRes}`);
-      if (info.code === 0 && lyric.code === 0) {
-        const lrc = unescapeHTML(lyric.lyric);
-        let url = info.req_0.data;
+    post(`/cgi-bin/musicu.fcg?_=${Date.now()}`, data).subscribe(res => {
+      if (res.code === 0) {
+        let url = res.req_0.data;
         url = `${url.sip[0]}${url.midurlinfo[0].purl}`;
         setSong({
           name: song1.songname,
@@ -62,7 +55,14 @@ const PlayerDemo: FC = function() {
           singer: song1.singer,
           url
         });
-        console.log(url, lrc);
+      }
+    });
+    get(`/lyric/fcgi-bin/fcg_query_lyric.fcg?uin=0&format=json&inCharset=utf-8&outCharset=utf-8&notice=0&platform=h5&needNewCode=1&nobase64=1&musicid=${song1.songid}&songtype=0&_=${Date.now()}`).subscribe(res => {
+      // eslint-disable-next-line no-eval
+      const lyric = eval(`function MusicJsonCallback(r) {return r}${res}`);
+      if (lyric.code === 0) {
+        const lrc = unescapeHTML(lyric.lyric);
+        setLyric(lrc);
       }
     });
   }, []);
@@ -73,7 +73,7 @@ const PlayerDemo: FC = function() {
         <Header title={'Player'} />
       }
       footer={
-        <Player song={song} />
+        <Player song={song} lyric={lyric} />
       }
     >
       <div style={{padding: 10}}>

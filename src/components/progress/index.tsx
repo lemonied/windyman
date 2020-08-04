@@ -9,35 +9,64 @@ import React, {
   ForwardRefRenderFunction,
   useImperativeHandle,
   useMemo,
-  createRef, useCallback, PropsWithChildren
+  createRef,
+  useCallback
 } from 'react';
 import './style.scss';
 import ReactDOM from 'react-dom';
 import { combineClassNames } from '../../common/utils';
 
-const DefaultAppend:FC<{percent: number;}> = function(props) {
+const DefaultAppend: FC<{percent: number;}> = function(props) {
   const { percent = 0 } = props;
   return (
     <Fragment>{percent} %</Fragment>
   );
 };
 
-interface NormalProgressProps extends PropsWithChildren<any>{
+interface ProgressProps {
   percent: number;
-  progress?: ProgressInstance;
-  after?: ReactNode;
-  middle?: ReactNode;
-  height?: number;
   className?: string;
   trailColor?: string;
   color?: string;
+  progress?: ProgressInstance;
 }
-
-interface CircleProgressProps extends NormalProgressProps {
+interface ProgressInstance {
+  setPercent: (percent?: number) => void;
+}
+export const useProgress = (): ProgressInstance => {
+  const instance = useRef<ProgressInstance>({} as ProgressInstance);
+  return instance.current;
+};
+interface CircleProgressProps extends ProgressProps {
   type?: 'circle';
+  middle?: ReactNode;
 }
-const CircleProgress: FC<CircleProgressProps> = function(props) {
-  const { percent, middle, className, trailColor, color } = props;
+const CircleProgressFc: ForwardRefRenderFunction<ProgressInstance, CircleProgressProps> = function(props, ref) {
+  const { percent, middle, className, trailColor, color, progress } = props;
+
+  const [ realPercent, setRealPercent ] = useState<number>(percent);
+
+  const instance = useMemo<ProgressInstance>(() => {
+    return {
+      setPercent: (percent?: number) => {
+        setRealPercent(percent || 0);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof progress === 'object') {
+      Object.assign(progress, instance);
+    }
+  }, [progress, instance]);
+
+  useEffect(() => {
+    setRealPercent(percent);
+  }, [percent]);
+
+  useImperativeHandle(ref, () => {
+    return instance;
+  });
 
   return (
     <div className={combineClassNames('windy-circle-progress', className)}>
@@ -52,7 +81,7 @@ const CircleProgress: FC<CircleProgressProps> = function(props) {
           stroke={trailColor}
         />
         <path
-          style={{ strokeDasharray: `${94 * percent / 100 * 3.14}px, ${94 * 3.14}px` }}
+          style={{ strokeDasharray: `${94 * realPercent / 100 * 3.14}px, ${94 * 3.14}px` }}
           className="circle-path"
           d="M 50,50 m 0,-47a 47,47 0 1 1 0,94a 47,47 0 1 1 0,-94"
           strokeLinecap="round"
@@ -65,7 +94,7 @@ const CircleProgress: FC<CircleProgressProps> = function(props) {
       {
         typeof middle === 'undefined' ?
           <div className={'windy-circle-progress-middle'}>
-            <DefaultAppend percent={percent} />
+            <DefaultAppend percent={realPercent} />
           </div> :
           middle !== null ?
             <div className={'windy-circle-progress-middle'}>{middle}</div> :
@@ -75,15 +104,20 @@ const CircleProgress: FC<CircleProgressProps> = function(props) {
   );
 };
 
-interface LineProgressProps extends NormalProgressProps {
+export const CircleProgress = forwardRef(CircleProgressFc);
+
+interface LineProgressProps extends ProgressProps {
   type?: 'line';
+  after?: ReactNode;
+  height?: number;
+  dot?: boolean;
   onChange?: (percent: number) => void;
 }
-const LineProgress: FC<LineProgressProps> = function (props) {
-  const { percent = 0, after, height = 5, className, trailColor, color, onChange } = props;
+const LineProgressFc: ForwardRefRenderFunction<ProgressInstance, LineProgressProps> = function (props, ref) {
+  const { percent = 0, after, height = 5, className, trailColor, color, onChange, progress, dot = true } = props;
 
-  const [ realPercent, setRealPercent ] = useState(0);
-  const [ slow, setSlow ] = useState(true);
+  const [ realPercent, setRealPercent ] = useState<number>(0);
+  const [ slow, setSlow ] = useState<boolean>(true);
 
   const progressBarRef = useRef<HTMLDivElement>(null);
   const touchRef = useRef({
@@ -92,23 +126,44 @@ const LineProgress: FC<LineProgressProps> = function (props) {
     offset: 0
   });
 
+  const instance = useMemo<ProgressInstance>(() => {
+    return {
+      setPercent(percent?: number) {
+        setRealPercent(percent || 0);
+      }
+    };
+  }, []);
+  useImperativeHandle(ref, () => {
+    return instance;
+  });
   useEffect(() => {
+    if (typeof progress === 'object') {
+      Object.assign(progress, instance);
+    }
+  }, [instance, progress]);
+
+  useEffect(() => {
+    if (touchRef.current.isMove) {
+      return;
+    }
     setRealPercent(percent);
   }, [percent]);
 
   const handleChange = useCallback((percent: number) => {
     if (typeof onChange === 'function') {
-      onChange(Number(percent.toFixed(2)));
+      onChange(Math.floor(percent * 100));
     }
   }, [onChange]);
 
   const touchStart = useCallback((e: React.TouchEvent) => {
+    if (!dot) { return; }
     e.preventDefault();
     e.stopPropagation();
     setSlow(false);
     touchRef.current.status = true;
-  }, []);
+  }, [dot]);
   const touchMove = useCallback((e: React.TouchEvent) => {
+    if (!dot) { return; }
     e.preventDefault();
     e.stopPropagation();
     if (!touchRef.current.status) {
@@ -118,8 +173,9 @@ const LineProgress: FC<LineProgressProps> = function (props) {
     const barWidth = progressBarRef.current?.clientWidth || 0;
     const offset = touchRef.current.offset = Math.min(e.touches[0].pageX - (progressBarRef.current?.offsetLeft || 0), barWidth);
     setRealPercent(offset / barWidth * 100);
-  }, []);
+  }, [dot]);
   const touchEnd = useCallback((e: React.TouchEvent) => {
+    if (!dot) { return; }
     e.preventDefault();
     e.stopPropagation();
     const barWidth = progressBarRef.current?.clientWidth || 0;
@@ -130,14 +186,15 @@ const LineProgress: FC<LineProgressProps> = function (props) {
     touchRef.current.isMove = false;
     handleChange(touchRef.current.offset / barWidth);
     setSlow(true);
-  }, [handleChange]);
+  }, [handleChange, dot]);
   const progressClick = useCallback((e: React.MouseEvent) => {
+    if (!dot) { return; }
     e.preventDefault();
     const barWidth = progressBarRef.current?.clientWidth || 0;
     const offset = touchRef.current.offset = e.pageX - (progressBarRef.current?.offsetLeft || 0);
     setRealPercent(offset / barWidth * 100);
     handleChange(touchRef.current.offset / barWidth);
-  }, [handleChange]);
+  }, [handleChange, dot]);
 
   return (
     <div
@@ -156,10 +213,14 @@ const LineProgress: FC<LineProgressProps> = function (props) {
           className={combineClassNames('windy-progress-bg', slow ? 'slow' : null)}
           style={{width: `${realPercent}%`, backgroundColor: color}}
         >
-          <div className={'progress-btn-wrapper'}>
-            <div className="progress-btn" />
-            <div className="progress-btn-circle" />
-          </div>
+          {
+            dot ?
+              <div className={'progress-btn-wrapper'}>
+                <div className="progress-btn" />
+                <div className="progress-btn-circle" />
+              </div> :
+              null
+          }
         </div>
       </div>
       {
@@ -173,46 +234,7 @@ const LineProgress: FC<LineProgressProps> = function (props) {
     </div>
   );
 };
-
-interface ProgressInstance {
-  setPercent: (percent: number) => void;
-}
-export const useProgress = (): ProgressInstance => {
-  const instance = useRef<ProgressInstance>({} as ProgressInstance);
-  return instance.current;
-};
-type ProgressProps = LineProgressProps | CircleProgressProps;
-const ProgressFc: ForwardRefRenderFunction<ProgressInstance, ProgressProps> = function(props, ref) {
-  const { type = 'line', percent = 0, progress, after, middle, height, className, onChange } = props;
-  const [count, setCount] = useState(percent);
-  useEffect(() => {
-    setCount(percent);
-  }, [percent]);
-  const instance = useMemo<ProgressInstance>(() => {
-    return {
-      setPercent: setCount
-    };
-  }, []);
-  useEffect(() => {
-    if (typeof progress !== 'undefined') {
-      Object.assign(progress, instance);
-    }
-  }, [progress, instance]);
-  useImperativeHandle(ref, () => {
-    return instance;
-  });
-
-  switch (type) {
-    case 'line':
-      return <LineProgress percent={count} after={after} height={height} className={className} onChange={onChange} />;
-    case 'circle':
-      return <CircleProgress percent={count} middle={middle} className={className} />;
-    default:
-      return null;
-  }
-};
-
-export const Progress = forwardRef<ProgressInstance, ProgressProps>(ProgressFc);
+export const LineProgress = forwardRef(LineProgressFc);
 
 interface ProgressServiceOptions {
   defaultPercent?: number;
@@ -233,7 +255,7 @@ export class ProgressService {
     container.className = 'progress-container';
     document.body.appendChild(container);
     ReactDOM.render(
-      <Progress type={'line'} percent={0} ref={this.instance} after={null} height={height} />,
+      <LineProgress percent={0} ref={this.instance} after={null} height={height} dot={false} />,
       container,
       () => setTimeout(() => this.set(defaultPercent))
     );

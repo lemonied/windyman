@@ -131,7 +131,7 @@ $color-favorite: #d93f30;
             color: rgba(255, 255, 255, 0.5);
             font-size: $font-size-medium;
             &.current {
-              color: $color-text;
+              color: #ffffff;
             }
           }
         }
@@ -189,9 +189,13 @@ $color-favorite: #d93f30;
           flex: 1;
           color: $color-windy;
           font-size: 32px;
-          &.disable {
+          display: inline-block;
+          &.disabled {
             color: $color-windy-l;
           }
+        }
+        .windy-icon{
+          vertical-align: middle;
         }
         .i-left {
           text-align: right;

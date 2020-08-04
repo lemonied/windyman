@@ -35,7 +35,7 @@ export interface ScrollYInstance {
   finishPullDown: () => void;
   openPullDown: (options?: any) => void;
   scrollTo: (x: number, y: number, time?: number, easing?: object, extraTransform?: object, isSilent?: boolean) => void;
-  scrollToElement: (el: HTMLElement, time?: number, offsetX?: number | boolean, offsetY?: number | boolean, easing?: object) => void;
+  scrollToElement: (el: Element, time?: number, offsetX?: number | boolean, offsetY?: number | boolean, easing?: object) => void;
 }
 // ScrollY Hook
 export const useScrollY = (): ScrollYInstance => {

@@ -22,6 +22,6 @@ export { YForm, YField } from './y-form';
 
 export { Icon } from './icon';
 
-export { Progress, ProgressService, progressBar, useProgress } from './progress';
+export { CircleProgress, LineProgress, ProgressService, progressBar, useProgress } from './progress';
 
 export { List, Item } from './list';

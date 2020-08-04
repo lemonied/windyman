@@ -11,8 +11,7 @@ const tagRegMap: any = {
   by: 'by'
 };
 
-function noop() {}
-
+type Handler = (line: { lineNum: number } & LyricLine) => void;
 export interface LyricLine {
   time: number;
   txt: string;
@@ -22,13 +21,13 @@ export class Lyric {
   tags: any = {};
   curLine: number;
   lines: LyricLine[];
-  handler: (line: { lineNum: number } & LyricLine) => void;
+  handler: Handler;
   state: 0 | 1;
   curNum = 0;
   startStamp = 0;
   timer: any = null;
   pauseStamp = 0;
-  constructor(lrc: string, handler = noop) {
+  constructor(lrc: string, handler: Handler) {
     this.lrc = lrc;
     this.tags = {};
     this.lines = [];

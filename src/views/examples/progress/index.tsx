@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Header, Layout } from '../../../components/layout';
-import { progressBar, Progress } from '../../../components/progress';
+import { progressBar, LineProgress, CircleProgress } from '../../../components/progress';
 import { Button } from '../../../components/button';
 
 const ProgressDemo = function():JSX.Element {
@@ -30,7 +30,7 @@ const ProgressDemo = function():JSX.Element {
         <div>
           线形 Line：
         </div>
-        <Progress percent={percent} onChange={(e: number) => setPercent(e * 100)} />
+        <LineProgress percent={percent} onChange={(e: number) => setPercent(e)} />
         <div>
           环形 Circle：
         </div>
@@ -41,7 +41,7 @@ const ProgressDemo = function():JSX.Element {
             margin: '0 auto'
           }}
         >
-          <Progress type={'circle'} percent={percent} />
+          <CircleProgress percent={percent} />
         </div>
         <div style={{textAlign: 'center'}}>
           <Button onClick={e => changePercent(false)} ghost type={'primary'}>减少 -5%</Button>
