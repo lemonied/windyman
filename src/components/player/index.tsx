@@ -3,7 +3,8 @@ import React, {
   ForwardRefRenderFunction,
   useCallback,
   useEffect,
-  useImperativeHandle, useMemo,
+  useImperativeHandle,
+  useMemo,
   useRef,
   useState
 } from 'react';
@@ -28,10 +29,10 @@ export interface Song {
   image: string; // image url
   name: string; // song name
   singer: string; // singer name
-  url: string; // play url
+  url?: string; // play url
   like?: boolean; // like or dislike
 }
-type PlayModes = 'loop' | 'sequence' | 'random';
+export type PlayModes = 'loop' | 'sequence' | 'random';
 interface PlayerInstance {
   play(): Promise<void>;
   pause(): void;
@@ -44,7 +45,7 @@ interface PlayerProps {
   list?: Song[];
   onLike?(): Promise<void>;
   onDislike?(): Promise<void>;
-  onChange?(song: Song, mode: PlayModes): Promise<void>;
+  onChange?(song: Song, index: number, mode: PlayModes): Promise<void>;
   onModeChange?(mode: PlayModes): void;
 }
 const PlayerFc: ForwardRefRenderFunction<PlayerInstance, PlayerProps> = function(props, ref) {
@@ -77,62 +78,6 @@ const PlayerFc: ForwardRefRenderFunction<PlayerInstance, PlayerProps> = function
   const [ like, setLike ] = useState<boolean>(!!song?.like);
   const [ isSwitching, setIsSwitching ] = useState(false);
 
-  useEffect(() => {
-    audioRef.current.autoplay = autoplay;
-  }, [autoplay]);
-  useEffect(() => {
-    audioRef.current.ontimeupdate = (e: any) => {
-      if (song) {
-        const time: number = e.target.currentTime;
-        setFmtTime(timeFormat(time));
-        setPercent(time / song.duration);
-        if (lyricRef.current && /5$/.test(String(Math.ceil(time)))) {
-          lyricRef.current.seek(time * 1000);
-        }
-      }
-    };
-    audioRef.current.onplay = () => {
-      playingRef.current = true;
-      setPlaying(true);
-    };
-    audioRef.current.onpause = () => {
-      playingRef.current = false;
-      setPlaying(false);
-      lyricRef.current?.stop();
-    };
-    setTotalTime(timeFormat(song?.duration));
-  }, [song]);
-  useEffect(() => {
-    if (song) {
-      audioRef.current.src = song.url;
-      audioRef.current.play().then(() => {
-        // playing
-      });
-    }
-  }, [song]);
-  useEffect(() => {
-    if (lyricRef.current) {
-      lyricRef.current.stop();
-      lyricRef.current = undefined;
-    }
-    if (lyric) {
-      const lyrics = lyricRef.current = new Lyric(lyric, (line) => {
-        setCurrentLine(line.lineNum);
-        setCurrentLyric(line.txt);
-        const lyricList = lyricListRef.current;
-        if (lyricList) {
-          const lines = lyricList.getElementsByClassName('text');
-          const currentLine = lines[line.lineNum];
-          if (currentLine) {
-            scroll.scrollToElement(currentLine, 1000, false, true);
-          }
-        }
-      });
-      setLyricLines(lyrics.lines);
-      lyrics.play();
-    }
-  }, [lyric, scroll]);
-
   // On Operation
   const togglePlay = useCallback(() => {
     if (playingRef.current) {
@@ -147,8 +92,32 @@ const PlayerFc: ForwardRefRenderFunction<PlayerInstance, PlayerProps> = function
     if (isSwitching) return;
     if (typeof onChange === 'function' && list && song) {
       setIsSwitching(true);
-      const index = list.indexOf(song);
-      onChange(list[(index + 1) % list.length], playMode).then(() => {
+      let index: number;
+      const i = list.indexOf(song);
+      if (playMode === 'random') {
+        index = getRandom(Math.max(i, 0), list.length);
+      } else {
+        index = (i + 1) % list.length;
+      }
+      onChange(list[index], index, playMode).then(() => {
+        setIsSwitching(false);
+      });
+    }
+  }, [isSwitching, onChange, list, song, playMode]);
+  const onPreClick = useCallback(() => {
+    if (isSwitching) return;
+    if (typeof onChange === 'function' && list && song) {
+      setIsSwitching(true);
+      let index: number;
+      const i = list.indexOf(song);
+      if (playMode === 'random') {
+        index = getRandom(Math.max(i, 0), list.length);
+      } else if (i === 0) {
+        index = list.length - 1;
+      } else {
+        index = (list.indexOf(song) - 1) % list.length;
+      }
+      onChange(list[index], index, playMode).then(() => {
         setIsSwitching(false);
       });
     }
@@ -287,6 +256,68 @@ const PlayerFc: ForwardRefRenderFunction<PlayerInstance, PlayerProps> = function
   }, [getMiniTransform]);
   const onAfterLeave = useCallback(() => {}, []);
 
+  useEffect(() => {
+    audioRef.current.autoplay = autoplay;
+  }, [autoplay]);
+  useEffect(() => {
+    audioRef.current.ontimeupdate = (e: any) => {
+      if (song) {
+        const time: number = e.target.currentTime;
+        setFmtTime(timeFormat(time));
+        setPercent(time / song.duration);
+        // correct lyric every 10 seconds.
+        if (lyricRef.current && /5$/.test(String(Math.ceil(time)))) {
+          lyricRef.current.seek(time * 1000);
+        }
+      }
+    };
+    setTotalTime(timeFormat(song?.duration));
+  }, [song]);
+  useEffect(() => {
+    audioRef.current.onplay = () => {
+      playingRef.current = true;
+      setPlaying(true);
+    };
+    audioRef.current.onpause = () => {
+      playingRef.current = false;
+      setPlaying(false);
+      lyricRef.current?.stop();
+    };
+    audioRef.current.onended = () => {
+      onNextClick();
+    };
+  }, [onNextClick]);
+  useEffect(() => {
+    if (song && song.url) {
+      audioRef.current.src = song.url;
+      audioRef.current.play().then(() => {
+        // playing
+      });
+    }
+  }, [song]);
+  useEffect(() => {
+    if (lyricRef.current) {
+      lyricRef.current.stop();
+      lyricRef.current = undefined;
+    }
+    if (lyric) {
+      const lyrics = lyricRef.current = new Lyric(lyric, (line) => {
+        setCurrentLine(line.lineNum);
+        setCurrentLyric(line.txt);
+        const lyricList = lyricListRef.current;
+        if (lyricList) {
+          const lines = lyricList.getElementsByClassName('text');
+          const currentLine = lines[line.lineNum];
+          if (currentLine) {
+            scroll.scrollToElement(currentLine, 1000, false, true);
+          }
+        }
+      });
+      setLyricLines(lyrics.lines);
+      lyrics.play();
+    }
+  }, [lyric, scroll]);
+
   // Instance Ref
   const instance = useMemo<PlayerInstance>(() => {
     return {
@@ -302,7 +333,7 @@ const PlayerFc: ForwardRefRenderFunction<PlayerInstance, PlayerProps> = function
     return instance;
   }, [instance]);
 
-  if (!song) {
+  if (!song || !song.url) {
     return null;
   }
   return (
@@ -322,7 +353,7 @@ const PlayerFc: ForwardRefRenderFunction<PlayerInstance, PlayerProps> = function
       >
         <div className="normal-player">
           <div className="background">
-            <img width="100%" height="100%" src={song.image} alt={'song'} />
+            <img width="100%" height="100%" src={song.image} alt={'bg'} />
           </div>
           <div className="top">
             <div className="back" onClick={toggleFullScreen}>
@@ -340,7 +371,7 @@ const PlayerFc: ForwardRefRenderFunction<PlayerInstance, PlayerProps> = function
             <div className="middle-l" ref={middleLRef}>
               <div className="cd-wrapper" ref={normalImgRef}>
                 <div className={`cd play${playing ? '' : ' pause'}`}>
-                  <img className="image" src={song.image} alt={'song'}  />
+                  <img className="image" src={song.image} alt={'cd'}  />
                 </div>
               </div>
               <div
@@ -386,7 +417,7 @@ const PlayerFc: ForwardRefRenderFunction<PlayerInstance, PlayerProps> = function
               <div
                 className={combineClassNames('icon', 'i-left', isSwitching ? 'disabled' : null)}
               >
-                <Icon type={'previous'} />
+                <Icon type={'previous'} onClick={onPreClick} />
               </div>
               <div className={combineClassNames('icon', 'i-center', isSwitching ? 'disabled' : null)}>
                 <Icon type={playing ? 'pause-missing' : 'play-missing'} onClick={togglePlay} />

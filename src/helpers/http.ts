@@ -3,6 +3,7 @@ import { RequestConfig, Canceler } from 'bxios/dist/types/types';
 import { deepMerge } from '../common/utils';
 import { Observable } from 'rxjs';
 import { queryString } from './query';
+import _jsonp from 'jsonp';
 
 const baseUrl = '/';
 
@@ -58,3 +59,22 @@ export function upload(url: string, form: FormData, params?: { [prop: string]: s
     }
   });
 }
+
+export const jsonp = (url: string, options: any): Observable<any> => {
+  return new Observable(subscribe => {
+    const cancel = _jsonp(url, options, (error, res) => {
+      if (error) {
+        subscribe.error(error);
+        subscribe.complete();
+        return;
+      }
+      subscribe.next(res);
+      subscribe.complete();
+    });
+    return {
+      unsubscribe() {
+        cancel();
+      }
+    };
+  });
+};
