@@ -5,11 +5,11 @@ import { Reducer, ReducersMapObject } from 'redux';
 
 export const makeAllReducers = (reducers: ReducersMapObject): Reducer => (combineReducers({ ...reducers }));
 
-// inject reducer dynamically.
+// Inject reducer dynamically.
 export const injectReducer = (key: string, reducer: Reducer) => {
   if (Object.hasOwnProperty.call(originalReducers, key)) {
     /*
-    * this reducer has been injected.
+    * This reducer has been injected.
     */
     return;
   }

@@ -309,7 +309,7 @@ const PlayerFc: ForwardRefRenderFunction<PlayerInstance, PlayerProps> = function
           const lines = lyricList.getElementsByClassName('text');
           const currentLine = lines[line.lineNum];
           if (currentLine) {
-            scroll.scrollToElement(currentLine, 1000, false, true);
+            scroll.scrollToElement(currentLine as HTMLElement, 1000, false, true);
           }
         }
       });

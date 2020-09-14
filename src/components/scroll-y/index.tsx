@@ -11,6 +11,7 @@ import React, {
   ReactNode
 } from 'react';
 import BScroll from '@better-scroll/core';
+import { ExposedAPI } from '@better-scroll/core/dist/types/scroller/Scroller';
 /*
 * examples for ease
 * import { ease } from '@better-scroll/shared-utils';
@@ -34,8 +35,8 @@ export interface ScrollYInstance {
   openPullUp: (option?: any) => void;
   finishPullDown: () => void;
   openPullDown: (options?: any) => void;
-  scrollTo: (x: number, y: number, time?: number, easing?: object, extraTransform?: object, isSilent?: boolean) => void;
-  scrollToElement: (el: Element, time?: number, offsetX?: number | boolean, offsetY?: number | boolean, easing?: object) => void;
+  scrollTo: ExposedAPI['scrollTo'];
+  scrollToElement: ExposedAPI['scrollToElement'];
 }
 // ScrollY Hook
 export const useScrollY = (): ScrollYInstance => {
@@ -58,7 +59,7 @@ export interface ScrollYProps {
   scroll?: { [prop: string]: any };
   children?: ReactNode;
   data?: any;
-  scrollbar?: { fade: boolean; interactive: boolean; } | boolean;
+  scrollbar?: { fade: boolean; interactive: boolean; };
   className?: string;
 }
 // check if event type exists
@@ -117,8 +118,8 @@ const ScrollYFc: ForwardRefRenderFunction<ScrollYInstance, ScrollYProps> = funct
       scrollY: true,
       click: true,
       probeType,
-      pullUpLoad: onPullingUp ? pullUpLoadConf : false,
-      pullDownRefresh: onPullingDown ? pullDownConf : false,
+      pullUpLoad: onPullingUp ? pullUpLoadConf : undefined,
+      pullDownRefresh: onPullingDown ? pullDownConf : undefined,
       scrollbar: scrollBarConf
     });
     return function () {

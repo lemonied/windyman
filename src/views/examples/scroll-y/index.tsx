@@ -1,18 +1,19 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Map } from 'immutable';
 import { post } from '../../../helpers/http';
 import { ScrollY, useScrollY } from '../../../components/scroll-y';
 import { Subscription } from 'rxjs';
 import { Header, Layout } from '../../../components/layout';
 import { Loading } from '../../../components/loading';
+import { useRecommends } from '../reducer';
+import { useSetRecommends, useUpdateRecommends } from '../actions';
 
-const ScrollYDemo: FC = function(props) {
+const ScrollYDemo: FC = function() {
 
   const [loading, setLoading] = useState(false);
 
-  const recommends: any[] = useSelector((state: Map<string, any>) => state.getIn(['demoState', 'recommends']));
-  const dispatch = useDispatch();
+  const recommends = useRecommends();
+  const setRecommends = useSetRecommends();
+  const updateRecommends = useUpdateRecommends();
 
   const query = useRef({ currentPage: 1, rowsNum: 30 });
 
@@ -36,15 +37,15 @@ const ScrollYDemo: FC = function(props) {
       if (query.current.currentPage === 1) {
         setLoading(false);
         scroll.openPullUp();
-        dispatch({ type: 'SET_RECOMMENDS', value: res.result });
+        setRecommends(res.result);
       } else {
-        dispatch({ type: 'UPDATE_RECOMMENDS', value: res.result });
+        updateRecommends(res.result);
       }
       query.current.currentPage += 1;
       scroll.finishPullUp();
       scroll.finishPullDown();
     });
-  }, [dispatch, scroll]);
+  }, [setRecommends, updateRecommends, scroll]);
 
   const onPullingUp = useCallback(() => {
     if (pageBean.current && pageBean.current.totalPage <= pageBean.current.currentPage) {
