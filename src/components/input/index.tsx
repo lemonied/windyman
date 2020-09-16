@@ -5,8 +5,8 @@ import { DateTimePicker, DateTimePickerProps, TimePicker, TimePickerProps } from
 import { Icon } from '../icon';
 import { combineClassNames } from '../../common/utils';
 
-type ExtendsWith<A = {}, B = {}, C = {}> = A & B & C;
-interface InputSharedProps extends ExtendsWith<any>{
+type MakeUp<A = {}, B = {}, C = {}> = A & B & C;
+interface InputSharedProps extends MakeUp<any>{
   value?: any;
   onChange?: (value: any) => void;
   placeholder?: string;
@@ -15,19 +15,19 @@ interface InputSharedProps extends ExtendsWith<any>{
   className?: string;
   style?: CSSProperties;
 }
-interface InputNormalProps extends ExtendsWith<InputSharedProps> {
+interface InputNormalProps extends MakeUp<InputSharedProps> {
   type?: 'text' | 'password';
 }
-interface InputPickerOption extends ExtendsWith<InputSharedProps, PickerInputProps> {
+interface InputPickerOption extends MakeUp<InputSharedProps, PickerInputProps> {
   type: 'picker';
 }
-interface InputDateTimePickerOption extends ExtendsWith<InputSharedProps, DateTimePickerProps> {
+interface InputDateTimePickerOption extends MakeUp<InputSharedProps, DateTimePickerProps> {
   type: 'dateTime';
 }
-interface InputTimePickerOption extends ExtendsWith<InputSharedProps, TimePickerProps> {
+interface InputTimePickerOption extends MakeUp<InputSharedProps, TimePickerProps> {
   type: 'time';
 }
-interface InputSelectorOption extends ExtendsWith<InputSharedProps, SelectorInputProps> {
+interface InputSelectorOption extends MakeUp<InputSharedProps, SelectorInputProps> {
   type: 'selector';
 }
 

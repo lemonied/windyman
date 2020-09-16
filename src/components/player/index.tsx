@@ -257,6 +257,17 @@ const PlayerFc: ForwardRefRenderFunction<PlayerInstance, PlayerProps> = function
   const onAfterLeave = useCallback(() => {}, []);
 
   useEffect(() => {
+    const audio = audioRef.current;
+    return () => {
+      audio.onpause = null;
+      audio.ontimeupdate = null;
+      audio.onplay = null;
+      audio.onended = null;
+      audio.pause();
+      lyricRef.current?.stop();
+    };
+  }, []);
+  useEffect(() => {
     audioRef.current.autoplay = autoplay;
   }, [autoplay]);
   useEffect(() => {

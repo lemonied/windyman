@@ -1,6 +1,7 @@
 import { store } from './index';
 import { originalReducers } from './reducers';
 import { combineReducers } from 'redux-immutable';
+import { Map } from 'immutable';
 import { Reducer, ReducersMapObject } from 'redux';
 
 export const makeAllReducers = (reducers: ReducersMapObject): Reducer => (combineReducers({ ...reducers }));
@@ -18,3 +19,7 @@ export const injectReducer = (key: string, reducer: Reducer) => {
     makeAllReducers(originalReducers)
   );
 };
+
+export interface StateMap<T> extends Map<string, any> {
+  get<K extends keyof T>(key: K): T[K];
+}

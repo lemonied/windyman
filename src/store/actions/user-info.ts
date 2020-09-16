@@ -1,5 +1,7 @@
 import { Dispatch } from 'redux';
 import { fromJS } from 'immutable';
+import { useDispatch } from 'react-redux';
+import { useCallback } from 'react';
 
 export const pullUserInfo = (dispatch: Dispatch) => {
   setTimeout(() => {
@@ -8,4 +10,11 @@ export const pullUserInfo = (dispatch: Dispatch) => {
       value: fromJS({ status: 1, nick: 'ChenJiYuan' })
     });
   }, 2000);
+};
+
+export const useGetUserInfo = () => {
+  const dispatch = useDispatch();
+  return useCallback(() => {
+    pullUserInfo(dispatch);
+  }, [dispatch]);
 };

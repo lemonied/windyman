@@ -2,7 +2,7 @@ import { Map } from 'immutable';
 import { injectReducer } from '../../store/core';
 import { useSelector } from 'react-redux';
 
-const defaultState: Map<string, any> = Map({
+const defaultState = Map({
   recommends: []
 });
 
@@ -20,7 +20,7 @@ const demoState = (state = defaultState, action: any) => {
 };
 
 export const useRecommends = (): any[] => {
-  return useSelector<Map<string, any>, any[]>(state => state.getIn(['demoState', 'recommends']));
+  return useSelector(state => state.getIn(['demoState', 'recommends']));
 };
 
 injectReducer('demoState', demoState);
