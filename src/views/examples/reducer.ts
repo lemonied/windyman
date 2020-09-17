@@ -1,6 +1,11 @@
-import { Map } from 'immutable';
+import { Map, Record } from 'immutable';
 import { injectReducer } from '../../store/core';
 import { useSelector } from 'react-redux';
+
+interface Demo {
+  recommends: any[];
+}
+type DemoTypes = Record<Demo>;
 
 const defaultState = Map({
   recommends: []
@@ -19,8 +24,11 @@ const demoState = (state = defaultState, action: any) => {
   }
 };
 
-export const useRecommends = (): any[] => {
-  return useSelector(state => state.getIn(['demoState', 'recommends']));
+export const useDemoStates = (): DemoTypes => {
+  return useSelector((state: any) => state.get('demoState'));
+};
+export const useRecommends = (): Demo['recommends'] => {
+  return useSelector((state: any) => state.getIn(['demoState', 'recommends']));
 };
 
 injectReducer('demoState', demoState);

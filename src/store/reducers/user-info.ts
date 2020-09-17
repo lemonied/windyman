@@ -1,13 +1,13 @@
 import { fromJS, Map, Record } from 'immutable';
 import { useSelector } from 'react-redux';
 
-export interface UserInfo {
+interface UserInfo {
   status: 0 | 1;
   nick?: string;
 }
 type StateTypes = Record<UserInfo>;
 
-const defaultState: StateTypes = fromJS({
+const defaultState = fromJS({
   status: 0
 });
 
@@ -28,5 +28,5 @@ export default (state = defaultState, action: Action) => {
 };
 
 export const useUserInfo = (): StateTypes => {
-  return useSelector(state => state.get('userInfo'));
+  return useSelector((state: any) => state.get('userInfo'));
 };
