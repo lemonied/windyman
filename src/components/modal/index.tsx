@@ -1,11 +1,11 @@
-import React, { Component, ReactNode, createRef, ReactElement } from 'react';
+import React, { Component, createRef, ReactElement, ReactNode } from 'react';
 import ReactDOM from 'react-dom';
-import './style.scss';
-import { CSSTransition } from 'react-transition-group';
-import { YField, YForm } from '../y-form';
-import { Input } from '../input';
 import { FormInstance } from 'rc-field-form';
 import { Rule } from 'rc-field-form/es/interface';
+import { CSSTransition } from 'react-transition-group';
+import { Input } from '../input';
+import { YField, YForm } from '../y-form';
+import './style.scss';
 
 interface Footer {
   text: string;

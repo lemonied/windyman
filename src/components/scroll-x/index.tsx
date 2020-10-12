@@ -9,10 +9,10 @@ import React, {
   useRef,
   useState
 } from 'react';
-import './style.scss';
-import { combineClassNames } from '../../common/utils';
 import BScroll from '@better-scroll/core';
 import { ScrollYInstance } from '../scroll-y';
+import { combineClassNames } from '../../common/utils';
+import './style.scss';
 
 export interface ScrollXInstance {
   refresh: ScrollYInstance['refresh'];

@@ -1,21 +1,20 @@
 import React, {
   Component,
-  useEffect,
-  useRef,
   createRef,
-  RefObject,
-  ReactNode,
-  ForwardRefRenderFunction,
   forwardRef,
+  ForwardRefRenderFunction,
+  ReactNode,
+  RefObject,
+  useEffect,
+  useImperativeHandle,
   useMemo,
-  useImperativeHandle
+  useRef
 } from 'react';
 import ReactDOM from 'react-dom';
-import './style.scss';
 import BScroll from '@better-scroll/core';
 import Wheel from '@better-scroll/wheel';
-import { combineClassNames } from '../../common/utils';
 import { CSSTransition } from 'react-transition-group';
+import { combineClassNames } from '../../common/utils';
 import {
   DataItem,
   MultiDataChildren,
@@ -25,6 +24,7 @@ import {
   SelectorInterface,
   SelectorOpenOptions
 } from './core';
+import './style.scss';
 
 BScroll.use(Wheel);
 

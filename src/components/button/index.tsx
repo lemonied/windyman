@@ -1,7 +1,7 @@
 import React, { FC, ReactNode, useCallback, useMemo } from 'react';
-import './style.scss';
-import { combineClassNames } from '../../common/utils';
 import { Icon } from '../icon';
+import { combineClassNames } from '../../common/utils';
+import './style.scss';
 
 interface ButtonProps {
   type?: 'primary' | 'warn' | 'danger' | 'default';

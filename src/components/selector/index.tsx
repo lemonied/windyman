@@ -13,7 +13,6 @@ import React, {
   useState
 } from 'react';
 import ReactDOM from 'react-dom';
-import './style.scss';
 import { CSSTransition } from 'react-transition-group';
 import {
   DataItem,
@@ -21,11 +20,13 @@ import {
   MultiDataManager,
   MultiDataSet,
   PickerValues,
-  SelectorInterface, SelectorOpenOptions
+  SelectorInterface,
+  SelectorOpenOptions
 } from '../picker/core';
-import { combineClassNames } from '../../common/utils';
-import { ScrollY, useScrollY } from '../scroll-y';
 import { Icon } from '../icon';
+import { ScrollY, useScrollY } from '../scroll-y';
+import { combineClassNames } from '../../common/utils';
+import './style.scss';
 
 interface SelectorColumnProps {
   onClick: (item: DataItem, key: number, index: number) => void;

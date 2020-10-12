@@ -1,6 +1,6 @@
 import React, { CSSProperties, FC, useMemo } from 'react';
-import './style.scss';
 import { combineClassNames } from '../../common/utils';
+import './style.scss';
 
 interface IconProps {
   type?: string;

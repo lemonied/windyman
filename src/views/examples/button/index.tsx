@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { Button } from '../../../components/button';
 import { Header, Layout } from '../../../components/layout';
-import { List, Item } from '../../../components/list';
+import { Item, List } from '../../../components/list';
 import './style.scss';
 import { Icon } from '../../../components/icon';
 

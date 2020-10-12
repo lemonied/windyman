@@ -1,19 +1,20 @@
 import React, {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
   Children,
-  useMemo,
-  ReactElement,
+  CSSProperties,
   forwardRef,
   ForwardRefRenderFunction,
-  useImperativeHandle, CSSProperties
+  ReactElement,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState
 } from 'react';
-import './style.scss';
 import BScroll from '@better-scroll/core';
 import Slide from '@better-scroll/slide';
 import { combineClassNames, debounce } from '../../common/utils';
+import './style.scss';
 
 BScroll.use(Slide);
 

@@ -10,6 +10,7 @@ type DemoTypes = Record<Demo>;
 const defaultState = Map({
   recommends: []
 });
+const stateName = 'demoState';
 
 const demoState = (state = defaultState, action: any) => {
   switch (action.type) {
@@ -25,10 +26,10 @@ const demoState = (state = defaultState, action: any) => {
 };
 
 export const useDemoStates = (): DemoTypes => {
-  return useSelector((state: any) => state.get('demoState'));
+  return useSelector((state: any) => state.get(stateName));
 };
 export const useRecommends = (): Demo['recommends'] => {
-  return useSelector((state: any) => state.getIn(['demoState', 'recommends']));
+  return useSelector((state: any) => state.getIn([stateName, 'recommends']));
 };
 
-injectReducer('demoState', demoState);
+injectReducer(stateName, demoState);

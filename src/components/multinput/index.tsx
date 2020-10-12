@@ -9,14 +9,14 @@ import React, {
   useRef,
   useState
 } from 'react';
-import { PickerSharedProps } from '../input/picker-input';
-import './style.scss';
-import { PickerService } from '../picker';
-import { SelectorService } from '../selector';
-import { DataItem, MultiDataChildren, MultiDataManager, MultiDataSet } from '../picker/core';
-import { deepMerge } from '../../common/utils';
 import { Icon } from '../icon';
+import { PickerSharedProps } from '../input/picker-input';
+import { PickerService } from '../picker';
+import { DataItem, MultiDataChildren, MultiDataManager, MultiDataSet } from '../picker/core';
+import { SelectorService } from '../selector';
 import { modal } from '../modal';
+import { deepMerge } from '../../common/utils';
+import './style.scss';
 
 interface MultinputInstance {
   open?: (e?: React.MouseEvent) => void;

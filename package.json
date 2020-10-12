@@ -2,12 +2,12 @@
   "name": "windyman",
   "version": "0.1.8",
   "scripts": {
-    "start": "BROWSER=none EXTEND_ESLINT=true react-scripts start",
-    "build": "tsc --project ./src && node ./build-cmt.js && NODE_ENV=production node config/build.js",
-    "build-all": "CI=true EXTEND_ESLINT=true PUBLIC_URL=/ GENERATE_SOURCEMAP=false react-scripts build",
-    "windows-start": "set BROWSER=none&& set EXTEND_ESLINT=true&& react-scripts start",
-    "windows-build": "tsc --project ./src && node ./build-cmt.js && set NODE_ENV=production&& node config/build.js",
-    "windows-build-all": "set CI=true&& set EXTEND_ESLINT=true&& set PUBLIC_URL=/&& set GENERATE_SOURCEMAP=false&& react-scripts build",
+    "start": "NODE_ENV=development node build.js",
+    "build": "NODE_ENV=production node build.js",
+    "compile": "tsc --project ./src && node compile.js && NODE_ENV=production node config/build.js",
+    "start.windows": "set NODE_ENV=development&& node build.js",
+    "build.windows": "set NODE_ENV=production&& node build.js",
+    "compile.windows": "tsc --project ./src && node compile.js && set NODE_ENV=production&& node config/build.js",
     "test": "react-scripts test"
   },
   "repository": "https://github.com/timoodada/windyman.git",

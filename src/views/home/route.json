@@ -1,0 +1,6 @@
+{
+  "name": "首页",
+  "path": "/",
+  "order": 0,
+  "exact": true
+}

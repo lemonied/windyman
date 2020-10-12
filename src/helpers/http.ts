@@ -1,9 +1,9 @@
-import Bxios, { CancelToken } from 'bxios';
-import { RequestConfig, Canceler } from 'bxios/dist/types/types';
+import Bxios, { CancelToken } from 'bxios/dist/lib';
 import { deepMerge } from '../common/utils';
 import { Observable } from 'rxjs';
 import { queryString } from './query';
 import _jsonp from 'jsonp';
+import { Canceler, RequestConfig } from 'bxios/dist/lib/types';
 
 const baseUrl = '/';
 

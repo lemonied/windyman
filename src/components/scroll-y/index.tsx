@@ -1,14 +1,14 @@
 import React, {
-  useEffect,
-  useState,
   CSSProperties,
-  useCallback,
-  useRef,
-  useMemo,
   forwardRef,
   ForwardRefRenderFunction,
+  ReactNode,
+  useCallback,
+  useEffect,
   useImperativeHandle,
-  ReactNode
+  useMemo,
+  useRef,
+  useState
 } from 'react';
 import BScroll from '@better-scroll/core';
 import { ExposedAPI } from '@better-scroll/core/dist/types/scroller/Scroller';
@@ -17,11 +17,11 @@ import { ExposedAPI } from '@better-scroll/core/dist/types/scroller/Scroller';
 * import { ease } from '@better-scroll/shared-utils';
 */
 import PullUp from '@better-scroll/pull-up';
-import PullDown from './pull-down/index';
 import ScrollBar from '@better-scroll/scroll-bar';
-import './style.scss';
+import PullDown from './pull-down/index';
 import { Loading } from '../loading';
 import { combineClassNames } from '../../common/utils';
+import './style.scss';
 
 BScroll
   .use(PullDown)

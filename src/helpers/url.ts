@@ -23,7 +23,7 @@ export function urlParser(href: string): Url {
 
 function getOrigin(url: string): string {
   if (!isWholeUrl(url)) { return ''; }
-  return url.replace(/([^\/])\/[^\/].*/, '$1');
+  return url.replace(/([^/])\/[^/].*/, '$1');
 }
 
 export function buildUrl(url: string, params?: any, paramsSerializer?: (params: any) => string): string {
@@ -62,7 +62,7 @@ export function resolveUrl(from: string, to: string): string {
   if (isAbsoluteUrl(to)) {
     return baseUrl.origin + to;
   } else {
-    return baseUrl.path.replace(/(\/)[^\/.]*$/, '$1') + to;
+    return baseUrl.path.replace(/(\/)[^/.]*$/, '$1') + to;
   }
 }
 

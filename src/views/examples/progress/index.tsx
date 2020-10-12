@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Header, Layout } from '../../../components/layout';
-import { progressBar, LineProgress, CircleProgress } from '../../../components/progress';
+import { CircleProgress, LineProgress, progressBar } from '../../../components/progress';
 import { Button } from '../../../components/button';
 
 const ProgressDemo = function():JSX.Element {

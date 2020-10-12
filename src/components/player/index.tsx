@@ -8,13 +8,13 @@ import React, {
   useRef,
   useState
 } from 'react';
-import './style.scss';
 import { CSSTransition } from 'react-transition-group';
-import { combineClassNames, prefixStyle } from '../../common/utils';
-import { LineProgress, CircleProgress } from '../progress';
 import { Icon } from '../icon';
+import { CircleProgress, LineProgress } from '../progress';
 import { ScrollY, useScrollY } from '../scroll-y';
-import { LyricLine, Lyric } from './lyric';
+import { Lyric, LyricLine } from './lyric';
+import { combineClassNames, prefixStyle } from '../../common/utils';
+import './style.scss';
 
 const transform = prefixStyle('transform');
 const transitionDuration = prefixStyle('transitionDuration');

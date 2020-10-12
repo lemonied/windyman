@@ -1,9 +1,9 @@
 import React, { cloneElement, CSSProperties, FC, useCallback, useEffect, useMemo, useState } from 'react';
-import './style.scss';
-import { PickerInput, PickerInputInstance, PickerInputProps, SelectorInput, SelectorInputProps } from './picker-input';
 import { DateTimePicker, DateTimePickerProps, TimePicker, TimePickerProps } from './date-time-input';
 import { Icon } from '../icon';
+import { PickerInput, PickerInputInstance, PickerInputProps, SelectorInput, SelectorInputProps } from './picker-input';
 import { combineClassNames } from '../../common/utils';
+import './style.scss';
 
 type MakeUp<A = {}, B = {}, C = {}> = A & B & C;
 interface InputSharedProps extends MakeUp<any>{

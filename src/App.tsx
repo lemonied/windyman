@@ -1,11 +1,11 @@
 import React from 'react';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { AsyncLoad } from './components/async-load';
 import { routes } from './routes';
 
 function App() {
   return (
-    <BrowserRouter basename={'/windy'}>
+    <BrowserRouter basename={process.env.PUBLIC_URL}>
       <Switch>
         {
           routes.map(item => (

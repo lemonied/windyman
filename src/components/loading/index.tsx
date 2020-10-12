@@ -1,7 +1,7 @@
 import React, { CSSProperties, FC, ReactNode } from 'react';
-import './style.scss';
 import { Icon } from '../icon';
 import { combineClassNames } from '../../common/utils';
+import './style.scss';
 
 interface LoadingProps {
   title?: ReactNode;

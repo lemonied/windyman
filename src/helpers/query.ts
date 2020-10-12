@@ -1,4 +1,5 @@
-import { isDate, isPlainObject, isNull } from '../common/utils';
+import { isDate, isNull, isPlainObject } from '../common/utils';
+
 function encode(val: string): string {
   return encodeURIComponent(val)
     .replace(/%40/g, '@')

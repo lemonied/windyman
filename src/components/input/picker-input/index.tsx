@@ -1,8 +1,8 @@
 /*
 * Picker Input
 */
-import { PickerService } from '../../picker';
 import React, { CSSProperties, FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { PickerService } from '../../picker';
 import { MultiDataChildren, MultiDataSet, PickerValues } from '../../picker/core';
 import { SelectorService } from '../../selector';
 

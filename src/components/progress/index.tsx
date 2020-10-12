@@ -1,20 +1,20 @@
 import React, {
+  createRef,
   FC,
-  ReactNode,
-  Fragment,
-  useState,
-  useEffect,
-  useRef,
   forwardRef,
   ForwardRefRenderFunction,
+  Fragment,
+  ReactNode,
+  useCallback,
+  useEffect,
   useImperativeHandle,
   useMemo,
-  createRef,
-  useCallback
+  useRef,
+  useState
 } from 'react';
-import './style.scss';
 import ReactDOM from 'react-dom';
 import { combineClassNames } from '../../common/utils';
+import './style.scss';
 
 const DefaultAppend: FC<{percent: number;}> = function(props) {
   const { percent = 0 } = props;

@@ -1,8 +1,8 @@
 import React, { CSSProperties, FC, ReactNode } from 'react';
-import { combineClassNames } from '../../common/utils';
+import { Link, LinkProps } from 'react-router-dom';
 import { Icon } from '../icon';
+import { combineClassNames } from '../../common/utils';
 import './style.scss';
-import { LinkProps, Link } from 'react-router-dom';
 
 interface ListProps {
   className?: string;
