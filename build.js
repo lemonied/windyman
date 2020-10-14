@@ -5,12 +5,14 @@ const fs = require('fs');
 const isProduction = process.env.NODE_ENV === 'production';
 
 if (isProduction) {
+  // production
   Object.assign(process.env, {
     'EXTEND_ESLINT': true,
     'PUBLIC_URL': '/',
     'GENERATE_SOURCEMAP': false
   });
 } else {
+  // development
   Object.assign(process.env, {
     'BROWSER': 'none',
     'EXTEND_ESLINT': 'true',
@@ -20,6 +22,7 @@ if (isProduction) {
 
 const files = glob.sync(resolve(__dirname, './src/views/*'));
 
+const features = {};
 const routes = files.map(file => {
   if (!fs.statSync(file).isDirectory()) {
     return null;
@@ -39,10 +42,12 @@ const routes = files.map(file => {
     console.error(err);
     return null;
   }
-}).filter(v => !!v);
+}).filter(v => v && v.enable)
+  .sort((a, b) => a.order - b.order);
 
 Object.assign(process.env, {
-  'REACT_APP_ROUTES': JSON.stringify(routes)
+  'REACT_APP_ROUTES': JSON.stringify(routes),
+  'REACT_APP_FEATURES': JSON.stringify(features)
 });
 
 const progress = child_progress.exec(isProduction ? 'react-scripts build' : 'react-scripts start');
